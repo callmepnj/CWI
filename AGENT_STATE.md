@@ -63,3 +63,14 @@ Next steps:
 - Remote set to `https://github.com/callmepnj/CWI.git`.
 - Initial project commit pushed to `origin/main`: `45af0bc Initial CWI website`.
 - Confirmed `.env.local`, `.next`, `node_modules`, and `tsconfig.tsbuildinfo` were ignored before commit.
+
+2026-05-20 SEO upgrade:
+- Updated canonical site URL to `https://cwi-ten.vercel.app`.
+- Added centralized SEO helper at `lib/seo.ts`.
+- Added page-level canonical, robots index/follow, OpenGraph, Twitter/X metadata, and keywords across primary pages and Watch Desk posts.
+- Added `app/sitemap.ts`, `app/robots.ts`, `app/manifest.ts`, dynamic `app/opengraph-image.tsx`, `app/icon.tsx`, `app/apple-icon.tsx`, `public/favicon.svg`, and `public/favicon.ico`.
+- Added Organization and WebSite JSON-LD in `app/layout.tsx`.
+- Added Reddit social profile and expanded footer/social links.
+- Improved homepage crawlable SEO copy and heading labels while preserving UI structure.
+- Added `README.md` with Search Console and sitemap submission checklist.
+- Verified locally: `npm run lint`, `npm run build`, standalone `npm run typecheck`, `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, `/opengraph-image`, `/favicon.ico`, and homepage 200.

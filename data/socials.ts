@@ -1,4 +1,4 @@
-import { Mail, Twitter, Youtube, Instagram, Send } from "lucide-react";
+import { Instagram, Mail, MessageCircle, Send, Twitter, Youtube } from "lucide-react";
 import { site } from "@/lib/site";
 
 export const socials = [
@@ -25,6 +25,12 @@ export const socials = [
     href: site.telegram,
     handle: "t.me/cockroachwatchindia",
     icon: Send
+  },
+  {
+    label: "Reddit",
+    href: site.reddit,
+    handle: "r/CockroachwatchIndia",
+    icon: MessageCircle
   },
   {
     label: "Email",

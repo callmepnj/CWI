@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import { PollCard } from "@/components/PollCard";
 import { Section } from "@/components/Section";
 import { Card, CardLabel } from "@/components/ui/card";
+import { createMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Youth Voice",
-  description: "Questions, public reaction cards, student voice, first-time voter voice, unemployed youth voice, creator voice, and quiet watcher submissions."
-};
+export const metadata = createMetadata({
+  title: "Youth Voice — Cockroach Watch India",
+  description:
+    "Read CWI youth voice questions, public reaction cards, student voice, first-time voter voice, unemployed youth voice, creator voice, and quiet watcher submissions.",
+  path: "/youth-voice"
+});
 
 const questions = [
   "What issue should India's youth discuss first?",
@@ -28,7 +30,7 @@ const sections = [
 
 export default function YouthVoicePage() {
   return (
-    <Section eyebrow="Youth Voice" title="Youth Voice" subtitle="Not silent. Not invisible. Not disposable.">
+    <Section eyebrow="Youth Voice" title="Youth Voice" titleAs="h1" subtitle="Not silent. Not invisible. Not disposable.">
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <PollCard />
         <Card>

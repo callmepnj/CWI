@@ -4,6 +4,7 @@ import { Section } from "@/components/Section";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { Card, CardLabel } from "@/components/ui/card";
 import { posts } from "@/data/posts";
+import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 type Props = {
@@ -19,13 +20,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = posts.find((item) => item.slug === slug);
 
   if (!post) {
-    return { title: "Watch Desk Post" };
+    return createMetadata({
+      title: "Watch Desk Post — Cockroach Watch India",
+      description: site.description,
+      path: "/watch-desk"
+    });
   }
 
-  return {
+  return createMetadata({
     title: post.title,
-    description: post.summary
-  };
+    description: post.summary,
+    path: `/watch-desk/${post.slug}`,
+    type: "article",
+    publishedTime: post.date,
+    keywords: post.tags
+  });
 }
 
 export default async function WatchPostPage({ params }: Props) {
@@ -37,7 +46,7 @@ export default async function WatchPostPage({ params }: Props) {
   }
 
   return (
-    <Section eyebrow={post.category} title={post.title} subtitle={post.summary}>
+    <Section eyebrow={post.category} title={post.title} titleAs="h1" subtitle={post.summary}>
       <Card>
         <div className="flex flex-wrap items-center gap-3">
           <CardLabel className="mb-0">{post.date}</CardLabel>

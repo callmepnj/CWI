@@ -3,15 +3,23 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 
 const footerLinks = [
+  { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Charter", href: "/charter" },
-  { label: "Credit Policy", href: "/credit-policy" },
-  { label: "Contact", href: "/contact" },
+  { label: "Watch Desk", href: "/watch-desk" },
+  { label: "Issues", href: "/issues" },
+  { label: "Join", href: "/join" },
   { label: "Submit Report", href: "/submit" },
+  { label: "Contact", href: "/contact" },
+  { label: "Five-Point Agenda", href: "/five-point-agenda" },
+  { label: "Youth Voice", href: "/youth-voice" },
+  { label: "Media Bank", href: "/media-bank" },
+  { label: "Credit Policy", href: "/credit-policy" },
   { label: "X", href: site.x },
   { label: "Instagram", href: site.instagram },
   { label: "YouTube", href: site.youtube },
-  { label: "Telegram", href: site.telegram }
+  { label: "Reddit", href: site.reddit },
+  { label: "Email", href: `mailto:${site.email}` }
 ];
 
 export function Footer() {
@@ -23,7 +31,7 @@ export function Footer() {
             <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white ring-1 ring-white/15">
               <Image
                 src="/brand/logo.png"
-                alt="Cockroach Watch India logo"
+                alt="Cockroach Watch India CWI logo"
                 width={56}
                 height={56}
                 className="h-full w-full object-cover"

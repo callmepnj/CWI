@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import type React from "react";
-import { Archivo, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Archivo, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
-import { Navbar } from "@/components/Navbar";
-import { MobileNav } from "@/components/MobileNav";
 import { Footer } from "@/components/Footer";
+import { MobileNav } from "@/components/MobileNav";
+import { Navbar } from "@/components/Navbar";
+import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 const display = Archivo({
@@ -27,38 +28,48 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  ...createMetadata({
+    title: "Cockroach Watch India — CWI Civic Watch Platform",
+    description: site.description,
+    path: "/"
+  }),
   metadataBase: new URL(site.url),
-  title: {
-    default: "Cockroach Watch India — Civic Watch, Youth Voice & Movement Archive",
-    template: "%s | Cockroach Watch India"
-  },
-  description: site.description,
-  keywords: site.keywords,
-  openGraph: {
-    title: "Cockroach Watch India — Civic Watch, Youth Voice & Movement Archive",
-    description: site.description,
-    url: site.url,
-    siteName: site.name,
-    images: [
-      {
-        url: "/brand/banner.png",
-        width: 1200,
-        height: 630,
-        alt: "Cockroach Watch India civic watch banner"
-      }
-    ],
-    locale: "en_IN",
-    type: "website"
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Cockroach Watch India",
-    description: site.description,
-    images: ["/brand/banner.png"]
-  },
+  applicationName: site.name,
+  manifest: "/manifest.webmanifest",
+  category: "civic media",
   icons: {
-    icon: "/brand/logo.png",
-    apple: "/brand/logo.png"
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon", type: "image/png", sizes: "512x512" }
+    ],
+    apple: [{ url: "/apple-icon", type: "image/png", sizes: "512x512" }]
+  }
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  alternateName: site.shortName,
+  url: site.url,
+  email: site.email,
+  description: "Founder-led civic watch, satire, and commentary platform.",
+  logo: `${site.url}/brand/logo.png`,
+  sameAs: [site.x, site.instagram, site.youtube, site.reddit]
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: site.name,
+  alternateName: site.shortName,
+  url: site.url,
+  description: site.description,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${site.url}/watch-desk?search={search_term_string}`,
+    "query-input": "required name=search_term_string"
   }
 };
 
@@ -66,6 +77,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en-IN" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         <DisclaimerBanner />
         <Navbar />
         <main>{children}</main>

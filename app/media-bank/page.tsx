@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import { ArchiveCard } from "@/components/ArchiveCard";
 import { CreditPolicyBox } from "@/components/CreditPolicyBox";
 import { Section } from "@/components/Section";
+import { createMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Media Bank",
-  description: "The CWI visual archive for posters, reels, shorts, memes, explainable graphics, public reaction clips, creator submissions, and official assets."
-};
+export const metadata = createMetadata({
+  title: "Media Bank — Cockroach Watch India",
+  description:
+    "Explore the CWI visual archive for posters, reels, shorts, explainable graphics, public reaction clips, creator submissions, and official assets.",
+  path: "/media-bank"
+});
 
 const assets = [
   ["CWI Official Posters", "Posters", "Cockroach Watch India", "CWI", "Official asset"],
@@ -21,7 +23,7 @@ const assets = [
 
 export default function MediaBankPage() {
   return (
-    <Section eyebrow="Archive" title="Media Bank" subtitle="The visual archive of the movement. This is a serious archive, not a meme dump.">
+    <Section eyebrow="Archive" title="Media Bank" titleAs="h1" subtitle="The visual archive of the movement. This is a serious archive, not a meme dump.">
       <div className="mb-8">
         <CreditPolicyBox />
       </div>

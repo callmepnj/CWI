@@ -34,13 +34,13 @@ export function HeroSection() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/submit">Submit Report <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/submit">Submit a civic report to CWI <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="green">
-              <Link href="/watch-desk">Read Watch Desk</Link>
+              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/join">Join the Watch</Link>
+              <Link href="/join">Join the CWI Watch</Link>
             </Button>
           </div>
           <div className="mt-4 flex flex-wrap gap-3">
@@ -64,7 +64,7 @@ export function HeroSection() {
         </div>
         <div className="relative">
           <div className="absolute -right-2 top-6 z-10 hidden rounded-2xl bg-saffron px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-ink shadow-soft sm:block">
-            Document / Verify / Amplify
+            Document. Verify. Amplify.
           </div>
           <div className="rounded-[2rem] border border-line bg-white p-4 shadow-soft">
             <div className="rounded-[1.5rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white">
@@ -96,7 +96,7 @@ export function HeroSection() {
                   src="/brand/banner.png"
                   width={900}
                   height={560}
-                  alt="Cockroach Watch India visual banner"
+                  alt="Cockroach Watch India civic watch platform banner"
                   className="aspect-[16/10] h-full w-full object-cover opacity-80 saturate-150"
                   priority
                 />

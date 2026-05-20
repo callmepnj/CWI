@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { Section } from "@/components/Section";
@@ -6,11 +5,14 @@ import { SocialLinks } from "@/components/SocialLinks";
 import { Card, CardLabel } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { site } from "@/lib/site";
+import { createMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact CWI",
-  description: "Contact Cockroach Watch India for media inquiry, creator credit, takedown request, submit issue, collaboration, correction, or watcher role."
-};
+export const metadata = createMetadata({
+  title: "Contact Cockroach Watch India — CWI",
+  description:
+    "Contact Cockroach Watch India for creator credit, takedown requests, corrections, collaborations, media inquiries, and civic reports.",
+  path: "/contact"
+});
 
 const categories = [
   "Media inquiry",
@@ -25,7 +27,7 @@ const categories = [
 
 export default function ContactPage() {
   return (
-    <Section eyebrow="Contact" title="Contact CWI" subtitle="For public issues, correction requests, creator credit, takedown review, collaboration, and Watcher roles.">
+    <Section eyebrow="Contact" title="Contact CWI" titleAs="h1" subtitle="For public issues, correction requests, creator credit, takedown review, collaboration, and Watcher roles.">
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <Card>
           <CardLabel>Support Email</CardLabel>

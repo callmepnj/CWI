@@ -39,7 +39,7 @@ export function Navbar() {
           <span className="grid h-12 w-12 place-items-center overflow-hidden rounded-2xl bg-white shadow-[0_12px_28px_rgba(11,92,255,0.18)] ring-1 ring-line">
             <Image
               src="/brand/logo.png"
-              alt="Cockroach Watch India logo"
+              alt="Cockroach Watch India CWI logo"
               width={48}
               height={48}
               className="h-full w-full object-cover"

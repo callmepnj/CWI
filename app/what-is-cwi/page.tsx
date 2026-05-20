@@ -1,13 +1,15 @@
-import type { Metadata } from "next";
 import { Eye, FileSearch, Megaphone, ShieldAlert } from "lucide-react";
 import { Section } from "@/components/Section";
 import { Card, CardLabel } from "@/components/ui/card";
 import { site } from "@/lib/site";
+import { createMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "What is Cockroach Watch India?",
-  description: "A clear explanation of CWI as an independent youth-first civic watch, satire, commentary, and movement documentation platform."
-};
+export const metadata = createMetadata({
+  title: "What is Cockroach Watch India? — CWI Explained",
+  description:
+    "Understand Cockroach Watch India as an independent youth-first civic watch, civic satire, commentary, and movement documentation platform.",
+  path: "/what-is-cwi"
+});
 
 const whatWeAre = [
   "Civic watch platform",
@@ -29,7 +31,7 @@ const whatWeAreNot = [
 
 export default function WhatIsCwiPage() {
   return (
-    <Section eyebrow="CWI Explained" title="What is Cockroach Watch India?" subtitle={site.shortDisclaimer}>
+    <Section eyebrow="CWI Explained" title="What is Cockroach Watch India?" titleAs="h1" subtitle={site.shortDisclaimer}>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardLabel>A. The Origin of the Watch</CardLabel>
