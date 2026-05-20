@@ -1,0 +1,57 @@
+import Image from "next/image";
+import Link from "next/link";
+import { site } from "@/lib/site";
+
+const footerLinks = [
+  { label: "About", href: "/about" },
+  { label: "Charter", href: "/charter" },
+  { label: "Credit Policy", href: "/credit-policy" },
+  { label: "Contact", href: "/contact" },
+  { label: "Submit Report", href: "/submit" },
+  { label: "X", href: site.x },
+  { label: "Instagram", href: site.instagram },
+  { label: "YouTube", href: site.youtube },
+  { label: "Telegram", href: site.telegram }
+];
+
+export function Footer() {
+  return (
+    <footer className="bg-ink px-4 py-12 text-white">
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <div className="flex items-center gap-4">
+            <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white ring-1 ring-white/15">
+              <Image
+                src="/brand/logo.png"
+                alt="Cockroach Watch India logo"
+                width={56}
+                height={56}
+                className="h-full w-full object-cover"
+              />
+            </span>
+            <p className="font-display text-4xl font-black uppercase leading-none tracking-[-0.04em]">
+              Cockroach Watch India
+            </p>
+          </div>
+          <p className="mt-4 max-w-xl text-white/72">
+            Founded to document, verify, and amplify the youth voice.
+          </p>
+          <p className="mt-6 max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-4 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-white/78">
+            {site.disclaimer}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {footerLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/78 transition hover:border-saffron/60 hover:bg-white/10 hover:text-saffron"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -1,0 +1,61 @@
+# Agent State
+
+Last updated: 2026-05-20
+
+Current task: Build the complete Cockroach Watch India production-ready Next.js website in `c:\Users\praka\Downloads\CWI`.
+
+Workspace notes:
+- The folder initially contained only `1st.png`, `agenda.png`, `banner.png`, and two MP4 files.
+- Assets have been copied into `public/brand/`.
+- This is being built as a standalone Next.js App Router project.
+- Required positioning: CWI is independent from Cockroach Janta Party unless explicitly declared. Do not claim CWI is the official CJP website.
+- Required disclaimer text: “Cockroach Watch India is an independent civic watch, satire, and commentary platform. Not affiliated with any political party or organization unless officially declared.”
+
+Implementation progress:
+- Project config, Tailwind config, shared site constants, and utilities added.
+- Assets copied into `public/brand/`.
+- Data files added: roles, issues, agenda, posts, charter, socials.
+- Reusable components added: hero, founder statement, ticker, charter/role/issue/agenda/watch desk cards, social links, submit form, disclaimer, footer, nav, mobile nav, verification badge, credit policy box, movement quote, archive card, poll card.
+- Pages added: home, what-is-cwi, charter, join, submit, watch-desk, watch-desk/[slug], five-point-agenda, issues, media-bank, credit-policy, youth-voice, about, contact.
+- API placeholder added: `POST /api/submit-report`.
+- CJP site was reviewed only for manifesto/poster rhythm. CWI copy was rephrased and keeps independent/non-party positioning.
+
+Next steps:
+- Verified commands passed: `npm run lint`, `npm run typecheck`, `npm audit --omit=dev`, `npm run build`.
+- `npm audit --omit=dev` reports 0 vulnerabilities after adding a PostCSS override.
+- The build generated 25 static/server routes including all requested pages and dynamic Watch Desk post pages.
+- `.gitignore` added for `.next/`, `node_modules/`, and TypeScript build info.
+- If continuing, run `npm run dev` and review the UI in browser at desktop and mobile widths.
+
+2026-05-20 UI redesign progress:
+- User requested CWI visual identity move away from CJP-style saffron/green/cream poster look.
+- Shared Tailwind tokens remapped to CWI palette: royal/electric blue, amber, white, deep navy, teal, warning orange.
+- Global background, buttons, cards, inputs, section headers, ticker, disclaimer, hero, navbar, footer, form, cards, and many route layouts refactored to cleaner modern civic-newsroom style.
+- Navbar simplified to Home, Watch Desk, Issues, Join, Submit, Contact plus More dropdown: Charter, Five-Point Agenda, Youth Voice, Media Bank, Credit Policy, About.
+- Mobile bottom nav disabled; hamburger menu now handles primary and More links.
+- Watch Desk now has client-side category filters.
+- Telegram link added: `https://t.me/cockroachwatchindia`.
+- `logo.png` copied to `public/brand/logo.png` and used in navbar, footer, and metadata icons.
+- Verified after redesign/logo/social updates: `npm run lint`, `npm run typecheck`, `npm run build`.
+- Dev server restarted and ready at `http://localhost:3000`.
+- Fixed CTA clipping across the website by removing fixed-height/nowrap button behavior, allowing safe wrapping, making role CTAs full-width, and changing role grids from forced 5 columns at `lg` to `md:2`, `lg:3`, `xl:5`.
+- Verified after clipping fix: `npm run lint`, clean `npm run build`, then standalone `npm run typecheck`.
+
+2026-05-20 Supabase integration:
+- Added `pg` and `@types/pg`.
+- Added server-only DB helper at `lib/db.ts`.
+- Added `.env.example` and `.env.local`; `.env.local` contains the Supabase `DATABASE_URL` and remains ignored by `.gitignore`.
+- Updated `POST /api/submit-report` to create/use `cwi_report_submissions` and insert validated reports into Supabase.
+- Added `npm run db:check` using `scripts/check-db.mjs`.
+- Verified: `npm run lint`, `npm run build`, `npm run typecheck`, `npm run db:check`, `npm audit --omit=dev`.
+- Live API insert test succeeded, then the test row was deleted from Supabase.
+- Dev server restarted and ready at `http://localhost:3000`.
+- Fixed submit form client bug: saved `event.currentTarget` before awaiting `fetch`, then called `form.reset()` from the saved reference.
+- Verified after reset fix: `npm run lint`, `npm run build`, standalone `npm run typecheck`, live API test succeeded, and test row was deleted.
+- Stopped duplicate Node dev servers and restarted one clean dev server at `http://localhost:3000`.
+
+2026-05-20 GitHub publish prep:
+- User requested pushing the full project to `https://github.com/callmepnj/CWI.git`.
+- Important: parent folder `C:\Users\praka` is already a Git repo with unrelated `aisupport` remote. Treat `CWI` as its own nested standalone repository.
+- Added strict proprietary `LICENSE`.
+- `.env.local` must remain untracked; `.gitignore` already excludes `.env*` except `.env.example`.
