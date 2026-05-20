@@ -79,3 +79,4 @@ Next steps:
 - Current SEO optimization pass added homepage WebPage JSON-LD, homepage FAQ JSON-LD, crawlable FAQ content, stronger internal homepage links to About/Credit Policy/Submit, Telegram in Organization `sameAs`, and extra README ranking checklist items.
 - Verified after current SEO pass: `npm run lint`, `npm run typecheck`, `npm run build`, secret scan excluding `.env.local`, and generated homepage HTML contains FAQPage/WebPage schema plus Google verification metadata.
 - User uploaded Google Search Console HTML verification file `public/google9c2f6600a0be4f79.html`; file content is only the Google verification token and is safe to commit.
+- Live check after push showed `https://cwi-ten.vercel.app/google9c2f6600a0be4f79.html` still returning 404 while GitHub raw served the file, indicating Vercel had not deployed the latest commit yet.
