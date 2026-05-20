@@ -74,3 +74,4 @@ Next steps:
 - Improved homepage crawlable SEO copy and heading labels while preserving UI structure.
 - Added `README.md` with Search Console and sitemap submission checklist.
 - Verified locally: `npm run lint`, `npm run build`, standalone `npm run typecheck`, `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, `/opengraph-image`, `/favicon.ico`, and homepage 200.
+- Added Facebook social URL `https://www.facebook.com/profile.php?id=61590247497201` to shared site config, social cards, footer, and Organization JSON-LD.

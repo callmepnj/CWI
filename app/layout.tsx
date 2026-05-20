@@ -56,7 +56,7 @@ const organizationJsonLd = {
   email: site.email,
   description: "Founder-led civic watch, satire, and commentary platform.",
   logo: `${site.url}/brand/logo.png`,
-  sameAs: [site.x, site.instagram, site.youtube, site.reddit]
+  sameAs: [site.x, site.instagram, site.youtube, site.reddit, site.facebook]
 };
 
 const websiteJsonLd = {

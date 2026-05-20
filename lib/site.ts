@@ -8,6 +8,7 @@ export const site = {
   youtube: "https://www.youtube.com/@CockroachWatchIndia",
   telegram: "https://t.me/cockroachwatchindia",
   reddit: "https://www.reddit.com/r/CockroachwatchIndia/",
+  facebook: "https://www.facebook.com/profile.php?id=61590247497201",
   disclaimer:
     "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Not affiliated with any political party or organization unless officially declared.",
   shortDisclaimer:
