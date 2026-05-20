@@ -28,6 +28,10 @@ Do not commit `.env.local`.
 - Use the consistent public name “Cockroach Watch India” and abbreviation “CWI” across all social bios and posts.
 - Test social previews with the OpenGraph image before major campaigns.
 - Keep page titles, descriptions, and Watch Desk content updated with real civic-watch language.
+- Publish fresh Watch Desk posts regularly with original context, source labels, and internal links to Submit, Issues, Charter, and About.
+- Build real backlinks by linking the site from every official social profile, YouTube descriptions, creator credits, press notes, and community posts.
+- Use the exact brand phrase `Cockroach Watch India` in public bios, captions, and video descriptions so Google connects off-site mentions to the website.
+- In Google Search Console, inspect the homepage and key pages after each deployment, then request indexing when major content changes are published.
 
 ## License
 

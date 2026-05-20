@@ -19,7 +19,78 @@ import { charterPrinciples } from "@/data/charter";
 import { issues } from "@/data/issues";
 import { posts } from "@/data/posts";
 import { roles } from "@/data/roles";
-import { createMetadata } from "@/lib/seo";
+import { absoluteUrl, createMetadata } from "@/lib/seo";
+import { site } from "@/lib/site";
+
+const homepageFaqs = [
+  {
+    question: "What is Cockroach Watch India?",
+    answer:
+      "Cockroach Watch India, also known as CWI, is a founder-led civic watch, satire, and commentary platform documenting youth voice, public issues, viral civic moments, creator-led commentary, civic satire, creator credit, and the Cockroach wave across India."
+  },
+  {
+    question: "Is CWI the official Cockroach Janta Party website?",
+    answer:
+      "No. CWI is independent from Cockroach Janta Party unless officially declared otherwise. Cockroach Watch India does not impersonate any political party and exists as a public-interest civic watch, satire, and commentary platform."
+  },
+  {
+    question: "What does CWI document?",
+    answer:
+      "CWI documents public issues, youth reactions, civic satire, viral political and civic moments, correction requests, fact-check leads, creator-credit requests, local accountability stories, and movement archive material."
+  },
+  {
+    question: "How can someone submit a report to CWI?",
+    answer:
+      "Citizens can submit a public issue, viral post, source link, correction, creator credit request, or youth story through the Submit a Report page. CWI asks for evidence, context, consent, and responsible public-interest submissions."
+  },
+  {
+    question: "Why does creator credit matter to Cockroach Watch India?",
+    answer:
+      "Creator credit protects public memory and respects the people who record, explain, design, satirize, and document civic moments. CWI does not remove watermarks or claim ownership of user-created work."
+  }
+];
+
+const homepageFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: homepageFaqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer
+    }
+  }))
+};
+
+const homepageWebPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Cockroach Watch India - CWI Civic Watch Platform",
+  url: absoluteUrl("/"),
+  description: site.description,
+  isPartOf: {
+    "@type": "WebSite",
+    name: site.name,
+    url: site.url
+  },
+  about: [
+    "Cockroach Watch India",
+    "CWI",
+    "Cockroach wave",
+    "Youth voice India",
+    "Civic watch India",
+    "Political satire India",
+    "Public issues India",
+    "Creator credit"
+  ],
+  primaryImageOfPage: {
+    "@type": "ImageObject",
+    url: absoluteUrl("/opengraph-image"),
+    width: 1200,
+    height: 630
+  }
+};
 
 export const metadata = createMetadata({
   title: "Cockroach Watch India — CWI Civic Watch Platform",
@@ -31,6 +102,14 @@ export const metadata = createMetadata({
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageWebPageJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaqJsonLd) }}
+      />
       <HeroSection />
       <WatchTicker />
       <Section title="A Statement From The Founders">
@@ -141,6 +220,32 @@ export default function HomePage() {
           </p>
           <Button asChild className="mt-7" variant="saffron">
             <Link href="/submit">Submit a civic report to CWI</Link>
+          </Button>
+        </div>
+      </Section>
+      <Section
+        eyebrow="Public Questions"
+        title="Cockroach Watch India FAQ"
+        subtitle="Clear answers for searchers, creators, citizens, and readers trying to understand CWI without confusing it with any political party."
+      >
+        <div className="grid gap-6 md:grid-cols-2">
+          {homepageFaqs.map((faq) => (
+            <Card key={faq.question}>
+              <CardLabel>CWI FAQ</CardLabel>
+              <h3 className="font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em]">{faq.question}</h3>
+              <p className="mt-4 leading-7 text-ink/72">{faq.answer}</p>
+            </Card>
+          ))}
+        </div>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button asChild>
+            <Link href="/about">Learn about Cockroach Watch India</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/credit-policy">Read the creator credit policy</Link>
+          </Button>
+          <Button asChild variant="green">
+            <Link href="/submit">Submit a public issue to CWI</Link>
           </Button>
         </div>
       </Section>
