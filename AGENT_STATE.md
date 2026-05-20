@@ -59,3 +59,7 @@ Next steps:
 - Important: parent folder `C:\Users\praka` is already a Git repo with unrelated `aisupport` remote. Treat `CWI` as its own nested standalone repository.
 - Added strict proprietary `LICENSE`.
 - `.env.local` must remain untracked; `.gitignore` already excludes `.env*` except `.env.example`.
+- Initialized standalone Git repo inside `CWI`.
+- Remote set to `https://github.com/callmepnj/CWI.git`.
+- Initial project commit pushed to `origin/main`: `45af0bc Initial CWI website`.
+- Confirmed `.env.local`, `.next`, `node_modules`, and `tsconfig.tsbuildinfo` were ignored before commit.
