@@ -37,6 +37,9 @@ export const metadata: Metadata = {
   applicationName: site.name,
   manifest: "/manifest.webmanifest",
   category: "civic media",
+  verification: {
+    google: "Wqz_bAcrTX-o4uXV83OWMUA3qSLYj3lHYanoWci9BPY"
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
