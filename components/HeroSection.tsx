@@ -27,7 +27,7 @@ export function HeroSection() {
             Cockroach Watch India
           </h1>
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-ink/82">
-            A founder-led civic watch platform documenting youth voice, public issues, viral civic moments, and the movement they tried to ignore.
+            A founder-led civic watch platform documenting youth voice, public issues, civic satire, viral moments, creator culture, and the Cockroach wave across India.
           </p>
           <p className="mt-5 max-w-3xl leading-8 text-ink/68">
             Cockroach Watch India is built to document, verify, and amplify the new wave of youth-led civic expression in India. We track viral moments, public issues, citizen reports, explainers, satire, youth reactions, and the larger movement forming around the Cockroach identity.

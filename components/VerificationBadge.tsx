@@ -8,6 +8,7 @@ const styles: Record<VerificationStatus, string> = {
   Developing: "bg-saffron/25 text-[#8A5B00] ring-saffron/35",
   Claimed: "bg-royal/10 text-royal ring-royal/20",
   Reported: "bg-ink text-white ring-ink",
+  Opinion: "bg-skywash text-royal ring-royal/20",
   "Opinion/Satire": "bg-urgent/10 text-urgent ring-urgent/20"
 };
 
@@ -16,6 +17,7 @@ const icons = {
   Developing: Clock,
   Claimed: MessageSquareQuote,
   Reported: Radio,
+  Opinion: MessageSquareQuote,
   "Opinion/Satire": FileWarning
 } satisfies Record<VerificationStatus, React.ComponentType<{ className?: string }>>;
 

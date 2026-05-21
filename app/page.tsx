@@ -17,7 +17,7 @@ import { Card, CardLabel } from "@/components/ui/card";
 import { agendaItems } from "@/data/agenda";
 import { charterPrinciples } from "@/data/charter";
 import { issues } from "@/data/issues";
-import { posts } from "@/data/posts";
+import { posts, trendingTopics } from "@/data/posts";
 import { roles } from "@/data/roles";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -100,6 +100,11 @@ export const metadata = createMetadata({
 });
 
 export default function HomePage() {
+  const featuredPost = posts[0];
+  const latestIssuePost = posts.find((post) => post.category === "Civic Issue") ?? posts[0];
+  const latestYouthPost = posts.find((post) => post.category === "Youth Voice") ?? posts[1];
+  const creatorSpotlight = posts.find((post) => post.category === "Creator Spotlight") ?? posts[2];
+
   return (
     <>
       <script
@@ -173,10 +178,48 @@ export default function HomePage() {
         </Button>
       </Section>
       <Section eyebrow="Watch Desk" title="Watch Desk" subtitle="Verified notes, explainers, public reactions, corrections, and movement updates.">
+        <div className="mb-6 rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
+          <CardLabel className="bg-white/12 text-saffron ring-white/15">Featured article hero</CardLabel>
+          <h3 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">{featuredPost.title}</h3>
+          <p className="mt-4 max-w-3xl leading-8 text-white/76">{featuredPost.summary}</p>
+          <Button asChild className="mt-6" variant="saffron">
+            <Link href={`/watch-desk/${featuredPost.slug}`}>Read featured Watch Desk article</Link>
+          </Button>
+        </div>
+
+        <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardLabel>Trending topics</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">CJP / Cockroach wave</p>
+            <p className="mt-3 leading-7 text-ink/70">{trendingTopics.slice(0, 5).join(", ")}</p>
+          </Card>
+          <Card>
+            <CardLabel>Most discussed issue</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">Youth frustration and public memory</p>
+            <p className="mt-3 leading-7 text-ink/70">Tracked through civic satire, creator commentary, public reaction, and submitted issue signals.</p>
+          </Card>
+          <Card>
+            <CardLabel>Creator spotlight</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">{creatorSpotlight.title}</p>
+            <Link href={`/watch-desk/${creatorSpotlight.slug}`} className="mt-4 inline-flex font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">Read spotlight</Link>
+          </Card>
+          <Card>
+            <CardLabel>Viral tracker</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">Publicly circulating</p>
+            <p className="mt-3 leading-7 text-ink/70">CWI labels developing trends carefully and avoids treating viral claims as confirmed facts.</p>
+          </Card>
+        </div>
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {posts.slice(0, 4).map((post) => (
+          {posts.slice(0, 8).map((post) => (
             <WatchDeskCard key={post.slug} post={post} />
           ))}
+        </div>
+      </Section>
+      <Section eyebrow="Latest Signals" title="Latest public issue and youth voice">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <WatchDeskCard post={latestIssuePost} />
+          <WatchDeskCard post={latestYouthPost} />
         </div>
       </Section>
       <Section eyebrow="Agenda Explainer" title="Five-point agenda, with context." subtitle="CWI explains the viral agenda as public-interest commentary, not official endorsement.">

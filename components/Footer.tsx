@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { posts, trendingTopics } from "@/data/posts";
 import { site } from "@/lib/site";
 
 const footerLinks = [
@@ -26,7 +27,7 @@ const footerLinks = [
 export function Footer() {
   return (
     <footer className="bg-ink px-4 py-12 text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.8fr_0.8fr]">
         <div>
           <div className="flex items-center gap-4">
             <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white ring-1 ring-white/15">
@@ -49,7 +50,20 @@ export function Footer() {
             {site.disclaimer}
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div>
+          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Latest updates</p>
+          <div className="space-y-3">
+            {posts.slice(0, 4).map((post) => (
+              <Link key={post.slug} href={`/watch-desk/${post.slug}`} className="block rounded-2xl border border-white/10 bg-white/5 p-3 text-xs font-black uppercase leading-5 tracking-[0.1em] text-white/78 transition hover:border-saffron/60 hover:text-saffron">
+                {post.title}
+              </Link>
+            ))}
+          </div>
+          <p className="mt-5 text-xs font-bold uppercase leading-6 tracking-[0.08em] text-white/52">
+            Trending: {trendingTopics.slice(0, 5).join(" / ")}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           {footerLinks.map((link) => (
             <Link
               key={link.href}

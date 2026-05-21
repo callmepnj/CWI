@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Section } from "@/components/Section";
+import { ArrowRight, CalendarDays, Clock, FileText, ShieldCheck, Tag } from "lucide-react";
+import { ArticleProgress } from "@/components/ArticleProgress";
+import { ShareButtons } from "@/components/ShareButtons";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { Card, CardLabel } from "@/components/ui/card";
 import { posts } from "@/data/posts";
-import { createMetadata } from "@/lib/seo";
+import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { slugifyTopic } from "@/lib/taxonomy";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
+
+const articleDisclaimer =
+  "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Articles may discuss publicly circulating trends, satire, public reactions, and civic commentary. Claims should not be treated as legal findings or official statements unless verified.";
 
 export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }));
@@ -21,20 +29,86 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) {
     return createMetadata({
-      title: "Watch Desk Post — Cockroach Watch India",
+      title: "Watch Desk Post - Cockroach Watch India",
       description: site.description,
       path: "/watch-desk"
     });
   }
 
   return createMetadata({
-    title: post.title,
-    description: post.summary,
+    title: post.metaTitle,
+    description: post.metaDescription,
     path: `/watch-desk/${post.slug}`,
     type: "article",
     publishedTime: post.date,
     keywords: post.tags
   });
+}
+
+function jsonLdForPost(post: (typeof posts)[number]) {
+  const url = absoluteUrl(`/watch-desk/${post.slug}`);
+  const image = absoluteUrl("/opengraph-image");
+  const articleBase = {
+    headline: post.title,
+    description: post.metaDescription,
+    image,
+    datePublished: post.date,
+    dateModified: post.updatedDate,
+    author: {
+      "@type": "Organization",
+      name: post.author,
+      url: site.url
+    },
+    publisher: {
+      "@type": "Organization",
+      name: site.name,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/brand/logo.png")
+      }
+    },
+    mainEntityOfPage: url,
+    articleSection: post.category,
+    keywords: post.tags.join(", "),
+    isAccessibleForFree: true
+  };
+
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      ...articleBase
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      ...articleBase
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: site.url
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Watch Desk",
+          item: absoluteUrl("/watch-desk")
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: post.title,
+          item: url
+        }
+      ]
+    }
+  ];
 }
 
 export default async function WatchPostPage({ params }: Props) {
@@ -45,25 +119,172 @@ export default async function WatchPostPage({ params }: Props) {
     notFound();
   }
 
+  const relatedPosts = post.relatedSlugs
+    .map((relatedSlug) => posts.find((item) => item.slug === relatedSlug))
+    .filter((item): item is (typeof posts)[number] => Boolean(item))
+    .slice(0, 3);
+  const latestPosts = posts.filter((item) => item.slug !== post.slug).slice(0, 5);
+  const jsonLd = jsonLdForPost(post);
+
   return (
-    <Section eyebrow={post.category} title={post.title} titleAs="h1" subtitle={post.summary}>
-      <Card>
-        <div className="flex flex-wrap items-center gap-3">
-          <CardLabel className="mb-0">{post.date}</CardLabel>
-          <VerificationBadge status={post.verificationStatus} />
+    <>
+      <ArticleProgress />
+      {jsonLd.map((item) => (
+        <script key={`${item["@type"]}-${post.slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />
+      ))}
+
+      <article className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mb-6 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-ink/55">
+          <Link href="/" className="hover:text-royal">Home</Link>
+          <span>/</span>
+          <Link href="/watch-desk" className="hover:text-royal">Watch Desk</Link>
+          <span>/</span>
+          <span>{post.category}</span>
         </div>
-        <div className="mt-8 space-y-5 text-lg leading-8 text-ink/70">
-          {post.content.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_330px]">
+          <div>
+            <div className="rounded-[2rem] border border-line bg-white p-6 shadow-card sm:p-8 lg:p-10">
+              <div className="flex flex-wrap items-center gap-3">
+                <CardLabel className="mb-0">{post.category}</CardLabel>
+                <VerificationBadge status={post.verificationStatus} />
+                <span className="inline-flex items-center gap-2 rounded-full bg-paper px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.14em] text-ink/55 ring-1 ring-line">
+                  <Clock className="h-3.5 w-3.5" /> {post.readingMinutes} min read
+                </span>
+              </div>
+
+              <h1 className="mt-6 font-display text-4xl font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink sm:text-6xl">
+                {post.title}
+              </h1>
+              <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
+
+              <div className="mt-7 grid gap-3 border-y border-line py-5 text-sm font-bold uppercase tracking-[0.08em] text-ink/55 sm:grid-cols-3">
+                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-royal" /> Published {post.date}</span>
+                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Updated {post.updatedDate}</span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-royal" /> {post.author}</span>
+              </div>
+
+              <div className="mt-8 rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
+                <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-saffron">Watch Desk Pull Quote</p>
+                <p className="mt-4 font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em]">{post.pullQuote}</p>
+              </div>
+
+              <div className="prose-cwi mt-10 space-y-10">
+                {post.sections.map((section) => (
+                  <section key={section.heading}>
+                    <h2 className="font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">{section.heading}</h2>
+                    <div className="mt-4 space-y-5 text-lg leading-8 text-ink/74">
+                      {section.paragraphs.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+
+              <div className="mt-10 flex flex-wrap gap-2 border-t border-line pt-6">
+                {post.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/watch-desk/tag/${slugifyTopic(tag)}`}
+                    className="inline-flex items-center gap-1 rounded-full bg-paper px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-ink/62 ring-1 ring-line hover:bg-skywash hover:text-royal"
+                  >
+                    <Tag className="h-3.5 w-3.5" />
+                    {tag}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <Card className="mt-8">
+              <CardLabel>Article disclaimer</CardLabel>
+              <p className="leading-8 text-ink/72">{articleDisclaimer}</p>
+            </Card>
+
+            <Card className="mt-8">
+              <CardLabel>Social copy kit</CardLabel>
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <h2 className="font-display text-2xl font-black uppercase">X thread</h2>
+                  <ol className="mt-3 space-y-3 text-sm font-semibold leading-6 text-ink/70">
+                    {post.social.xThread.map((line, index) => (
+                      <li key={line}>{index + 1}. {line}</li>
+                    ))}
+                  </ol>
+                </div>
+                <div className="space-y-4 text-sm font-semibold leading-6 text-ink/70">
+                  <p><strong className="text-ink">Instagram:</strong> {post.social.instagramCaption}</p>
+                  <p><strong className="text-ink">Reddit:</strong> {post.social.redditPost}</p>
+                  <p><strong className="text-ink">YouTube Shorts:</strong> {post.social.youtubeShortsDescription}</p>
+                </div>
+              </div>
+            </Card>
+
+            {relatedPosts.length > 0 ? (
+              <section className="mt-10">
+                <div className="mb-5 flex items-center justify-between gap-4">
+                  <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Watch Desk articles</h2>
+                  <Link href="/watch-desk" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
+                    View all <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {relatedPosts.map((relatedPost) => (
+                    <WatchDeskCard key={relatedPost.slug} post={relatedPost} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </div>
+
+          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+            <Card>
+              <CardLabel>Share this article</CardLabel>
+              <ShareButtons title={post.title} path={`/watch-desk/${post.slug}`} summary={post.summary} />
+            </Card>
+
+            <Card>
+              <CardLabel>Author</CardLabel>
+              <h2 className="font-display text-2xl font-black uppercase tracking-[-0.03em]">{post.author}</h2>
+              <p className="mt-4 leading-7 text-ink/70">
+                CWI&apos;s editorial desk documents youth voice, public issues, civic satire, creator-led commentary, and the Cockroach wave with public-interest context.
+              </p>
+              <Link href="/about" className="mt-5 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">
+                About CWI <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Card>
+
+            <Card>
+              <CardLabel>Internal links</CardLabel>
+              <div className="grid gap-2">
+                {[
+                  ["Watch Desk", "/watch-desk"],
+                  ["Submit Report", "/submit"],
+                  ["Issue Watch", "/issues"],
+                  ["Youth Voice", "/youth-voice"],
+                  ["CWI Charter", "/charter"]
+                ].map(([label, href]) => (
+                  <Link key={href} href={href} className="rounded-2xl bg-paper px-4 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink/68 transition hover:bg-skywash hover:text-royal">
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </Card>
+
+            <Card>
+              <CardLabel>Latest updates</CardLabel>
+              <div className="space-y-4">
+                {latestPosts.map((latestPost) => (
+                  <Link key={latestPost.slug} href={`/watch-desk/${latestPost.slug}`} className="block border-b border-line pb-4 last:border-b-0 last:pb-0">
+                    <p className="font-display text-lg font-black uppercase leading-tight tracking-[-0.03em]">{latestPost.title}</p>
+                    <p className="mt-1 text-xs font-black uppercase tracking-[0.12em] text-ink/45">{latestPost.category}</p>
+                  </Link>
+                ))}
+              </div>
+            </Card>
+          </aside>
         </div>
-        <div className="mt-8 border-t border-line pt-5 text-sm font-bold uppercase leading-6 tracking-[0.08em] text-ink/62">
-          <p>Source/Credit: {post.sourceLabel}</p>
-          <p>Credit: {post.credit}</p>
-          <p>Tags: {post.tags.join(", ")}</p>
-          <p className="mt-4">{site.disclaimer}</p>
-        </div>
-      </Card>
-    </Section>
+      </article>
+    </>
   );
 }
