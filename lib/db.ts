@@ -3,6 +3,7 @@ import { Pool } from "pg";
 declare global {
   var cwiPgPool: Pool | undefined;
   var cwiReportsTableReady: Promise<void> | undefined;
+  var cwiCommentsTableReady: Promise<void> | undefined;
 }
 
 function getDatabaseUrl() {
@@ -51,4 +52,29 @@ export async function ensureReportsTable() {
   }
 
   return globalThis.cwiReportsTableReady;
+}
+
+export async function ensureCommentsTable() {
+  if (!globalThis.cwiCommentsTableReady) {
+    globalThis.cwiCommentsTableReady = getPool().query(`
+      create extension if not exists pgcrypto;
+
+      create table if not exists cwi_article_comments (
+        id uuid primary key default gen_random_uuid(),
+        article_slug text not null,
+        name text not null,
+        email text,
+        comment text not null,
+        status text not null default 'pending',
+        created_at timestamptz not null default now(),
+        ip_hash text,
+        user_agent text
+      );
+
+      create index if not exists cwi_article_comments_slug_status_created_idx
+      on cwi_article_comments (article_slug, status, created_at desc);
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiCommentsTableReady;
 }

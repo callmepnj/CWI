@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, Clock, FileText, ShieldCheck, Tag } from "lucide-react";
 import { ArticleProgress } from "@/components/ArticleProgress";
+import { CommentSection } from "@/components/CommentSection";
 import { ShareButtons } from "@/components/ShareButtons";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { WatchDeskCard } from "@/components/WatchDeskCard";
@@ -36,11 +37,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return createMetadata({
-    title: post.metaTitle,
-    description: post.metaDescription,
+    title: post.seoTitle,
+    description: post.seoDescription,
     path: `/watch-desk/${post.slug}`,
     type: "article",
-    publishedTime: post.date,
+    publishedTime: post.publishedAt,
     keywords: post.tags
   });
 }
@@ -52,8 +53,8 @@ function jsonLdForPost(post: (typeof posts)[number]) {
     headline: post.title,
     description: post.metaDescription,
     image,
-    datePublished: post.date,
-    dateModified: post.updatedDate,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt,
     author: {
       "@type": "Organization",
       name: post.author,
@@ -70,6 +71,7 @@ function jsonLdForPost(post: (typeof posts)[number]) {
     mainEntityOfPage: url,
     articleSection: post.category,
     keywords: post.tags.join(", "),
+    citation: post.sources.map((source) => source.url),
     isAccessibleForFree: true
   };
 
@@ -159,8 +161,8 @@ export default async function WatchPostPage({ params }: Props) {
               <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
 
               <div className="mt-7 grid gap-3 border-y border-line py-5 text-sm font-bold uppercase tracking-[0.08em] text-ink/55 sm:grid-cols-3">
-                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-royal" /> Published {post.date}</span>
-                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Updated {post.updatedDate}</span>
+                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-royal" /> Published {post.publishedAt}</span>
+                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Updated {post.updatedAt}</span>
                 <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-royal" /> {post.author}</span>
               </div>
 
@@ -182,6 +184,27 @@ export default async function WatchPostPage({ params }: Props) {
                 ))}
               </div>
 
+              <div className="mt-10 border-t border-line pt-8">
+                <h2 className="font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">Sources & Further Reading</h2>
+                <div className="mt-5 grid gap-4">
+                  {post.sources.map((source) => (
+                    <Link
+                      key={source.url}
+                      href={source.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40 hover:bg-skywash"
+                    >
+                      <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">
+                        {source.outlet} / {source.type}
+                      </p>
+                      <h3 className="mt-2 font-display text-xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">{source.name}</h3>
+                      <p className="mt-2 text-sm leading-6 text-ink/68">{source.note}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
               <div className="mt-10 flex flex-wrap gap-2 border-t border-line pt-6">
                 {post.tags.map((tag) => (
                   <Link
@@ -200,6 +223,8 @@ export default async function WatchPostPage({ params }: Props) {
               <CardLabel>Article disclaimer</CardLabel>
               <p className="leading-8 text-ink/72">{articleDisclaimer}</p>
             </Card>
+
+            <CommentSection articleSlug={post.slug} />
 
             <Card className="mt-8">
               <CardLabel>Social copy kit</CardLabel>

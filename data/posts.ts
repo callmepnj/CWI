@@ -1,4 +1,4 @@
-export type VerificationStatus = "Verified" | "Developing" | "Claimed" | "Reported" | "Opinion" | "Opinion/Satire";
+export type VerificationStatus = "Verified" | "Developing" | "Claimed" | "Reported" | "Opinion/Analysis" | "Satire/Context";
 
 export type WatchCategory =
   | "Movement Update"
@@ -26,17 +26,28 @@ export type SocialPack = {
   seoSummary: string;
 };
 
+export type ArticleSource = {
+  name: string;
+  outlet: string;
+  url: string;
+  type: "News report" | "Official source" | "Feature" | "Fact-check" | "Reference";
+  note: string;
+};
+
 export type WatchPost = {
   title: string;
   slug: string;
   date: string;
   updatedDate: string;
+  publishedAt: string;
+  updatedAt: string;
   category: WatchCategory;
   summary: string;
   content: string[];
   sections: ArticleSection[];
   sourceLabel: string;
   sourceUrl?: string;
+  sources: ArticleSource[];
   verificationStatus: VerificationStatus;
   credit: string;
   tags: string[];
@@ -44,9 +55,13 @@ export type WatchPost = {
   readingMinutes: number;
   metaTitle: string;
   metaDescription: string;
+  seoTitle: string;
+  seoDescription: string;
+  ogImage: string;
   imageAlt: string;
   pullQuote: string;
   relatedSlugs: string[];
+  relatedArticles: string[];
   social: SocialPack;
 };
 
@@ -64,6 +79,79 @@ const author = "Cockroach Watch India Editorial Desk";
 const publishDate = "2026-05-21";
 const coreDisclaimer =
   "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article may discuss publicly circulating trends, satire, public reactions, and civic commentary. It should not be read as a legal finding, official statement, or verified claim unless clearly marked as such.";
+
+const sourceLibrary = {
+  reuters: {
+    name: "India's cockroach group goes viral, spotlights Gen Z worries",
+    outlet: "Reuters",
+    url: "https://www.reuters.com/world/india/indias-cockroach-group-goes-viral-spotlights-gen-z-worries-2026-05-21/",
+    type: "News report",
+    note: "Used for reported Instagram growth, founder context, sign-up claims attributed to Abhijeet Dipke, and youth concerns including unemployment, inflation, and representation."
+  },
+  officialCjp: {
+    name: "Cockroach Janta Party official website",
+    outlet: "Cockroach Janta Party",
+    url: "https://cockroachjantaparty.org/",
+    type: "Official source",
+    note: "Used for CJP's own self-description, satire framing, public-facing manifesto language, involvement sections, and official positioning."
+  },
+  economicTimesOverview: {
+    name: "Cockroach Janta Party explodes on social media",
+    outlet: "The Economic Times",
+    url: "https://economictimes.indiatimes.com/news/new-updates/cockroach-janta-party-explodes-on-social-media-who-is-the-founder-website-link-manifesto-leaders-and-why-its-going-viral/articleshow/131191686.cms",
+    type: "News report",
+    note: "Used for reported origin timeline, founder background, viral spread, manifesto discussion, and youth frustration context."
+  },
+  economicTimesX: {
+    name: "Cockroach Janta Party's X account withheld in India",
+    outlet: "The Economic Times",
+    url: "https://economictimes.indiatimes.com/news/new-updates/cockroach-janta-partys-x-account-withheld-in-india-hours-after-it-surpasses-bjp-on-instagram-with-nearly-13-million-followers/articleshow/131242915.cms",
+    type: "News report",
+    note: "Used for the accurate wording that the X account was reportedly withheld in India and for time-specific follower reporting."
+  },
+  alJazeera: {
+    name: "Top Indian judge's comment sparks satire, protest",
+    outlet: "Al Jazeera",
+    url: "https://www.aljazeera.com/features/2026/5/20/cockroach-janata-party-top-indian-judges-comment-sparks-satire-protest",
+    type: "Feature",
+    note: "Used for satire/protest framing and public interpretation of why the Cockroach identity resonated."
+  },
+  indiaToday: {
+    name: "Meet the man behind the Cockroach Janta Party",
+    outlet: "India Today",
+    url: "https://www.indiatoday.in/india/video/meet-the-man-behind-the-cockroach-janta-party-2914598-2026-05-20",
+    type: "News report",
+    note: "Used for founder profile context and interview framing around Abhijeet Dipke."
+  },
+  timesOfIndia: {
+    name: "Who is Abhijeet Dipke?",
+    outlet: "The Times of India",
+    url: "https://timesofindia.indiatimes.com/etimes/trending/who-is-abhijeet-dipke-the-man-behind-the-viral-cockroach-janata-party-hoping-to-change-the-political-landscape-of-india/amp_articleshow/131218807.cms",
+    type: "News report",
+    note: "Used for additional founder background and public timeline context."
+  },
+  hindustanTimes: {
+    name: "Cockroach Janta Party X account withheld in India",
+    outlet: "Hindustan Times",
+    url: "https://www.hindustantimes.com/india-news/cockroach-janta-party-x-twitter-account-withheld-in-india-abhijeet-dipke-shares-photo-101779350031188.html",
+    type: "News report",
+    note: "Used as supporting coverage for the X account being withheld in India and public reaction to that development."
+  },
+  boomLive: {
+    name: "BOOM Live fact-checking and verification resources",
+    outlet: "BOOM Live",
+    url: "https://www.boomlive.in/",
+    type: "Fact-check",
+    note: "Used for verification discipline, misinformation-safe framing, and practical checks before sharing viral claims."
+  },
+  apNews: {
+    name: "A parody 'cockroach' party becomes outlet for youth anger",
+    outlet: "Associated Press",
+    url: "https://apnews.com/article/9e8be82b182e32feda4fee42d52de75b",
+    type: "News report",
+    note: "Used for international framing, founder-attributed comments, and the broader youth anger/protest context."
+  }
+} satisfies Record<string, ArticleSource>;
 
 const articleSeeds: ArticleSeed[] = [
   {
@@ -90,7 +178,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "the line between meme culture and movement language",
     angle: "The Cockroach wave shows how a format can become shorthand for dignity, anger, and public memory.",
     tags: ["Cockroach wave", "meme politics", "movement"],
-    verificationStatus: "Opinion/Satire"
+    verificationStatus: "Satire/Context"
   },
   {
     title: "Why Gen Z connects with political satire",
@@ -182,7 +270,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "how different audiences interpret CJP",
     angle: "CJP is discussed online as satire, commentary, and movement language, depending on context and source.",
     tags: ["CJP", "satire", "movement"],
-    verificationStatus: "Opinion"
+    verificationStatus: "Opinion/Analysis"
   },
   {
     title: "Youth frustration and meme politics",
@@ -233,7 +321,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "why satire feels closer to everyday youth experience than formal messaging",
     angle: "Online satire works because it speaks in the rhythm of feeds, comments, frustration, and lived reality.",
     tags: ["online satire", "youth voice", "political satire India"],
-    verificationStatus: "Opinion"
+    verificationStatus: "Opinion/Analysis"
   },
   {
     title: "How political meme culture changed India",
@@ -258,7 +346,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "the conditions that turn a meme into movement language",
     angle: "A meme becomes movement language when it helps people name a shared public feeling with clarity.",
     tags: ["meme movement", "Cockroach wave", "digital culture"],
-    verificationStatus: "Opinion/Satire"
+    verificationStatus: "Satire/Context"
   },
   {
     title: "The role of humor in digital protest",
@@ -283,7 +371,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "trust gaps between youth, institutions, creators, and civic media",
     angle: "Trust moves toward voices that feel accountable, visible, responsive, and close to lived experience.",
     tags: ["youth trust", "creators", "institutions"],
-    verificationStatus: "Opinion"
+    verificationStatus: "Opinion/Analysis"
   },
   {
     title: "Digital movements and public memory",
@@ -369,7 +457,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "why satire should not become misinformation",
     angle: "Sharp satire can hold power accountable, but context separates commentary from fake claims.",
     tags: ["satire", "context", "misinformation"],
-    verificationStatus: "Opinion"
+    verificationStatus: "Opinion/Analysis"
   },
   {
     title: "How public reaction becomes news",
@@ -430,7 +518,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "responsible satire standards",
     angle: "Civic satire can be sharp without becoming abuse, doxxing, hate, or targeted harassment.",
     tags: ["civic satire", "editorial standards", "safety"],
-    verificationStatus: "Opinion"
+    verificationStatus: "Opinion/Analysis"
   },
   {
     title: "Why public memory matters in internet politics",
@@ -456,7 +544,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "why the Cockroach identity is memorable online",
     angle: "The identity travels because it is resilient, uncomfortable, ironic, and easy to remix without losing recognition.",
     tags: ["Cockroach identity", "Cockroach wave", "meme watch"],
-    verificationStatus: "Opinion/Satire"
+    verificationStatus: "Satire/Context"
   },
   {
     title: "What students are saying through meme politics",
@@ -518,7 +606,7 @@ const articleSeeds: ArticleSeed[] = [
     focus: "standards for covering viral politics responsibly",
     angle: "Civic media should explain the signal, verify the claim, credit the creator, and avoid panic framing.",
     tags: ["civic media", "viral politics", "editorial standards"],
-    verificationStatus: "Opinion"
+    verificationStatus: "Opinion/Analysis"
   },
   {
     title: "What CJP searchers should know first",
@@ -563,6 +651,186 @@ const articleSeeds: ArticleSeed[] = [
     angle: "Public-interest commentary should document the issue, protect dignity, and label uncertainty clearly.",
     tags: ["public-interest commentary", "CWI", "standards"],
     verificationStatus: "Verified"
+  },
+  {
+    title: "Who is Abhijeet Dipke?",
+    slug: "who-is-abhijeet-dipke",
+    category: "Explainer",
+    focus: "the publicly reported founder background of Abhijeet Dipke",
+    angle: "Public reports identify Abhijeet Dipke as the founder of CJP, but CWI separates biographical reporting from online speculation.",
+    tags: ["Abhijeet Dipke", "CJP founder", "Cockroach Janta Party"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "Was CJP's X account banned or withheld in India?",
+    slug: "was-cjp-x-account-banned-or-withheld-in-india",
+    category: "Fact Check",
+    focus: "accurate wording around the reported X account restriction",
+    angle: "Multiple reports used the wording withheld in India; CWI avoids calling it a ban unless an official source clearly confirms that language.",
+    tags: ["CJP on X", "withheld in India", "fact check"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "What does Voice of the Lazy and Unemployed mean?",
+    slug: "voice-of-the-lazy-and-unemployed-meaning",
+    category: "Explainer",
+    focus: "CJP's satirical identity phrase and its youth-facing meaning",
+    angle: "The phrase works as satire and reclamation, but it should be read through the official CJP framing and public reporting.",
+    tags: ["Voice of the Lazy and Unemployed", "CJP", "youth unemployment"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "The CJP Five-Point Agenda explained with context",
+    slug: "cjp-five-point-agenda-explained-with-context",
+    category: "Explainer",
+    focus: "the publicly circulating CJP agenda points and their policy context",
+    angle: "CWI explains the agenda as reported and publicly listed material, not as an endorsement or legal policy finding.",
+    tags: ["five-point agenda", "CJP manifesto", "policy context"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "Why youth unemployment is central to the CJP conversation",
+    slug: "why-youth-unemployment-is-central-to-cjp",
+    category: "Youth Voice",
+    focus: "unemployment as a recurring theme in CJP coverage and public reaction",
+    angle: "Reuters and other reports connect the CJP discussion to youth concerns including unemployment, costs, and representation.",
+    tags: ["youth unemployment", "Gen Z politics India", "CJP"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "Why exam controversies entered the Cockroach conversation",
+    slug: "why-exam-controversies-entered-cockroach-conversation",
+    category: "Civic Issue",
+    focus: "student anxiety around exam leaks, cancellations, and recruitment uncertainty",
+    angle: "Public reports connect the wider youth frustration to exam and recruitment controversies, but each specific claim still needs sourcing.",
+    tags: ["exam controversies", "students", "public issues India"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "Why social media followers changed the CJP conversation",
+    slug: "why-social-media-followers-changed-cjp-conversation",
+    category: "Digital Culture",
+    focus: "time-specific follower reporting and its effect on public attention",
+    angle: "Follower counts reported by Reuters and Economic Times changed how people read CJP, but those numbers are time-bound and may change quickly.",
+    tags: ["Instagram followers", "CJP", "social media"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "What does Main Bhi Cockroach represent?",
+    slug: "what-main-bhi-cockroach-represents",
+    category: "Meme Watch",
+    focus: "the slogan as satire, identity, and public reaction",
+    angle: "Main Bhi Cockroach works as a satirical identity phrase for people responding to a public insult, but its meaning depends on context.",
+    tags: ["Main Bhi Cockroach", "slogan", "satire"],
+    verificationStatus: "Satire/Context"
+  },
+  {
+    title: "How to verify viral CJP claims before sharing",
+    slug: "how-to-verify-viral-cjp-claims-before-sharing",
+    category: "Fact Check",
+    focus: "a practical verification checklist for CJP-related claims",
+    angle: "Before sharing viral CJP claims, readers should check the source, date, original post, screenshots, reverse search results, and official confirmation.",
+    tags: ["verify CJP claims", "fact check", "BOOM Live"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "What happened after CJP's X account was withheld?",
+    slug: "what-happened-after-cjp-x-account-withheld",
+    category: "Public Reaction",
+    focus: "public reaction after reports that CJP's X account was withheld in India",
+    angle: "Reports say the account was withheld in India; the exact official reason should not be assumed where it has not been clearly confirmed.",
+    tags: ["CJP on X", "withheld in India", "public reaction"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "Why international media noticed India's Cockroach wave",
+    slug: "why-international-media-noticed-indias-cockroach-wave",
+    category: "Archive",
+    focus: "global interest in the Cockroach wave as a satire and youth politics story",
+    angle: "Reuters, AP, and Al Jazeera framed the story as more than a meme because it connects satire with visible youth frustration.",
+    tags: ["international media", "Cockroach wave", "Reuters"],
+    verificationStatus: "Reported"
+  },
+  {
+    title: "Meme or movement: the honest answer",
+    slug: "meme-or-movement-the-honest-answer",
+    category: "Opinion",
+    focus: "a balanced reading of CJP as both satire and serious public expression",
+    angle: "The honest answer is that CJP is satire by design, but the public response around it carries serious civic meaning.",
+    tags: ["meme or movement", "CJP", "political satire India"],
+    verificationStatus: "Opinion/Analysis"
+  },
+  {
+    title: "How CWI separates facts from public reaction",
+    slug: "how-cwi-separates-facts-from-public-reaction",
+    category: "Fact Check",
+    focus: "CWI's method for separating verified facts, public reaction, satire, and commentary",
+    angle: "CWI separates official statements, reported facts, public reaction, satire, and unanswered questions so readers can see what is known.",
+    tags: ["CWI method", "verification", "public reaction"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "What reliable sources currently say about CJP",
+    slug: "what-reliable-sources-say-about-cjp",
+    category: "Explainer",
+    focus: "a source-by-source guide to Reuters, ET, official CJP, Al Jazeera, India Today, and AP reporting",
+    angle: "Reliable sources agree that CJP is a satirical online phenomenon; details such as counts and platform actions remain time-sensitive.",
+    tags: ["CJP sources", "Reuters", "Economic Times"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "Why CWI now lists sources on every article",
+    slug: "why-cwi-lists-sources-on-every-article",
+    category: "Archive",
+    focus: "CWI's source-backed editorial standard",
+    angle: "CWI lists sources because public trust depends on visible attribution, correction paths, and separation between reporting and commentary.",
+    tags: ["sources", "editorial policy", "CWI"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "How to read CJP follower numbers responsibly",
+    slug: "how-to-read-cjp-follower-numbers-responsibly",
+    category: "Fact Check",
+    focus: "why CJP follower counts should be treated as date-specific reported numbers",
+    angle: "Follower counts change quickly, so CWI cites them only as reported by named outlets on specific dates.",
+    tags: ["follower counts", "CJP", "fact check"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "Why satire can become civic documentation",
+    slug: "why-satire-can-become-civic-documentation",
+    category: "Digital Culture",
+    focus: "satire as a record of public feeling when properly sourced",
+    angle: "Satire becomes civic documentation when it records public feeling, source trails, creator work, and the issues behind the joke.",
+    tags: ["civic satire", "public memory", "digital culture"],
+    verificationStatus: "Opinion/Analysis"
+  },
+  {
+    title: "What readers should not assume about CJP",
+    slug: "what-readers-should-not-assume-about-cjp",
+    category: "Fact Check",
+    focus: "common assumptions CWI will not present as fact",
+    angle: "Readers should not assume motives, legal findings, follower counts, or official reasons for platform actions without reliable attribution.",
+    tags: ["CJP assumptions", "verification", "media literacy"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "Why CWI is independent from CJP",
+    slug: "why-cwi-is-independent-from-cjp",
+    category: "Archive",
+    focus: "CWI's independent position relative to Cockroach Janta Party",
+    angle: "CWI documents CJP and the Cockroach wave, but it is not the official website, spokesperson, or representative of Cockroach Janta Party.",
+    tags: ["CWI independence", "Cockroach Janta Party", "editorial policy"],
+    verificationStatus: "Verified"
+  },
+  {
+    title: "How readers can submit corrections to CWI",
+    slug: "how-readers-can-submit-corrections-to-cwi",
+    category: "Fact Check",
+    focus: "reader corrections, source updates, and creator-credit requests",
+    angle: "CWI welcomes corrections, source links, creator-credit notes, and context that improves the public record.",
+    tags: ["corrections", "submit report", "creator credit"],
+    verificationStatus: "Verified"
   }
 ];
 
@@ -602,6 +870,38 @@ function socialPack(seed: ArticleSeed, summary: string): SocialPack {
   };
 }
 
+function sourcesFor(seed: ArticleSeed): ArticleSource[] {
+  const base = [sourceLibrary.reuters, sourceLibrary.officialCjp, sourceLibrary.economicTimesOverview];
+  const title = `${seed.title} ${seed.slug} ${seed.tags.join(" ")}`.toLowerCase();
+  const extra: ArticleSource[] = [];
+
+  if (title.includes("x account") || title.includes("withheld") || title.includes("on x")) {
+    extra.push(sourceLibrary.economicTimesX, sourceLibrary.hindustanTimes);
+  }
+
+  if (title.includes("abhijeet") || title.includes("founder") || title.includes("who is")) {
+    extra.push(sourceLibrary.indiaToday, sourceLibrary.timesOfIndia);
+  }
+
+  if (title.includes("verify") || title.includes("fact") || title.includes("misinformation") || title.includes("claim")) {
+    extra.push(sourceLibrary.boomLive);
+  }
+
+  if (title.includes("satire") || title.includes("protest") || title.includes("meme") || title.includes("main bhi")) {
+    extra.push(sourceLibrary.alJazeera);
+  }
+
+  if (title.includes("international") || title.includes("global") || title.includes("public reaction")) {
+    extra.push(sourceLibrary.apNews, sourceLibrary.alJazeera);
+  }
+
+  if (seed.category === "Creator Spotlight" || seed.category === "Digital Culture" || seed.category === "Youth Voice") {
+    extra.push(sourceLibrary.alJazeera, sourceLibrary.apNews);
+  }
+
+  return Array.from(new Map([...base, ...extra].map((source) => [source.url, source])).values()).slice(0, 6);
+}
+
 function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "relatedSlugs"> {
   const metaClosers = [
     "CWI tracks the context around CJP, the Cockroach wave, and civic satire.",
@@ -611,6 +911,8 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   const summary = seed.angle;
   const metaDescription = limitText(`${seed.angle} ${pick(metaClosers, index)}`, 155);
   const readingMinutes = 4 + (index % 4);
+  const sources = sourcesFor(seed);
+  const primarySource = sources[0];
   const pullQuote = pick(
     [
       "A viral moment becomes useful only when it is documented with context, credit, and care.",
@@ -642,30 +944,38 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   ];
   const sections = [
     {
-      heading: pick(["Why this matters", "The context", "Why readers are watching"], index),
+      heading: "What we know",
       paragraphs: [
-        pick(articleOpeners, index),
-        `The Cockroach wave is being discussed through humor, anger, creator work, and public commentary. CWI tracks those signals while keeping the distinction clear between satire, public reaction, and verified information.`
+        `${pick(articleOpeners, index)} The source base for this article includes ${sources.map((source) => source.outlet).join(", ")}.`,
+        `According to public reporting and the official CJP website, the story should be read through separate layers: official self-description, media reporting, public reaction, satire, and still-developing claims. CWI does not merge those layers into one claim.`
       ]
     },
     {
-      heading: pick(["The public signal", "What the conversation shows", "How it is spreading"], index),
+      heading: "What is still unclear",
+      paragraphs: [
+        `Some details remain time-sensitive, especially follower counts, sign-up claims, platform actions, and the exact reasons behind any account restrictions. CWI treats those as reported or developing unless an official source states otherwise.`,
+        `The timing of online events has led to public speculation, but no official reason should be assumed where a platform, court, government body, or named institution has not clearly confirmed it.`
+      ]
+    },
+    {
+      heading: "Why it matters",
       paragraphs: [
         pick(contextParagraphs, index),
         `The link to Cockroach Janta Party and CJP-related search interest should be read as part of a wider digital culture story: people are looking for language that makes public frustration visible without relying only on formal speeches or statements.`
       ]
     },
     {
-      heading: pick(["CWI context", "Editorial note", "How CWI reads it"], index),
+      heading: "CWI context",
       paragraphs: [
         pick(cwiMethodParagraphs, index),
-        `This is why CWI keeps creator credit, correction requests, and cautious verification labels inside the article record. The goal is a usable archive, not a louder version of the feed.`
+        `This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. The goal is a usable archive, not a louder version of the feed.`
       ]
     },
     {
-      heading: pick(["What to watch next", "What comes next", "Where the record goes"], index),
+      heading: "Editorial note",
       paragraphs: [
         pick(closingParagraphs, index),
+        `Primary reference for this version: ${primarySource.outlet} — ${primarySource.name}. Additional sources are listed below for readers who want to check the reporting trail.`,
         coreDisclaimer
       ]
     }
@@ -678,11 +988,15 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     slug: seed.slug,
     date: publishDate,
     updatedDate: publishDate,
+    publishedAt: publishDate,
+    updatedAt: publishDate,
     category: seed.category,
     summary,
     content,
     sections,
     sourceLabel: "CWI Watch Desk",
+    sourceUrl: primarySource.url,
+    sources,
     verificationStatus: seed.verificationStatus ?? "Reported",
     credit: "Cockroach Watch India",
     tags: Array.from(new Set([...seed.tags, "Cockroach Watch India", "CWI", "Cockroach wave"])),
@@ -690,8 +1004,12 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     readingMinutes,
     metaTitle: metaTitle(seed.title),
     metaDescription,
+    seoTitle: metaTitle(seed.title),
+    seoDescription: metaDescription,
+    ogImage: "/opengraph-image",
     imageAlt: `${seed.title} - Cockroach Watch India Watch Desk article graphic`,
     pullQuote,
+    relatedArticles: [],
     social: socialPack(seed, summary)
   };
 }
@@ -705,7 +1023,8 @@ export const posts: WatchPost[] = generatedPosts.map((post, index) => {
 
   return {
     ...post,
-    relatedSlugs
+    relatedSlugs,
+    relatedArticles: relatedSlugs
   };
 });
 

@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const baseUrl = "https://cwi-ten.vercel.app";
+const baseUrl = "https://cockroachwatchindia.online";
 const lastModified = "2026-05-21";
 
 const staticRoutes = [

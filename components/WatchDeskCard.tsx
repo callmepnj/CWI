@@ -13,7 +13,7 @@ export function WatchDeskCard({ post }: { post: WatchPost }) {
       </div>
       <h3 className="mt-5 font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">{post.title}</h3>
       <p className="mt-3 font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/50">
-        {post.date} / {post.readingMinutes} min read
+        {post.date} / {post.sources.length} sources / {post.readingMinutes} min read
       </p>
       <p className="mt-5 flex-1 leading-7 text-ink/70">{post.summary}</p>
       <div className="mt-5 flex flex-wrap gap-2">

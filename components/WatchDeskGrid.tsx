@@ -5,14 +5,26 @@ import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { postCategories, trendingTopics, type WatchPost } from "@/data/posts";
 import { cn } from "@/lib/utils";
 
-const filters = ["All", ...postCategories] as const;
+const filters = [
+  "All",
+  "Verified",
+  "Reported",
+  "Developing",
+  "Explainer",
+  "Opinion/Analysis",
+  "Satire/Context",
+  ...postCategories
+] as const;
 
 export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
   const [active, setActive] = useState<(typeof filters)[number]>("All");
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLowerCase();
   const visiblePosts = posts.filter((post) => {
-    const categoryMatch = active === "All" || post.category === active;
+    const categoryMatch =
+      active === "All" ||
+      post.category === active ||
+      post.verificationStatus === active;
     const queryMatch =
       normalizedQuery.length === 0 ||
       [post.title, post.summary, post.category, post.verificationStatus, ...post.tags].join(" ").toLowerCase().includes(normalizedQuery);

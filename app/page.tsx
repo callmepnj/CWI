@@ -103,7 +103,6 @@ export default function HomePage() {
   const featuredPost = posts[0];
   const latestIssuePost = posts.find((post) => post.category === "Civic Issue") ?? posts[0];
   const latestYouthPost = posts.find((post) => post.category === "Youth Voice") ?? posts[1];
-  const creatorSpotlight = posts.find((post) => post.category === "Creator Spotlight") ?? posts[2];
 
   return (
     <>
@@ -179,9 +178,12 @@ export default function HomePage() {
       </Section>
       <Section eyebrow="Watch Desk" title="Watch Desk" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from CWI.">
         <div className="mb-6 rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
-          <CardLabel className="bg-white/12 text-saffron ring-white/15">Featured article hero</CardLabel>
+          <CardLabel className="bg-white/12 text-saffron ring-white/15">Source-backed Watch Desk</CardLabel>
           <h3 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">{featuredPost.title}</h3>
           <p className="mt-4 max-w-3xl leading-8 text-white/76">{featuredPost.summary}</p>
+          <p className="mt-3 font-mono text-xs font-black uppercase tracking-[0.12em] text-saffron">
+            {featuredPost.sources.length} public sources / comments now open / corrections welcome
+          </p>
           <Button asChild className="mt-6" variant="saffron">
             <Link href={`/watch-desk/${featuredPost.slug}`}>Read featured Watch Desk article</Link>
           </Button>
@@ -189,24 +191,25 @@ export default function HomePage() {
 
         <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
+            <CardLabel>What we know</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">CJP is publicly reported as a satirical online phenomenon</p>
+            <p className="mt-3 leading-7 text-ink/70">CWI uses Reuters, Economic Times, official CJP pages, Al Jazeera, AP, and other public sources where relevant.</p>
+          </Card>
+          <Card>
+            <CardLabel>What remains unclear</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">Fast-moving details need attribution</p>
+            <p className="mt-3 leading-7 text-ink/70">Follower counts, platform actions, and public claims are treated as date-specific and developing unless clearly confirmed.</p>
+          </Card>
+          <Card>
             <CardLabel>Trending topics</CardLabel>
             <p className="font-display text-3xl font-black uppercase leading-tight">CJP / Cockroach wave</p>
             <p className="mt-3 leading-7 text-ink/70">{trendingTopics.slice(0, 5).join(", ")}</p>
           </Card>
           <Card>
-            <CardLabel>Most discussed issue</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">Public frustration and memory</p>
-            <p className="mt-3 leading-7 text-ink/70">Tracked through civic satire, creator commentary, public reaction, and submitted issue signals.</p>
-          </Card>
-          <Card>
-            <CardLabel>Creator spotlight</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">{creatorSpotlight.title}</p>
-            <Link href={`/watch-desk/${creatorSpotlight.slug}`} className="mt-4 inline-flex font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">Read spotlight</Link>
-          </Card>
-          <Card>
-            <CardLabel>Viral tracker</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">Publicly circulating</p>
-            <p className="mt-3 leading-7 text-ink/70">CWI labels developing trends carefully and does not treat viral claims as confirmed facts.</p>
+            <CardLabel>Corrections and discussion</CardLabel>
+            <p className="font-display text-3xl font-black uppercase leading-tight">Submit context</p>
+            <p className="mt-3 leading-7 text-ink/70">Every article now has moderated comments and visible source links for correction, context, and public-interest discussion.</p>
+            <Link href="/submit" className="mt-4 inline-flex font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">Submit correction</Link>
           </Card>
         </div>
 
