@@ -17,7 +17,7 @@ const newsroomStats = [
 export const metadata = createMetadata({
   title: "CWI Watch Desk - Updates, Explainers & Civic Notes",
   description:
-    "Read Cockroach Watch India updates, explainers, public reactions, youth voice stories, fact-check notes, creator spotlights, and Cockroach wave archive posts.",
+    "Read CWI Watch Desk explainers, public reaction notes, youth voice stories, fact-check briefs, creator spotlights, and Cockroach wave archive posts.",
   path: "/watch-desk"
 });
 
@@ -31,7 +31,7 @@ export default function WatchDeskPage() {
         eyebrow="CWI Digital Newsroom"
         title="The Watch Desk"
         titleAs="h1"
-        subtitle="The internet archive and newsroom of the Cockroach wave: explainers, public reactions, youth voice, creator-led commentary, civic satire, and public issue signals."
+        subtitle="A digital newsroom and public archive for the Cockroach wave: explainers, public reactions, youth voice, creator-led commentary, civic satire, and issue signals."
       >
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="bg-gradient-to-br from-ink via-[#102a63] to-royal text-white">
@@ -62,7 +62,7 @@ export default function WatchDeskPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Watch Desk Highlights" title="Trending newsroom notes">
+      <Section eyebrow="Watch Desk Highlights" title="Editor-selected newsroom notes">
         <div className="grid gap-6 md:grid-cols-3">
           {highlights.map((post) => (
             <WatchDeskCard key={post.slug} post={post} />
@@ -70,7 +70,7 @@ export default function WatchDeskPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Archive Search" title="All Watch Desk articles" subtitle="Filter by category, search topic clusters, and read CWI&apos;s public-interest archive of the Cockroach wave.">
+      <Section eyebrow="Archive Search" title="All Watch Desk articles" subtitle="Filter by category, search topic clusters, and read CWI's public-interest archive of the Cockroach wave.">
         <WatchDeskGrid posts={posts} />
       </Section>
     </>

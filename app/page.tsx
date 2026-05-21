@@ -177,7 +177,7 @@ export default function HomePage() {
           <Link href="/issues">Explore public issues tracked by CWI</Link>
         </Button>
       </Section>
-      <Section eyebrow="Watch Desk" title="Watch Desk" subtitle="Verified notes, explainers, public reactions, corrections, and movement updates.">
+      <Section eyebrow="Watch Desk" title="Watch Desk" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from CWI.">
         <div className="mb-6 rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
           <CardLabel className="bg-white/12 text-saffron ring-white/15">Featured article hero</CardLabel>
           <h3 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">{featuredPost.title}</h3>
@@ -195,7 +195,7 @@ export default function HomePage() {
           </Card>
           <Card>
             <CardLabel>Most discussed issue</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">Youth frustration and public memory</p>
+            <p className="font-display text-3xl font-black uppercase leading-tight">Public frustration and memory</p>
             <p className="mt-3 leading-7 text-ink/70">Tracked through civic satire, creator commentary, public reaction, and submitted issue signals.</p>
           </Card>
           <Card>
@@ -206,7 +206,7 @@ export default function HomePage() {
           <Card>
             <CardLabel>Viral tracker</CardLabel>
             <p className="font-display text-3xl font-black uppercase leading-tight">Publicly circulating</p>
-            <p className="mt-3 leading-7 text-ink/70">CWI labels developing trends carefully and avoids treating viral claims as confirmed facts.</p>
+            <p className="mt-3 leading-7 text-ink/70">CWI labels developing trends carefully and does not treat viral claims as confirmed facts.</p>
           </Card>
         </div>
 

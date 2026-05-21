@@ -63,7 +63,7 @@ type ArticleSeed = {
 const author = "Cockroach Watch India Editorial Desk";
 const publishDate = "2026-05-21";
 const coreDisclaimer =
-  "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly circulating trends, satire, public reactions, and civic commentary. Claims should not be treated as legal findings or official statements unless verified.";
+  "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article may discuss publicly circulating trends, satire, public reactions, and civic commentary. It should not be read as a legal finding, official statement, or verified claim unless clearly marked as such.";
 
 const articleSeeds: ArticleSeed[] = [
   {
@@ -101,11 +101,11 @@ const articleSeeds: ArticleSeed[] = [
     tags: ["Gen Z politics India", "political satire", "youth voice"]
   },
   {
-    title: "Why Main Bhi Cockroach exploded online",
+    title: "Why Main Bhi Cockroach spread online",
     slug: "why-main-bhi-cockroach-exploded-online",
     category: "Digital Culture",
     focus: "the spread of the Main Bhi Cockroach phrase across online spaces",
-    angle: "A phrase can travel when people see themselves inside it and repeat it as identity, not only as comedy.",
+    angle: "A phrase travels when people see themselves inside it and repeat it as identity, not just as a joke.",
     tags: ["Main Bhi Cockroach", "viral phrase", "digital culture"],
     verificationStatus: "Reported"
   },
@@ -118,16 +118,16 @@ const articleSeeds: ArticleSeed[] = [
     tags: ["meme politics India", "youth culture", "politics"]
   },
   {
-    title: "What happened to CJP on X?",
+    title: "CJP on X: what the public conversation shows",
     slug: "what-happened-to-cjp-on-x",
     category: "Public Reaction",
     focus: "public discussion around CJP on X and other platforms",
-    angle: "The visible conversation around CJP should be read with care: screenshots, posts, and claims need context.",
+    angle: "The visible conversation around CJP should be read carefully: screenshots, posts, and claims need context.",
     tags: ["CJP on X", "public reaction", "social media"],
     verificationStatus: "Reported"
   },
   {
-    title: "Why digital satire spreads faster than speeches",
+    title: "Why digital satire travels faster than speeches",
     slug: "why-digital-satire-spreads-faster-than-speeches",
     category: "Digital Culture",
     focus: "why short satirical formats move faster than formal political messaging",
@@ -139,7 +139,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "public-reaction-to-cockroach-wave-explained",
     category: "Public Reaction",
     focus: "how citizens, creators, students, and observers are reacting to the Cockroach wave",
-    angle: "Public reaction is not one single mood; it is a mix of amusement, anger, curiosity, and civic recognition.",
+    angle: "Public reaction is rarely one mood. Around the Cockroach wave, it mixes amusement, anger, curiosity, and civic recognition.",
     tags: ["public reaction", "Cockroach wave", "youth voice"],
     verificationStatus: "Reported"
   },
@@ -148,7 +148,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "why-creators-are-joining-cockroach-movement",
     category: "Creator Spotlight",
     focus: "how creators participate in the Cockroach wave through edits, explainers, posts, and commentary",
-    angle: "Creators are becoming civic translators for audiences that do not wait for formal media framing.",
+    angle: "Creators increasingly translate civic frustration for audiences that do not wait for formal media framing.",
     tags: ["creator-led commentary", "Cockroach movement", "creator credit"]
   },
   {
@@ -156,7 +156,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "how-meme-politics-became-mainstream-in-india",
     category: "Explainer",
     focus: "the mainstreaming of meme politics in Indian public conversation",
-    angle: "Meme politics is no longer side commentary; it shapes attention, language, and public perception.",
+    angle: "Meme politics is no longer side commentary. It shapes attention, language, and public perception.",
     tags: ["meme politics India", "Indian politics", "digital culture"]
   },
   {
@@ -168,7 +168,7 @@ const articleSeeds: ArticleSeed[] = [
     tags: ["internet movements", "2026", "digital civic culture"]
   },
   {
-    title: "The rise of digital civic culture",
+    title: "The rise of digital civic culture in India",
     slug: "rise-of-digital-civic-culture",
     category: "Digital Culture",
     focus: "digital civic culture as a new layer of public participation",
@@ -180,7 +180,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "is-cjp-satire-commentary-or-movement",
     category: "Explainer",
     focus: "how different audiences interpret CJP",
-    angle: "CJP can be discussed as satire, commentary, and movement language depending on context and source.",
+    angle: "CJP is discussed online as satire, commentary, and movement language, depending on context and source.",
     tags: ["CJP", "satire", "movement"],
     verificationStatus: "Opinion"
   },
@@ -189,7 +189,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "youth-frustration-and-meme-politics",
     category: "Youth Voice",
     focus: "why youth frustration often appears first through meme politics",
-    angle: "When formal language feels distant, memes become a fast public vocabulary for frustration and dignity.",
+    angle: "When formal language feels distant, memes become a public vocabulary for frustration, dignity, and recognition.",
     tags: ["youth frustration", "meme politics", "dignity"]
   },
   {
@@ -197,7 +197,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "why-cwi-was-created",
     category: "Archive",
     focus: "the reason Cockroach Watch India exists as an independent civic archive",
-    angle: "CWI was built to document, verify, amplify, and preserve the public memory around the Cockroach wave.",
+    angle: "CWI was built to document, verify, amplify, and preserve public memory around the Cockroach wave.",
     tags: ["Cockroach Watch India", "CWI", "archive"],
     verificationStatus: "Verified"
   },
@@ -256,7 +256,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "what-makes-a-meme-become-a-movement",
     category: "Meme Watch",
     focus: "the conditions that turn a meme into movement language",
-    angle: "A meme becomes movement language when it helps people name a shared public feeling.",
+    angle: "A meme becomes movement language when it helps people name a shared public feeling with clarity.",
     tags: ["meme movement", "Cockroach wave", "digital culture"],
     verificationStatus: "Opinion/Satire"
   },
@@ -310,7 +310,7 @@ const articleSeeds: ArticleSeed[] = [
     tags: ["online communities", "digital culture", "public issues"]
   },
   {
-    title: "CJP and the rise of internet-first movements",
+    title: "CJP and the rise of internet-first public movements",
     slug: "cjp-and-rise-of-internet-first-movements",
     category: "Movement Update",
     focus: "CJP as part of a wider internet-first movement pattern",
@@ -376,7 +376,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "how-public-reaction-becomes-news",
     category: "Public Reaction",
     focus: "when public reaction deserves documentation",
-    angle: "Public reaction becomes news when it reveals a wider civic mood, not only a temporary comment storm.",
+    angle: "Public reaction becomes news when it reveals a wider civic mood, not just a temporary comment storm.",
     tags: ["public reaction", "newsroom", "civic mood"],
     verificationStatus: "Reported"
   },
@@ -385,7 +385,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "why-youth-voice-needs-an-archive",
     category: "Youth Voice",
     focus: "archiving youth voice before platforms bury it",
-    angle: "Youth voice deserves memory because public systems often notice only after the moment has passed.",
+    angle: "Youth voice deserves an archive because public systems often notice it only after the moment has passed.",
     tags: ["youth voice India", "archive", "public memory"]
   },
   {
@@ -393,7 +393,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "difference-between-satire-and-fake-news",
     category: "Fact Check",
     focus: "how CWI separates satire from misinformation",
-    angle: "Satire signals commentary. Fake news presents unverified claims as fact. The difference matters.",
+    angle: "Satire signals commentary. Fake news presents unverified claims as fact. The difference matters for trust, safety, and public memory.",
     tags: ["fact check", "satire", "fake news"],
     verificationStatus: "Verified"
   },
@@ -454,7 +454,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "why-cockroach-identity-travels",
     category: "Meme Watch",
     focus: "why the Cockroach identity is memorable online",
-    angle: "The identity travels because it is resilient, uncomfortable, ironic, and easy to remix.",
+    angle: "The identity travels because it is resilient, uncomfortable, ironic, and easy to remix without losing recognition.",
     tags: ["Cockroach identity", "Cockroach wave", "meme watch"],
     verificationStatus: "Opinion/Satire"
   },
@@ -463,7 +463,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "what-students-are-saying-through-meme-politics",
     category: "Youth Voice",
     focus: "student frustration, humor, and civic expression",
-    angle: "Student meme politics often carries serious signals about exams, jobs, dignity, and institutional trust.",
+    angle: "Student meme politics often carries serious signals about exams, jobs, dignity, and trust in institutions.",
     tags: ["students", "meme politics", "youth voice"],
     verificationStatus: "Reported"
   },
@@ -472,7 +472,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "why-unemployment-anger-appears-online-first",
     category: "Youth Voice",
     focus: "unemployment anger and digital expression",
-    angle: "Online spaces often become the first public record of frustration when offline channels feel closed.",
+    angle: "Online spaces often become the first public record of frustration when offline channels feel closed or unresponsive.",
     tags: ["unemployment", "youth voice India", "public issues"],
     verificationStatus: "Reported"
   },
@@ -490,7 +490,7 @@ const articleSeeds: ArticleSeed[] = [
     slug: "why-digital-protest-needs-verification",
     category: "Fact Check",
     focus: "verification as a safety layer for digital protest",
-    angle: "Verification protects public-interest speech from being weakened by fake claims or bad context.",
+    angle: "Verification protects public-interest speech from being weakened by false claims or missing context.",
     tags: ["digital protest", "verification", "fact check"],
     verificationStatus: "Verified"
   },
@@ -571,7 +571,11 @@ function limitText(text: string, maxLength: number) {
     return text;
   }
 
-  return `${text.slice(0, maxLength - 1).trimEnd()}.`;
+  const truncated = text.slice(0, maxLength - 3);
+  const lastSpace = truncated.lastIndexOf(" ");
+  const cleanText = lastSpace > 80 ? truncated.slice(0, lastSpace) : truncated;
+
+  return `${cleanText.trimEnd()}...`;
 }
 
 function metaTitle(title: string) {
@@ -580,53 +584,88 @@ function metaTitle(title: string) {
   return `${limitText(title, maxTitleLength)}${suffix}`;
 }
 
+function pick<T>(items: T[], index: number) {
+  return items[index % items.length];
+}
+
 function socialPack(seed: ArticleSeed, summary: string): SocialPack {
   return {
     xThread: [
-      `${seed.title}: a CWI Watch Desk note.`,
-      `Cockroach Watch India is documenting the Cockroach Janta Party conversation, the Cockroach wave, youth voice, and meme politics with context.`,
-      "Read the full article, check the source labels, and submit corrections or creator-credit notes where needed."
+      `${seed.title}: a Watch Desk brief from CWI.`,
+      "Cockroach Watch India is tracking the public conversation around Cockroach Janta Party, the Cockroach wave, creator commentary, and civic satire with context.",
+      "Read the article, check the labels, and send corrections or creator-credit notes when context is missing."
     ],
-    instagramCaption: `${seed.title}. Cockroach Watch India explains the Cockroach wave, CWI's civic-watch context, and the public conversation around Cockroach Janta Party. Document. Verify. Amplify.`,
-    redditPost: `${summary} This CWI post is for discussion, source-checking, and public-interest context around the Cockroach wave.`,
-    youtubeShortsDescription: `${seed.title} - Cockroach Watch India explains the Cockroach wave, CJP online discussion, youth voice, civic satire, and creator-led commentary.`,
+    instagramCaption: `${seed.title}. Cockroach Watch India explains the public context around CJP, the Cockroach wave, youth voice, civic satire, and creator-led commentary. Document. Verify. Amplify.`,
+    redditPost: `${summary} This CWI post is meant for source-checking, public-interest discussion, and responsible context around the Cockroach wave.`,
+    youtubeShortsDescription: `${seed.title} - CWI explains the Cockroach wave, Cockroach Janta Party discussion, Gen Z politics, civic satire, and creator culture in India.`,
     seoSummary: summary
   };
 }
 
 function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "relatedSlugs"> {
-  const summary = limitText(
-    `${seed.angle} Cockroach Watch India, or CWI, places this inside the wider Cockroach Janta Party discussion, the Cockroach wave, youth voice, civic satire, and digital public culture in India.`,
-    155
-  );
+  const metaClosers = [
+    "CWI tracks the context around CJP, the Cockroach wave, and civic satire.",
+    "A CWI Watch Desk brief on CJP, youth voice, and digital civic culture.",
+    "Cockroach Watch India explains the public context with careful labels."
+  ];
+  const summary = seed.angle;
+  const metaDescription = limitText(`${seed.angle} ${pick(metaClosers, index)}`, 155);
   const readingMinutes = 4 + (index % 4);
-  const pullQuote = `The Cockroach wave is not only a feed event; it is a public-memory signal that needs context, credit, and verification.`;
+  const pullQuote = pick(
+    [
+      "A viral moment becomes useful only when it is documented with context, credit, and care.",
+      "The internet moves quickly; public memory needs a slower, more responsible record.",
+      "CWI treats the Cockroach wave as a civic signal, not as a rumor machine.",
+      "Satire can travel fast, but public-interest commentary still needs verification."
+    ],
+    index
+  );
+  const articleOpeners = [
+    `${seed.title} matters because it points to ${seed.focus}. CWI is tracking this subject as part of a public archive, not as an official voice of Cockroach Janta Party or any political organization.`,
+    `At the center of this story is ${seed.focus}. Cockroach Watch India follows the discussion as independent civic commentary, with clear distance from official party claims or endorsements.`,
+    `The subject matters because it helps explain ${seed.focus}. CWI's role is to document the public conversation, identify context, and avoid treating viral claims as settled facts.`
+  ];
+  const contextParagraphs = [
+    "The discussion is moving through posts, edits, short videos, comment sections, and creator-led explainers. That visibility matters, but visibility alone does not verify a claim.",
+    "Online attention can make a topic feel settled before the facts are clear. CWI separates public reaction from confirmation, especially when screenshots, reposts, or edited clips are involved.",
+    "The strongest public signal is not only that people are sharing the topic. It is that they are using it to talk about recognition, frustration, accountability, and digital civic culture."
+  ];
+  const cwiMethodParagraphs = [
+    "Cockroach Watch India uses careful labels for developing material: reportedly, publicly circulating, online discussion, internet reaction, viral trend, and public commentary. The aim is clarity, not exaggeration.",
+    "CWI's editorial standard is simple: document the moment, verify the source trail where possible, credit creators, and explain the public-interest context without impersonating Cockroach Janta Party.",
+    "The Watch Desk avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
+  ];
+  const closingParagraphs = [
+    "What happens next depends on how creators, students, first-time voters, civic observers, and local communities continue to use the language. CWI will keep the record focused on context, safety, and public memory.",
+    "The next phase will be shaped by correction, repetition, creator credit, and whether the conversation stays attached to real public issues. CWI will continue to archive the signal without inflating it.",
+    "Readers should follow the source trail, compare claims, and treat viral certainty with caution. The purpose of the archive is to make the moment easier to understand, not louder than the evidence."
+  ];
   const sections = [
     {
-      heading: "Why this matters",
+      heading: pick(["Why this matters", "The context", "Why readers are watching"], index),
       paragraphs: [
-        `${seed.title} matters because ${seed.focus}. Cockroach Watch India follows this topic as a civic archive, not as an official voice of Cockroach Janta Party or any political organization.`,
-        `CWI tracks the Cockroach wave as public commentary: what people are saying, what creators are making, what issues are being attached to the trend, and what still requires verification.`
+        pick(articleOpeners, index),
+        `The Cockroach wave is being discussed through humor, anger, creator work, and public commentary. CWI tracks those signals while keeping the distinction clear between satire, public reaction, and verified information.`
       ]
     },
     {
-      heading: "The public signal",
+      heading: pick(["The public signal", "What the conversation shows", "How it is spreading"], index),
       paragraphs: [
-        `The online discussion around this topic is publicly circulating through posts, edits, short videos, comments, and creator-led commentary. That makes it visible, but visibility does not automatically make every claim verified.`,
-        `The stronger reading is that youth voice, meme politics, and civic satire are becoming part of how people describe public frustration in India. CWI documents that signal with source labels and correction paths.`
+        pick(contextParagraphs, index),
+        `The link to Cockroach Janta Party and CJP-related search interest should be read as part of a wider digital culture story: people are looking for language that makes public frustration visible without relying only on formal speeches or statements.`
       ]
     },
     {
-      heading: "CWI context",
+      heading: pick(["CWI context", "Editorial note", "How CWI reads it"], index),
       paragraphs: [
-        `Cockroach Watch India uses cautious language for developing claims: reportedly, publicly circulating, online discussions, internet reaction, viral trend, and public commentary. CWI avoids presenting unverified allegations as fact.`,
-        `For CWI, the editorial duty is simple: document the moment, verify the source trail, amplify public-interest context, credit creators, and archive the Cockroach wave without impersonating Cockroach Janta Party.`
+        pick(cwiMethodParagraphs, index),
+        `This is why CWI keeps creator credit, correction requests, and cautious verification labels inside the article record. The goal is a usable archive, not a louder version of the feed.`
       ]
     },
     {
-      heading: "What to watch next",
+      heading: pick(["What to watch next", "What comes next", "Where the record goes"], index),
       paragraphs: [
-        `Readers should watch how creators, students, first-time voters, and civic observers keep remixing this conversation. The next phase of any internet-first movement is often shaped by repetition, correction, and public memory.`,
+        pick(closingParagraphs, index),
         coreDisclaimer
       ]
     }
@@ -650,7 +689,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     author,
     readingMinutes,
     metaTitle: metaTitle(seed.title),
-    metaDescription: summary,
+    metaDescription,
     imageAlt: `${seed.title} - Cockroach Watch India Watch Desk article graphic`,
     pullQuote,
     social: socialPack(seed, summary)

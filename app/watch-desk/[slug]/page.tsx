@@ -247,7 +247,7 @@ export default async function WatchPostPage({ params }: Props) {
               <CardLabel>Author</CardLabel>
               <h2 className="font-display text-2xl font-black uppercase tracking-[-0.03em]">{post.author}</h2>
               <p className="mt-4 leading-7 text-ink/70">
-                CWI&apos;s editorial desk documents youth voice, public issues, civic satire, creator-led commentary, and the Cockroach wave with public-interest context.
+                CWI&apos;s editorial desk documents youth voice, public issues, civic satire, creator-led commentary, and the Cockroach wave with public-interest context and careful labels.
               </p>
               <Link href="/about" className="mt-5 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">
                 About CWI <ArrowRight className="h-4 w-4" />
