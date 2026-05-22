@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Mail, MessageCircle, Send, Twitter, Youtube } from "lucide-react";
+import { AtSign, Facebook, Instagram, Mail, MessageCircle, Send, Twitter, Youtube } from "lucide-react";
 import { site } from "@/lib/site";
 
 export const socials = [
@@ -37,6 +37,12 @@ export const socials = [
     href: site.facebook,
     handle: "Cockroach Watch India",
     icon: Facebook
+  },
+  {
+    label: "Bluesky",
+    href: site.bluesky,
+    handle: "cwatchindia.bsky.social",
+    icon: AtSign
   },
   {
     label: "Email",

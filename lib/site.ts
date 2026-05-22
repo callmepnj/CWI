@@ -9,6 +9,7 @@ export const site = {
   telegram: "https://t.me/cockroachwatchindia",
   reddit: "https://www.reddit.com/r/CockroachwatchIndia/",
   facebook: "https://www.facebook.com/profile.php?id=61590247497201",
+  bluesky: "https://bsky.app/profile/cwatchindia.bsky.social",
   disclaimer:
     "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Not affiliated with any political party or organization unless officially declared.",
   shortDisclaimer:

@@ -56,6 +56,9 @@ export function HeroSection() {
             <Button asChild size="sm" variant="ghost">
               <Link href={site.telegram} target="_blank">Telegram</Link>
             </Button>
+            <Button asChild size="sm" variant="ghost">
+              <Link href={site.bluesky} target="_blank">Bluesky</Link>
+            </Button>
           </div>
           <p className="mt-8 flex max-w-3xl items-start gap-3 rounded-3xl border border-royal/15 bg-skywash/85 p-4 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-ink/70">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-royal" />

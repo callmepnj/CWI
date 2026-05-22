@@ -21,6 +21,7 @@ const footerLinks = [
   { label: "YouTube", href: site.youtube },
   { label: "Reddit", href: site.reddit },
   { label: "Facebook", href: site.facebook },
+  { label: "Bluesky", href: site.bluesky },
   { label: "Email", href: `mailto:${site.email}` }
 ];
 
