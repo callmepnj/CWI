@@ -1006,7 +1006,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     metaDescription,
     seoTitle: metaTitle(seed.title),
     seoDescription: metaDescription,
-    ogImage: "/opengraph-image",
+    ogImage: "https://cockroachwatchindia.online/opengraph-image",
     imageAlt: `${seed.title} - Cockroach Watch India Watch Desk article graphic`,
     pullQuote,
     relatedArticles: [],

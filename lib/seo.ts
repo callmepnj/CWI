@@ -11,7 +11,7 @@ type SeoInput = {
 };
 
 export const ogImage = {
-  url: "/opengraph-image",
+  url: `${site.url}/opengraph-image`,
   width: 1200,
   height: 630,
   alt: "Cockroach Watch India Document Verify Amplify social preview"
