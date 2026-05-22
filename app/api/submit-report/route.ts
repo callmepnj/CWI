@@ -5,14 +5,15 @@ export const runtime = "nodejs";
 
 const validTypes = new Set([
   "Public Issue",
-  "Viral Video",
-  "Meme / Creative",
-  "Fact-check request",
-  "Correction",
-  "Creator credit request",
+  "Student / Youth Concern",
+  "Viral Claim",
+  "Civic Issue",
+  "Creator Credit Request",
+  "Correction Request",
+  "Fact-check Request",
+  "Local News Tip",
   "Collaboration",
-  "Youth story",
-  "Local civic issue"
+  "Other"
 ]);
 
 export async function POST(request: Request) {
@@ -22,16 +23,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Invalid request body." }, { status: 400 });
   }
 
+  if (typeof body.name !== "string" || body.name.trim().length < 1) {
+    return NextResponse.json({ ok: false, error: "Name or handle is required." }, { status: 400 });
+  }
+
   if (typeof body.type !== "string" || !validTypes.has(body.type)) {
-    return NextResponse.json({ ok: false, error: "Submission type is required." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Please select a submission type." }, { status: 400 });
+  }
+
+  if (typeof body.sourceUrl === "string" && body.sourceUrl.trim().length > 0 && !isValidUrl(body.sourceUrl)) {
+    return NextResponse.json({ ok: false, error: "Please enter a valid link." }, { status: 400 });
   }
 
   if (typeof body.message !== "string" || body.message.trim().length < 10) {
-    return NextResponse.json({ ok: false, error: "Describe the issue in at least 10 characters." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Please describe the issue." }, { status: 400 });
   }
 
-  if (body.consent !== "on" || body.safety !== "on") {
-    return NextResponse.json({ ok: false, error: "Consent and safety confirmation are required." }, { status: 400 });
+  if (body.consent !== "on" || body.safety !== "on" || body.editorialPolicy !== "on") {
+    return NextResponse.json({ ok: false, error: "Consent is required before submitting." }, { status: 400 });
   }
 
   try {
@@ -73,13 +82,17 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       id: result.rows[0]?.id,
-      message: "Report received. The Watch Desk will review it."
+      message: "Report submitted successfully. The Watch Desk will review it before taking further action."
     });
   } catch (error) {
     console.error("CWI report submission failed", error);
 
     return NextResponse.json(
-      { ok: false, error: "The Watch Desk could not save this report right now. Please try again." },
+      {
+        ok: false,
+        error:
+          "Something went wrong while submitting your report. Please try again or contact cockroachwatchindia@gmail.com."
+      },
       { status: 500 }
     );
   }
@@ -92,4 +105,13 @@ function optionalString(value: unknown) {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function isValidUrl(value: string) {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
