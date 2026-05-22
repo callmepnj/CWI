@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea, inputClass } from "@/components/ui/input";
@@ -19,9 +19,13 @@ const submissionTypes = [
   "Other"
 ];
 
+const maxEvidenceFiles = 3;
+const maxEvidenceBytes = 4 * 1024 * 1024;
+
 export function SubmitForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,6 +36,7 @@ export function SubmitForm() {
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
     const validationError = validateSubmission(payload);
+    const fileValidationError = validateEvidenceFiles(selectedFiles);
 
     if (validationError) {
       setStatus("error");
@@ -39,11 +44,16 @@ export function SubmitForm() {
       return;
     }
 
+    if (fileValidationError) {
+      setStatus("error");
+      setError(fileValidationError);
+      return;
+    }
+
     try {
       const response = await fetch("/api/submit-report", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: formData
       });
 
       const data = (await response.json()) as { ok?: boolean; error?: string };
@@ -54,6 +64,7 @@ export function SubmitForm() {
       }
 
       form.reset();
+      setSelectedFiles([]);
       setStatus("success");
     } catch (submitError) {
       setStatus("error");
@@ -63,6 +74,10 @@ export function SubmitForm() {
           : "Something went wrong while submitting your report. Please try again or contact cockroachwatchindia@gmail.com."
       );
     }
+  }
+
+  function onEvidenceChange(event: ChangeEvent<HTMLInputElement>) {
+    setSelectedFiles(Array.from(event.currentTarget.files ?? []));
   }
 
   return (
@@ -128,13 +143,27 @@ export function SubmitForm() {
 
           <Field
             label="Upload Evidence"
-            helper="Accepted formats: JPG, PNG, PDF, MP4, or document files. Avoid uploading private personal data."
+            helper="Accepted formats: JPG, PNG, PDF, MP4, WebM, MOV, DOC, or DOCX. You can add up to 3 files with a combined size under 4 MB. For larger videos, paste the source link above."
           >
-            <div className="rounded-2xl border border-dashed border-royal/30 bg-royal/5 p-5">
+            <div className="grid gap-4 rounded-2xl border border-dashed border-royal/30 bg-royal/5 p-5">
               <p className="font-bold text-ink">Upload screenshots, images, documents, or supporting files</p>
-              <p className="mt-2 text-sm leading-6 text-ink/62">
-                File upload will be available soon. For now, paste the source link or describe the evidence below.
-              </p>
+              <input
+                name="evidenceFiles"
+                type="file"
+                multiple
+                accept=".jpg,.jpeg,.png,.pdf,.mp4,.webm,.mov,.doc,.docx,image/jpeg,image/png,application/pdf,video/mp4,video/webm,video/quicktime,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={onEvidenceChange}
+                className="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm font-bold text-ink file:mr-4 file:rounded-full file:border-0 file:bg-ink file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-[0.12em] file:text-white"
+              />
+              {selectedFiles.length > 0 ? (
+                <ul className="grid gap-2 text-xs font-bold leading-5 text-ink/62">
+                  {selectedFiles.map((file) => (
+                    <li key={`${file.name}-${file.size}`} className="rounded-xl bg-white px-3 py-2">
+                      {file.name} - {formatBytes(file.size)}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </Field>
 
@@ -223,6 +252,45 @@ function validateSubmission(payload: Record<string, FormDataEntryValue>) {
   }
 
   return "";
+}
+
+function validateEvidenceFiles(files: File[]) {
+  const allowedTypes = new Set([
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+    "video/mp4",
+    "video/webm",
+    "video/quicktime",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ]);
+
+  if (files.length > maxEvidenceFiles) {
+    return `Please upload no more than ${maxEvidenceFiles} evidence files.`;
+  }
+
+  const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+
+  if (totalBytes > maxEvidenceBytes) {
+    return "Evidence files must be under 4 MB total. For larger videos, paste the source link instead.";
+  }
+
+  const unsupportedFile = files.find((file) => file.size > 0 && !allowedTypes.has(file.type));
+
+  if (unsupportedFile) {
+    return "Please upload JPG, PNG, PDF, MP4, WebM, MOV, DOC, or DOCX files only.";
+  }
+
+  return "";
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024 * 1024) {
+    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function isHttpUrl(value: string) {

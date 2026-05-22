@@ -48,6 +48,19 @@ export async function ensureReportsTable() {
         status text not null default 'received',
         raw_payload jsonb not null default '{}'::jsonb
       );
+
+      create table if not exists cwi_report_evidence_files (
+        id bigserial primary key,
+        report_id bigint not null references cwi_report_submissions(id) on delete cascade,
+        created_at timestamptz not null default now(),
+        file_name text not null,
+        file_type text not null,
+        file_size integer not null,
+        file_data bytea not null
+      );
+
+      create index if not exists cwi_report_evidence_files_report_id_idx
+      on cwi_report_evidence_files (report_id);
     `).then(() => undefined);
   }
 
