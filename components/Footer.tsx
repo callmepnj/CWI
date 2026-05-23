@@ -5,6 +5,7 @@ import { site } from "@/lib/site";
 
 const footerLinks = [
   { label: "Home", href: "/" },
+  { label: "Watch", href: "/watch" },
   { label: "About", href: "/about" },
   { label: "Charter", href: "/charter" },
   { label: "Watch Desk", href: "/watch-desk" },

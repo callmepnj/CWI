@@ -10,20 +10,19 @@ import { cn } from "@/lib/utils";
 
 const primaryItems = [
   { label: "Home", href: "/" },
+  { label: "Watch", href: "/watch" },
   { label: "Watch Desk", href: "/watch-desk" },
   { label: "Issues", href: "/issues" },
-  { label: "Join", href: "/join" },
-  { label: "Submit", href: "/submit" },
-  { label: "Contact", href: "/contact" }
+  { label: "Submit", href: "/submit" }
 ];
 
 const moreItems = [
+  { label: "About", href: "/about" },
   { label: "Charter", href: "/charter" },
-  { label: "Five-Point Agenda", href: "/five-point-agenda" },
   { label: "Youth Voice", href: "/youth-voice" },
   { label: "Media Bank", href: "/media-bank" },
   { label: "Credit Policy", href: "/credit-policy" },
-  { label: "About", href: "/about" }
+  { label: "Contact", href: "/contact" }
 ];
 
 export function Navbar() {

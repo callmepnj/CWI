@@ -10,6 +10,7 @@ const staticRoutes = [
   "/about",
   "/contact",
   "/charter",
+  "/watch",
   "/watch-desk",
   "/issues",
   "/join",

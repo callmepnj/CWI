@@ -11,6 +11,7 @@ import { RoleCard } from "@/components/RoleCard";
 import { Section } from "@/components/Section";
 import { SocialLinks } from "@/components/SocialLinks";
 import { WatchDeskCard } from "@/components/WatchDeskCard";
+import { WatchHighlightSection } from "@/components/WatchHighlightSection";
 import { WatchTicker } from "@/components/WatchTicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
@@ -115,6 +116,7 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaqJsonLd) }}
       />
       <HeroSection />
+      <WatchHighlightSection />
       <WatchTicker />
       <Section title="A Statement From The Founders">
         <FounderStatement />

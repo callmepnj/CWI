@@ -23,6 +23,7 @@ export const importantRoutes = [
   "/what-is-cwi",
   "/contact",
   "/charter",
+  "/watch",
   "/watch-desk",
   "/issues",
   "/join",
