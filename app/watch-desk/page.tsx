@@ -22,8 +22,9 @@ export const metadata = createMetadata({
 });
 
 export default function WatchDeskPage() {
-  const featured = posts[0];
-  const highlights = posts.slice(1, 4);
+  const dateSortedPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date));
+  const featured = dateSortedPosts[0];
+  const highlights = dateSortedPosts.slice(1, 4);
 
   return (
     <>
@@ -71,8 +72,12 @@ export default function WatchDeskPage() {
       </Section>
 
       <Section eyebrow="Archive Search" title="All Watch Desk articles" subtitle="Filter by category, search topic clusters, and read CWI's public-interest archive of the Cockroach wave.">
-        <WatchDeskGrid posts={posts} />
+        <WatchDeskGrid posts={dateSortedPosts} />
       </Section>
     </>
   );
+}
+
+function dateValue(value: string) {
+  return new Date(`${value}T00:00:00+05:30`).getTime();
 }

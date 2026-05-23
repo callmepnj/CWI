@@ -76,7 +76,7 @@ type ArticleSeed = {
 };
 
 const author = "Cockroach Watch India Editorial Desk";
-const publishDate = "2026-05-21";
+const articleDateCycle = ["2026-05-23", "2026-05-22", "2026-05-21"];
 const coreDisclaimer =
   "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.";
 
@@ -990,6 +990,31 @@ function topicSpecificParagraphs(seed: ArticleSeed) {
   return paragraphs;
 }
 
+function datesFor(seed: ArticleSeed, index: number) {
+  const title = `${seed.title} ${seed.slug} ${seed.tags.join(" ")}`.toLowerCase();
+
+  if (title.includes("x account") || title.includes("withheld") || title.includes("on x")) {
+    return { publishedAt: "2026-05-21", updatedAt: "2026-05-23" };
+  }
+
+  if (title.includes("abhijeet") || title.includes("founder") || title.includes("death") || title.includes("threat")) {
+    return { publishedAt: "2026-05-22", updatedAt: "2026-05-23" };
+  }
+
+  if (title.includes("follower") || title.includes("bot") || title.includes("social media")) {
+    return { publishedAt: "2026-05-22", updatedAt: "2026-05-23" };
+  }
+
+  if (seed.category === "Archive" || seed.category === "Fact Check") {
+    return { publishedAt: "2026-05-23", updatedAt: "2026-05-23" };
+  }
+
+  const publishedAt = articleDateCycle[index % articleDateCycle.length];
+  const updatedAt = publishedAt === "2026-05-21" ? "2026-05-22" : "2026-05-23";
+
+  return { publishedAt, updatedAt };
+}
+
 function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "relatedSlugs"> {
   const summary = limitText(`CWI Watch Desk: ${seed.angle}`, 190);
   const metaDescription = limitText(
@@ -1000,6 +1025,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   const sources = sourcesFor(seed);
   const primarySource = sources[0];
   const topicNotes = topicSpecificParagraphs(seed);
+  const articleDates = datesFor(seed, index);
   const pullQuote = pick(
     [
       "A viral moment becomes useful only when it is documented with context, credit, and care.",
@@ -1090,10 +1116,10 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   return {
     title: seed.title,
     slug: seed.slug,
-    date: publishDate,
-    updatedDate: publishDate,
-    publishedAt: publishDate,
-    updatedAt: publishDate,
+    date: articleDates.publishedAt,
+    updatedDate: articleDates.updatedAt,
+    publishedAt: articleDates.publishedAt,
+    updatedAt: articleDates.updatedAt,
     category: seed.category,
     summary,
     content,

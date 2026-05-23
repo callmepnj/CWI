@@ -51,7 +51,9 @@ const watchJsonLd = {
 };
 
 export default function WatchPage() {
-  const latestArticles = posts.slice(0, 6);
+  const latestArticles = [...posts]
+    .sort((first, second) => dateValue(second.date) - dateValue(first.date))
+    .slice(0, 6);
 
   return (
     <>
@@ -148,4 +150,8 @@ export default function WatchPage() {
       </Section>
     </>
   );
+}
+
+function dateValue(value: string) {
+  return new Date(`${value}T00:00:00+05:30`).getTime();
 }

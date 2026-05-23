@@ -27,6 +27,8 @@ const footerLinks = [
 ];
 
 export function Footer() {
+  const latestPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date)).slice(0, 4);
+
   return (
     <footer className="bg-ink px-4 py-12 text-white">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.8fr_0.8fr]">
@@ -55,7 +57,7 @@ export function Footer() {
         <div>
           <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Latest updates</p>
           <div className="space-y-3">
-            {posts.slice(0, 4).map((post) => (
+            {latestPosts.map((post) => (
               <Link key={post.slug} href={`/watch-desk/${post.slug}`} className="block rounded-2xl border border-white/10 bg-white/5 p-3 text-xs font-black uppercase leading-5 tracking-[0.1em] text-white/78 transition hover:border-saffron/60 hover:text-saffron">
                 {post.title}
               </Link>
@@ -79,4 +81,8 @@ export function Footer() {
       </div>
     </footer>
   );
+}
+
+function dateValue(value: string) {
+  return new Date(`${value}T00:00:00+05:30`).getTime();
 }

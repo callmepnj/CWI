@@ -165,8 +165,8 @@ export default async function WatchPostPage({ params }: Props) {
               </p>
 
               <div className="mt-7 grid gap-3 border-y border-line py-5 text-sm font-bold uppercase tracking-[0.08em] text-ink/55 sm:grid-cols-3">
-                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-royal" /> Published {post.publishedAt}</span>
-                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Last updated {post.updatedAt}</span>
+                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-royal" /> Published {formatArticleDate(post.publishedAt)}</span>
+                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Last updated {formatArticleDate(post.updatedAt)}</span>
                 <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-royal" /> {post.sources.length} sources</span>
               </div>
 
@@ -338,4 +338,12 @@ export default async function WatchPostPage({ params }: Props) {
       </article>
     </>
   );
+}
+
+function formatArticleDate(value: string) {
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(new Date(`${value}T00:00:00+05:30`));
 }

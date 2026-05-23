@@ -42,7 +42,9 @@ export default async function WatchDeskCategoryPage({ params }: Props) {
     notFound();
   }
 
-  const categoryPosts = posts.filter((post) => post.category === entry.label);
+  const categoryPosts = posts
+    .filter((post) => post.category === entry.label)
+    .sort((first, second) => dateValue(second.date) - dateValue(first.date));
 
   return (
     <Section
@@ -58,4 +60,8 @@ export default async function WatchDeskCategoryPage({ params }: Props) {
       </div>
     </Section>
   );
+}
+
+function dateValue(value: string) {
+  return new Date(`${value}T00:00:00+05:30`).getTime();
 }

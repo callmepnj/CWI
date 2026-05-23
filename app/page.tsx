@@ -101,9 +101,10 @@ export const metadata = createMetadata({
 });
 
 export default function HomePage() {
-  const featuredPost = posts[0];
-  const latestIssuePost = posts.find((post) => post.category === "Civic Issue") ?? posts[0];
-  const latestYouthPost = posts.find((post) => post.category === "Youth Voice") ?? posts[1];
+  const dateSortedPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date));
+  const featuredPost = dateSortedPosts[0];
+  const latestIssuePost = dateSortedPosts.find((post) => post.category === "Civic Issue") ?? dateSortedPosts[0];
+  const latestYouthPost = dateSortedPosts.find((post) => post.category === "Youth Voice") ?? dateSortedPosts[1];
 
   return (
     <>
@@ -216,7 +217,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {posts.slice(0, 8).map((post) => (
+          {dateSortedPosts.slice(0, 8).map((post) => (
             <WatchDeskCard key={post.slug} post={post} />
           ))}
         </div>
@@ -310,4 +311,8 @@ export default function HomePage() {
       </div>
     </>
   );
+}
+
+function dateValue(value: string) {
+  return new Date(`${value}T00:00:00+05:30`).getTime();
 }
