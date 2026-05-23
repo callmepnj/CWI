@@ -15,9 +15,9 @@ const newsroomStats = [
 ];
 
 export const metadata = createMetadata({
-  title: "CWI Watch Desk - Updates, Explainers & Civic Notes",
+  title: "CWI Watch Desk - Cockroach Watch India Articles, Updates & Explainers",
   description:
-    "Read CWI Watch Desk explainers, public reaction notes, youth voice stories, fact-check briefs, creator spotlights, and Cockroach wave archive posts.",
+    "Read source-backed articles from Cockroach Watch India. The CWI Watch Desk tracks CJP updates, Cockroach wave developments, youth voice, civic satire, viral claims, and public issues across India.",
   path: "/watch-desk"
 });
 
@@ -29,9 +29,9 @@ export default function WatchDeskPage() {
     <>
       <Section
         eyebrow="CWI Digital Newsroom"
-        title="The Watch Desk"
+        title="CWI Watch Desk"
         titleAs="h1"
-        subtitle="A digital newsroom and public archive for the Cockroach wave: explainers, public reactions, youth voice, creator-led commentary, civic satire, and issue signals."
+        subtitle="The CWI Watch Desk is the editorial archive of Cockroach Watch India. We document, verify, and amplify source-backed updates on the Cockroach wave, youth voice, public issues, civic satire, creator credit, and digital public memory."
       >
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="bg-gradient-to-br from-ink via-[#102a63] to-royal text-white">

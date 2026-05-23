@@ -18,7 +18,7 @@ type Props = {
 };
 
 const articleDisclaimer =
-  "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Articles may discuss publicly circulating trends, satire, public reactions, and civic commentary. Claims should not be treated as legal findings or official statements unless verified.";
+  "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.";
 
 export async function generateStaticParams() {
   return posts.map((post) => ({ slug: post.slug }));
@@ -68,6 +68,7 @@ function jsonLdForPost(post: (typeof posts)[number]) {
         url: absoluteUrl("/brand/logo.png")
       }
     },
+    url,
     mainEntityOfPage: url,
     articleSection: post.category,
     keywords: post.tags.join(", "),
@@ -159,11 +160,23 @@ export default async function WatchPostPage({ params }: Props) {
                 {post.title}
               </h1>
               <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
+              <p className="mt-5 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
+                By {post.author} / Published on CWI Watch Desk / Cockroach Watch India
+              </p>
 
               <div className="mt-7 grid gap-3 border-y border-line py-5 text-sm font-bold uppercase tracking-[0.08em] text-ink/55 sm:grid-cols-3">
                 <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-royal" /> Published {post.publishedAt}</span>
-                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Updated {post.updatedAt}</span>
-                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-royal" /> {post.author}</span>
+                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-royal" /> Last updated {post.updatedAt}</span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-royal" /> {post.sources.length} sources</span>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link href="/submit" className="inline-flex rounded-full bg-skywash px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-royal ring-1 ring-royal/15">
+                  Submit correction
+                </Link>
+                <Link href="/" className="inline-flex rounded-full bg-paper px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/62 ring-1 ring-line">
+                  Read more at Cockroach Watch India
+                </Link>
               </div>
 
               <div className="mt-8 rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
@@ -216,6 +229,17 @@ export default async function WatchPostPage({ params }: Props) {
                     {tag}
                   </Link>
                 ))}
+              </div>
+
+              <div className="mt-8 rounded-[2rem] border border-royal/15 bg-skywash p-6">
+                <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">CWI Note</p>
+                <p className="mt-3 leading-8 text-ink/74">
+                  The CWI Watch Desk documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through{" "}
+                  <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">
+                    Cockroach Watch India
+                  </Link>
+                  .
+                </p>
               </div>
             </div>
 
@@ -283,6 +307,8 @@ export default async function WatchPostPage({ params }: Props) {
               <CardLabel>Internal links</CardLabel>
               <div className="grid gap-2">
                 {[
+                  ["Cockroach Watch India", "/"],
+                  ["The Watch", "/watch"],
                   ["Watch Desk", "/watch-desk"],
                   ["Submit Report", "/submit"],
                   ["Issue Watch", "/issues"],
