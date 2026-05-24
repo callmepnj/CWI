@@ -7,11 +7,11 @@ import { WatchCategoryCard } from "@/components/WatchCategoryCard";
 import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { WatchPageHero } from "@/components/WatchPageHero";
 import { WatchVerificationPromise } from "@/components/WatchVerificationPromise";
-import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
+import { UnansweredFilesGestureRail, type UnansweredGestureItem } from "@/components/UnansweredFilesGestureRail";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
 import { posts } from "@/data/posts";
-import { unansweredFiles } from "@/data/unanswered-files";
+import { getThumbnailVisual, unansweredFiles } from "@/data/unanswered-files";
 import { watchAdvisories, watchCategories } from "@/data/watch";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 
@@ -56,6 +56,20 @@ export default function WatchPage() {
   const latestArticles = [...posts]
     .sort((first, second) => dateValue(second.date) - dateValue(first.date))
     .slice(0, 6);
+  const unansweredGestureItems: UnansweredGestureItem[] = unansweredFiles.slice(0, 8).map((file) => {
+    const visual = getThumbnailVisual(file);
+
+    return {
+      title: file.title,
+      slug: file.slug,
+      category: file.category,
+      status: file.status,
+      location: file.location,
+      summary: file.summary,
+      imageSrc: visual.src,
+      imageAlt: visual.alt
+    };
+  });
 
   return (
     <>
@@ -139,11 +153,7 @@ export default function WatchPage() {
                 </Button>
               </div>
             </div>
-            <div className="grid gap-3">
-              {unansweredFiles.slice(0, 2).map((file) => (
-                <UnansweredFileVisual key={file.slug} file={file} />
-              ))}
-            </div>
+            <UnansweredFilesGestureRail items={unansweredGestureItems} />
           </div>
         </Card>
       </Section>
