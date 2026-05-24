@@ -55,7 +55,7 @@ export function UnansweredFilesGestureRail({ items, className }: Props) {
         <motion.div
           className="flex w-max gap-4 px-3"
           animate={reduceMotion ? undefined : { x: ["0%", "-50%"] }}
-          transition={reduceMotion ? undefined : { duration: 26, repeat: Infinity, ease: "linear" }}
+          transition={reduceMotion ? undefined : { duration: 34, repeat: Infinity, ease: "linear" }}
         >
           {movingItems.map((item, index) => (
             <Link
@@ -97,23 +97,25 @@ export function UnansweredFilesGestureRail({ items, className }: Props) {
         </motion.div>
       </div>
 
-      <div className="relative mt-3 overflow-hidden rounded-full border border-royal/15 bg-ink py-2">
+      <div className="relative mt-3 overflow-hidden rounded-full border border-royal/12 bg-white/90 py-2 shadow-inner">
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-white to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-white to-transparent" />
         <motion.div
           className="flex w-max gap-3 whitespace-nowrap px-3"
           animate={reduceMotion ? undefined : { x: ["0%", "-50%"] }}
-          transition={reduceMotion ? undefined : { duration: 18, repeat: Infinity, ease: "linear" }}
+          transition={reduceMotion ? undefined : { duration: 28, repeat: Infinity, ease: "linear" }}
         >
           {tickerItems.map((item, index) => (
             <span
               key={`${item.slug}-${index}`}
-              className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-3 py-1 font-mono text-[0.62rem] font-black uppercase tracking-[0.14em] text-white/78 ring-1 ring-white/10"
+              className="inline-flex items-center gap-2 rounded-full bg-skywash px-3 py-1 font-mono text-[0.62rem] font-black uppercase tracking-[0.14em] text-ink/72 ring-1 ring-royal/10"
             >
               {index % 3 === 0 ? (
-                <Radio className="h-3 w-3 text-saffron" />
+                <Radio className="h-3 w-3 text-urgent" />
               ) : index % 3 === 1 ? (
-                <ShieldCheck className="h-3 w-3 text-sky-300" />
+                <ShieldCheck className="h-3 w-3 text-royal" />
               ) : (
-                <Sparkles className="h-3 w-3 text-emerald-300" />
+                <Sparkles className="h-3 w-3 text-emerald-600" />
               )}
               {item.title}
             </span>
