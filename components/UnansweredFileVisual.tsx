@@ -32,6 +32,7 @@ export function UnansweredFileVisual({
             alt={visual.alt}
             fill
             priority={priority}
+            loading={priority ? undefined : "lazy"}
             sizes="(max-width: 768px) 100vw, 50vw"
             className={cn("object-cover", imageClassName)}
           />
@@ -53,7 +54,24 @@ export function UnansweredFileVisual({
           </p>
         </div>
       </div>
-      {showCaption ? <figcaption className="bg-white p-4 text-xs font-semibold leading-6 text-ink/58">{visual.caption}</figcaption> : null}
+      {showCaption ? (
+        <figcaption className="bg-white p-4 text-xs font-semibold leading-6 text-ink/64">
+          <p>{visual.caption}</p>
+          <div className="mt-3 flex flex-wrap gap-2 font-mono text-[0.62rem] font-black uppercase tracking-[0.12em]">
+            <a
+              href={visual.sourceUrl}
+              target={visual.sourceUrl.startsWith("/") ? undefined : "_blank"}
+              rel={visual.sourceUrl.startsWith("/") ? undefined : "noreferrer"}
+              className="rounded-full bg-skywash px-3 py-1 text-royal ring-1 ring-royal/15 transition hover:bg-royal hover:text-white"
+            >
+              Source: {visual.source}
+            </a>
+            <span className="rounded-full bg-paper px-3 py-1 text-ink/48 ring-1 ring-line">
+              {visual.license}
+            </span>
+          </div>
+        </figcaption>
+      ) : null}
     </figure>
   );
 }

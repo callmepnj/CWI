@@ -1,21 +1,21 @@
 import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
 import type { UnansweredFile } from "@/data/unanswered-files";
-import { getFileVisuals } from "@/data/unanswered-files";
+import { getGalleryVisuals } from "@/data/unanswered-files";
 
 export function UnansweredImageGallery({ file }: { file: UnansweredFile }) {
-  const visuals = getFileVisuals(file);
+  const visuals = getGalleryVisuals(file);
 
   return (
     <section>
       <div className="mb-6 max-w-3xl">
         <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.2em] text-royal">
-          Image research board
+          Image gallery
         </p>
         <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-ink">
-          Visual context for this file
+          10 verified local images
         </h2>
         <p className="mt-4 text-base leading-8 text-ink/70">
-          CWI uses ethical, non-graphic visuals. Real local archive photos are labelled as such. Editorial visuals from the image pack are labelled clearly and are not presented as incident photographs.
+          CWI uses ethical, non-graphic visuals. These files are stored locally under <span className="font-mono text-royal">/images/cwi-unanswered-files/</span> and each image shows a caption, source label, source URL, and license note.
         </p>
       </div>
 

@@ -15,6 +15,7 @@ import { Card, CardLabel } from "@/components/ui/card";
 import {
   getFileSources,
   getFileVisual,
+  getInlineVisuals,
   getUnansweredFile,
   unansweredFiles
 } from "@/data/unanswered-files";
@@ -105,6 +106,13 @@ export default async function UnansweredFilePage({ params }: Props) {
     .sort((first, second) => Number(second.category === file.category) - Number(first.category === file.category))
     .slice(0, 3);
   const visual = getFileVisual(file);
+  const inlineVisuals = getInlineVisuals(file);
+  const inlineVisualByHeading = new Map(
+    ["What happened?", "Human cost", "Political accountability", "Government response", "Media silence/bias"].map((heading, index) => [
+      heading,
+      inlineVisuals[index]
+    ])
+  );
   const pageUrl = absoluteUrl(`/unanswered-files/${file.slug}`);
   const jsonLd = buildJsonLd(file, visual.src, pageUrl);
 
@@ -197,6 +205,16 @@ export default async function UnansweredFilePage({ params }: Props) {
                       <SourcePills file={file} indexes={section.sourceIndex} />
                     </div>
                     <p className="mt-4 text-lg leading-9 text-ink/74">{section.body}</p>
+                    {inlineVisualByHeading.get(section.heading) ? (
+                      <div className="mt-6">
+                        <UnansweredFileVisual
+                          file={file}
+                          visual={inlineVisualByHeading.get(section.heading)}
+                          showCaption
+                          imageClassName="transition duration-500 hover:scale-[1.02]"
+                        />
+                      </div>
+                    ) : null}
                   </section>
                 ))}
               </div>
