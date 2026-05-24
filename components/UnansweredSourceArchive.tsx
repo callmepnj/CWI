@@ -5,6 +5,8 @@ import { ExternalLink, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { FileSource, FileStatus } from "@/data/unanswered-files";
 
+const unansweredFilesPath = "/indias-unanswered-files";
+
 export type UnansweredSourceRecord = {
   id: string;
   fileTitle: string;
@@ -86,7 +88,7 @@ export function UnansweredSourceArchive({ records }: { records: UnansweredSource
                 {record.source.type}
               </span>
               <Link
-                href={`/unanswered-files/${record.fileSlug}`}
+                href={`${unansweredFilesPath}/${record.fileSlug}`}
                 className="rounded-full bg-saffron/25 px-3 py-1 font-mono text-[0.65rem] font-black uppercase tracking-[0.15em] text-[#8A5B00] ring-1 ring-saffron/35 transition hover:bg-saffron/40"
               >
                 {record.fileTitle}
@@ -101,7 +103,7 @@ export function UnansweredSourceArchive({ records }: { records: UnansweredSource
             <p className="mt-4 text-sm leading-7 text-ink/70">{record.source.note}</p>
             <div className="mt-4 flex flex-wrap justify-between gap-3">
               <Link
-                href={`/unanswered-files/${record.fileSlug}`}
+                href={`${unansweredFilesPath}/${record.fileSlug}`}
                 className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.13em] text-ink/62 transition hover:border-royal/35 hover:bg-skywash hover:text-royal"
               >
                 Open case file

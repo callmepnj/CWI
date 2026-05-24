@@ -5,12 +5,22 @@ const legacyHosts = new Set([["cwi-ten", "vercel", "app"].join(".")]);
 
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host")?.split(":")[0].toLowerCase();
+  const url = request.nextUrl.clone();
+
+  if (url.pathname === "/unanswered-files" || url.pathname.startsWith("/unanswered-files/")) {
+    url.pathname = url.pathname.replace("/unanswered-files", "/indias-unanswered-files");
+    if (host && legacyHosts.has(host)) {
+      url.protocol = "https:";
+      url.hostname = officialHost;
+      url.port = "";
+    }
+    return NextResponse.redirect(url, 308);
+  }
 
   if (!host || !legacyHosts.has(host)) {
     return NextResponse.next();
   }
 
-  const url = request.nextUrl.clone();
   url.protocol = "https:";
   url.hostname = officialHost;
   url.port = "";

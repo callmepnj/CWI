@@ -132,7 +132,7 @@ export default function WatchPage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button asChild>
-                  <Link href="/unanswered-files">Open India&apos;s Unanswered Files <FileSearch className="h-4 w-4" /></Link>
+                  <Link href="/indias-unanswered-files">Open India&apos;s Unanswered Files <FileSearch className="h-4 w-4" /></Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link href="/submit">Submit source or correction</Link>

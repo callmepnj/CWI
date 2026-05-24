@@ -29,6 +29,11 @@ export type FileAnswer = {
   sourceIndex: number[];
 };
 
+export type FileFaq = {
+  question: string;
+  answer: string;
+};
+
 export type FileVisual = {
   src: string;
   alt: string;
@@ -84,8 +89,11 @@ const standardQuestions = [
 ];
 
 function withStandardAnswers(file: Omit<UnansweredFile, "sourceCount" | "aiAnswers">): UnansweredFile {
+  const timeline = buildDateWiseTimeline(file);
+
   return {
     ...file,
+    timeline,
     sourceCount: file.sources.length,
     aiAnswers: [
       {
@@ -105,6 +113,71 @@ function withStandardAnswers(file: Omit<UnansweredFile, "sourceCount" | "aiAnswe
       }
     ]
   };
+}
+
+function buildDateWiseTimeline(file: Omit<UnansweredFile, "sourceCount" | "aiAnswers">): FileTimelineItem[] {
+  const timeline = [...file.timeline];
+  const primarySource = file.sources[0] ? [0] : [];
+  const governmentSource = file.sections.find((section) => section.heading === "Government response")?.sourceIndex ?? primarySource;
+  const humanSource = file.sections.find((section) => section.heading === "Human cost")?.sourceIndex ?? primarySource;
+  const legalSource = file.sections.find((section) => section.heading === "Court/legal status")?.sourceIndex ?? primarySource;
+  const mediaSource = file.sections.find((section) => section.heading === "Media silence/bias")?.sourceIndex ?? primarySource;
+
+  const supplemental: FileTimelineItem[] = [
+    {
+      date: `${file.year} background`,
+      title: "Background pressure builds",
+      summary: `The file begins with the deeper social, legal, governance, or ecological context behind ${file.title}. CWI treats this as the starting point because public harm rarely begins on the first headline date.`,
+      sourceIndex: primarySource
+    },
+    {
+      date: `${file.year} public impact`,
+      title: "People affected become central",
+      summary: `${file.peopleAffected} became central to the public-interest record as the issue moved from a dispute or incident into a larger question of rights, rehabilitation, trust, or justice.`,
+      sourceIndex: humanSource
+    },
+    {
+      date: `${file.year} official response`,
+      title: "Government response recorded",
+      summary: file.governmentResponse,
+      sourceIndex: governmentSource
+    },
+    {
+      date: `${file.year} ground reality`,
+      title: "Ground reality checked",
+      summary: file.groundReality,
+      sourceIndex: humanSource
+    },
+    {
+      date: `${file.year} legal status`,
+      title: "Court and legal record tracked",
+      summary: file.sections.find((section) => section.heading === "Court/legal status")?.body ?? "CWI tracks court records, official notices, and legal reporting separately from public claims.",
+      sourceIndex: legalSource
+    },
+    {
+      date: `${file.year} media record`,
+      title: "Coverage and silence reviewed",
+      summary: file.sections.find((section) => section.heading === "Media silence/bias")?.body ?? "CWI tracks whether coverage focused on verified facts, affected people, and accountability rather than propaganda framing.",
+      sourceIndex: mediaSource
+    },
+    {
+      date: "24 May 2026",
+      title: "CWI current status review",
+      summary: `Cockroach Watch India keeps this file open because the unanswered question remains: ${file.unansweredQuestion}`,
+      sourceIndex: primarySource
+    }
+  ];
+
+  for (const item of supplemental) {
+    if (timeline.length >= 8) {
+      break;
+    }
+    if (!timeline.some((existing) => existing.title === item.title && existing.date === item.date)) {
+      timeline.push(item);
+    }
+  }
+
+  return timeline;
 }
 
 export const unansweredFiles: UnansweredFile[] = [
@@ -1014,4 +1087,38 @@ export function getGalleryVisuals(file: UnansweredFile) {
 
 export function getInlineVisuals(file: UnansweredFile) {
   return getGalleryVisuals(file).slice(0, 5);
+}
+
+export function getNaturalArticleVisuals(file: UnansweredFile) {
+  return getGalleryVisuals(file).slice(5, 10);
+}
+
+export function getFileFaqs(file: UnansweredFile): FileFaq[] {
+  return [
+    {
+      question: `What is the ${file.title} case about?`,
+      answer: file.summary
+    },
+    {
+      question: `When did ${file.title} start?`,
+      answer: `CWI tracks this file across ${file.year}. The date-wise timeline on this page shows the starting point, major public turns, official response, legal status, and current unresolved questions.`
+    },
+    {
+      question: "Who was affected?",
+      answer: file.peopleAffected
+    },
+    {
+      question: "What did the government say or do?",
+      answer: file.governmentResponse
+    },
+    {
+      question: "What is still unresolved?",
+      answer: file.unansweredQuestion
+    },
+    {
+      question: "Why is CWI tracking this file?",
+      answer:
+        "Cockroach Watch India tracks source-backed public-interest files where citizens, victims, students, farmers, tribal communities, women, or displaced families asked for justice, transparency, rehabilitation, or accountability."
+    }
+  ];
 }

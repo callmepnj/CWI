@@ -10,7 +10,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:check": "node scripts/check-db.mjs"
+    "type-check": "tsc --noEmit",
+    "db:check": "node scripts/check-db.mjs",
+    "validate:unanswered-files": "node scripts/validate-unanswered-files.js"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",

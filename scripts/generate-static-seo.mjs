@@ -12,7 +12,7 @@ const staticRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
-  "/unanswered-files",
+  "/indias-unanswered-files",
   "/watch-desk",
   "/issues",
   "/join",
@@ -61,7 +61,7 @@ const routes = [
   ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
   ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
   ...postSlugs.map((slug) => `/watch-desk/${slug}`),
-  ...unansweredFileSlugs.map((slug) => `/unanswered-files/${slug}`)
+  ...unansweredFileSlugs.map((slug) => `/indias-unanswered-files/${slug}`)
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

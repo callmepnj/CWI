@@ -4,9 +4,12 @@ import Link from "next/link";
 import type React from "react";
 import { useMemo, useState } from "react";
 import { ArrowRight, FileText, HelpCircle, MapPin, Search, UsersRound } from "lucide-react";
+import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
 import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
 import { UnansweredStatusBadge } from "@/components/UnansweredStatusBadge";
 import type { UnansweredFile } from "@/data/unanswered-files";
+
+const unansweredFilesPath = "/indias-unanswered-files";
 
 export function UnansweredFilesGrid({ files }: { files: UnansweredFile[] }) {
   const [query, setQuery] = useState("");
@@ -101,8 +104,15 @@ export function UnansweredFilesGrid({ files }: { files: UnansweredFile[] }) {
                 <span className="rounded-full bg-white px-3 py-1 font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-ink/55 ring-1 ring-line">
                   {file.sourceCount} sources
                 </span>
+                <UnansweredArticleActions
+                  slug={file.slug}
+                  title={file.title}
+                  summary={file.summary}
+                  path={`${unansweredFilesPath}/${file.slug}`}
+                  compact
+                />
                 <Link
-                  href={`/unanswered-files/${file.slug}`}
+                  href={`${unansweredFilesPath}/${file.slug}`}
                   className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-royal"
                 >
                   Read full investigation <ArrowRight className="h-4 w-4" />

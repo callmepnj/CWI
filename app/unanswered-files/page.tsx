@@ -10,7 +10,7 @@ import { unansweredFiles, unansweredFilesKeywords } from "@/data/unanswered-file
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-const pagePath = "/unanswered-files";
+const pagePath = "/indias-unanswered-files";
 const pageTitle = "India's Unanswered Files - Cockroach Watch India";
 const pageDescription =
   "CWI's source-backed investigative archive of under-reported Indian public-interest cases where citizens asked for justice, rehabilitation, transparency, or accountability.";
@@ -45,7 +45,7 @@ const pageJsonLd = {
   hasPart: unansweredFiles.map((file) => ({
     "@type": "Article",
     headline: file.title,
-    url: absoluteUrl(`/unanswered-files/${file.slug}`),
+    url: absoluteUrl(`${pagePath}/${file.slug}`),
     articleSection: file.category,
     keywords: file.keywords.join(", ")
   }))

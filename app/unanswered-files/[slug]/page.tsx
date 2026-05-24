@@ -3,9 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, ExternalLink, FileText, Scale, ShieldCheck } from "lucide-react";
 import { ArticleProgress } from "@/components/ArticleProgress";
-import { ShareButtons } from "@/components/ShareButtons";
+import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
+import { UnansweredComments } from "@/components/UnansweredComments";
 import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
-import { UnansweredImageGallery } from "@/components/UnansweredImageGallery";
 import { UnansweredResearchBox } from "@/components/UnansweredResearchBox";
 import { UnansweredSourceArchive, type UnansweredSourceRecord } from "@/components/UnansweredSourceArchive";
 import { UnansweredStatusBadge } from "@/components/UnansweredStatusBadge";
@@ -15,6 +15,7 @@ import { Card, CardLabel } from "@/components/ui/card";
 import {
   getFileSources,
   getFileVisual,
+  getFileFaqs,
   getInlineVisuals,
   getUnansweredFile,
   unansweredFiles
@@ -28,6 +29,7 @@ type Props = {
 
 const articleDisclaimer =
   "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.";
+const unansweredFilesPath = "/indias-unanswered-files";
 
 export async function generateStaticParams() {
   return unansweredFiles.map((file) => ({ slug: file.slug }));
@@ -41,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return createMetadata({
       title: "India's Unanswered Files - Cockroach Watch India",
       description: site.description,
-      path: "/unanswered-files"
+      path: unansweredFilesPath
     });
   }
 
@@ -49,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseMetadata = createMetadata({
     title: file.seoTitle,
     description: file.seoDescription,
-    path: `/unanswered-files/${file.slug}`,
+    path: `${unansweredFilesPath}/${file.slug}`,
     type: "article",
     publishedTime: "2026-05-24T00:00:00+05:30",
     keywords: file.keywords
@@ -60,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: file.seoTitle,
       description: file.seoDescription,
-      url: absoluteUrl(`/unanswered-files/${file.slug}`),
+      url: absoluteUrl(`${unansweredFilesPath}/${file.slug}`),
       siteName: site.name,
       images: [
         {
@@ -107,14 +109,15 @@ export default async function UnansweredFilePage({ params }: Props) {
     .slice(0, 3);
   const visual = getFileVisual(file);
   const inlineVisuals = getInlineVisuals(file);
+  const faqs = getFileFaqs(file);
   const inlineVisualByHeading = new Map(
     ["What happened?", "Human cost", "Political accountability", "Government response", "Media silence/bias"].map((heading, index) => [
       heading,
       inlineVisuals[index]
     ])
   );
-  const pageUrl = absoluteUrl(`/unanswered-files/${file.slug}`);
-  const jsonLd = buildJsonLd(file, visual.src, pageUrl);
+  const pageUrl = absoluteUrl(`${unansweredFilesPath}/${file.slug}`);
+  const jsonLd = buildJsonLd(file, visual.src, pageUrl, faqs);
 
   return (
     <>
@@ -131,7 +134,7 @@ export default async function UnansweredFilePage({ params }: Props) {
               <div className="mb-6 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-white/58">
                 <Link href="/" className="hover:text-saffron">Home</Link>
                 <span>/</span>
-                <Link href="/unanswered-files" className="hover:text-saffron">India&apos;s Unanswered Files</Link>
+                <Link href={unansweredFilesPath} className="hover:text-saffron">India&apos;s Unanswered Files</Link>
                 <span>/</span>
                 <span>{file.category}</span>
               </div>
@@ -171,6 +174,19 @@ export default async function UnansweredFilePage({ params }: Props) {
                   <Link href="/submit">Submit correction</Link>
                 </Button>
               </div>
+              <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/[0.08] p-4">
+                <p className="mb-3 font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-saffron">
+                  Like / Save / Share this investigation
+                </p>
+                <UnansweredArticleActions
+                  slug={file.slug}
+                  title={file.title}
+                  summary={file.summary}
+                  path={`${unansweredFilesPath}/${file.slug}`}
+                  compact
+                  trackView
+                />
+              </div>
             </div>
 
             <UnansweredFileVisual file={file} priority showCaption className="border-white/15 shadow-[0_24px_90px_rgba(0,0,0,0.35)]" />
@@ -191,8 +207,6 @@ export default async function UnansweredFilePage({ params }: Props) {
                 <MiniFact label="Ground reality" value={file.groundReality} />
               </div>
             </Card>
-
-            <UnansweredImageGallery file={file} />
 
             <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card sm:p-8">
               <div className="space-y-10">
@@ -241,6 +255,23 @@ export default async function UnansweredFilePage({ params }: Props) {
               </div>
             </Card>
 
+            <Card>
+              <CardLabel>FAQ</CardLabel>
+              <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">
+                Frequently asked questions
+              </h2>
+              <div className="mt-5 grid gap-3">
+                {faqs.map((faq) => (
+                  <details key={faq.question} className="rounded-2xl border border-line bg-paper p-4">
+                    <summary className="cursor-pointer font-black uppercase tracking-[0.05em] text-ink">
+                      {faq.question}
+                    </summary>
+                    <p className="mt-3 leading-7 text-ink/70">{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </Card>
+
             <section>
               <div className="mb-6 max-w-3xl">
                 <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.2em] text-royal">Source archive</p>
@@ -269,10 +300,12 @@ export default async function UnansweredFilePage({ params }: Props) {
               <p className="mt-4 leading-8 text-ink/72">{articleDisclaimer}</p>
             </Card>
 
+            <UnansweredComments articleSlug={file.slug} />
+
             <section>
               <div className="mb-5 flex items-center justify-between gap-4">
                 <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Unanswered Files</h2>
-                <Link href="/unanswered-files" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
+                <Link href={unansweredFilesPath} className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
                   View all <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -280,7 +313,7 @@ export default async function UnansweredFilePage({ params }: Props) {
                 {relatedFiles.map((relatedFile) => (
                   <Link
                     key={relatedFile.slug}
-                    href={`/unanswered-files/${relatedFile.slug}`}
+                    href={`${unansweredFilesPath}/${relatedFile.slug}`}
                     className="group overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-card transition hover:-translate-y-1 hover:border-royal/30 hover:shadow-soft"
                   >
                     <UnansweredFileVisual file={relatedFile} imageClassName="transition duration-500 group-hover:scale-[1.03]" />
@@ -299,8 +332,13 @@ export default async function UnansweredFilePage({ params }: Props) {
 
           <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
             <Card>
-              <CardLabel>Share this file</CardLabel>
-              <ShareButtons title={file.title} path={`/unanswered-files/${file.slug}`} summary={file.summary} />
+              <CardLabel>Reader actions</CardLabel>
+              <UnansweredArticleActions
+                slug={file.slug}
+                title={file.title}
+                summary={file.summary}
+                path={`${unansweredFilesPath}/${file.slug}`}
+              />
             </Card>
 
             <Card>
@@ -325,7 +363,7 @@ export default async function UnansweredFilePage({ params }: Props) {
               <CardLabel>Internal links</CardLabel>
               <div className="grid gap-2">
                 {[
-                  ["India's Unanswered Files", "/unanswered-files"],
+                  ["India's Unanswered Files", unansweredFilesPath],
                   ["The Watch", "/watch"],
                   ["Watch Desk", "/watch-desk"],
                   ["Submit Report", "/submit"],
@@ -345,11 +383,22 @@ export default async function UnansweredFilePage({ params }: Props) {
   );
 }
 
-function buildJsonLd(file: NonNullable<ReturnType<typeof getUnansweredFile>>, imagePath: string, pageUrl: string) {
+function buildJsonLd(
+  file: NonNullable<ReturnType<typeof getUnansweredFile>>,
+  imagePath: string,
+  pageUrl: string,
+  faqs: ReturnType<typeof getFileFaqs>
+) {
   const articleBase = {
     headline: file.title,
     description: file.seoDescription,
-    image: absoluteUrl(imagePath),
+    image: [
+      {
+        "@type": "ImageObject",
+        url: absoluteUrl(imagePath),
+        caption: getFileVisual(file).caption
+      }
+    ],
     datePublished: "2026-05-24T00:00:00+05:30",
     dateModified: "2026-05-24T00:00:00+05:30",
     author: {
@@ -393,7 +442,7 @@ function buildJsonLd(file: NonNullable<ReturnType<typeof getUnansweredFile>>, im
           "@type": "ListItem",
           position: 2,
           name: "India's Unanswered Files",
-          item: absoluteUrl("/unanswered-files")
+          item: absoluteUrl(unansweredFilesPath)
         },
         {
           "@type": "ListItem",
@@ -402,6 +451,18 @@ function buildJsonLd(file: NonNullable<ReturnType<typeof getUnansweredFile>>, im
           item: pageUrl
         }
       ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer
+        }
+      }))
     }
   ];
 }
