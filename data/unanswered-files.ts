@@ -1,4 +1,9 @@
-import { unansweredFileImageFolders, unansweredFileImages, type UnansweredFileImage } from "@/data/unanswered-file-images";
+import {
+  unansweredFileImageFolders,
+  unansweredFileImageRoot,
+  unansweredFileImages,
+  type UnansweredFileImage
+} from "@/data/unanswered-file-images";
 
 export type FileStatus = "Developing" | "Court-monitored" | "Reported" | "Source-backed" | "Needs transparency";
 
@@ -42,6 +47,7 @@ export type FileVisual = {
   isPhoto: boolean;
   brief: string;
   filename: string;
+  type: UnansweredFileImage["type"];
   source: string;
   sourceUrl: string;
   photographer: string;
@@ -67,6 +73,12 @@ export type UnansweredFile = {
   seoTitle: string;
   seoDescription: string;
   keywords: string[];
+  heroImage: string;
+  thumbnailImage: string;
+  ogImage: string;
+  socialImages: string[];
+  galleryImages: string[];
+  altText: string;
   sources: FileSource[];
   timeline: FileTimelineItem[];
   sections: FileSection[];
@@ -82,18 +94,26 @@ const source = (
   note: string
 ): FileSource => ({ publisher, name, url, type, note });
 
+type UnansweredFileSeed = Omit<
+  UnansweredFile,
+  "sourceCount" | "aiAnswers" | "heroImage" | "thumbnailImage" | "ogImage" | "socialImages" | "galleryImages" | "altText"
+>;
+
 const standardQuestions = [
   "What happened?",
   "What did the government say?",
   "What remains unanswered?"
 ];
 
-function withStandardAnswers(file: Omit<UnansweredFile, "sourceCount" | "aiAnswers">): UnansweredFile {
+function withStandardAnswers(file: UnansweredFileSeed): UnansweredFile {
   const timeline = buildDateWiseTimeline(file);
 
   return {
     ...file,
     timeline,
+    ...buildImageFields(file.slug),
+    seoTitle: `${file.title} - CWI India Unanswered Files`,
+    seoDescription: `Cockroach Watch India documents ${file.title} as part of CWI India Unanswered Files, tracking public questions, civic memory, and source-backed context.`,
     sourceCount: file.sources.length,
     aiAnswers: [
       {
@@ -115,7 +135,40 @@ function withStandardAnswers(file: Omit<UnansweredFile, "sourceCount" | "aiAnswe
   };
 }
 
-function buildDateWiseTimeline(file: Omit<UnansweredFile, "sourceCount" | "aiAnswers">): FileTimelineItem[] {
+function buildImageFields(slug: string) {
+  const visuals = getImageRecords(slug);
+  const byType = (type: UnansweredFileImage["type"]) => visuals.find((image) => image.type === type);
+  const hero = byType("hero") ?? visuals[0];
+  const thumbnail = byType("thumbnail") ?? hero;
+  const og = byType("og") ?? hero;
+  const social = visuals.filter((image) => image.type === "social" || image.type === "poster");
+  const gallery = visuals.filter((image) => image.type === "gallery").slice(0, 6);
+
+  return {
+    heroImage: imagePath(slug, hero),
+    thumbnailImage: imagePath(slug, thumbnail),
+    ogImage: imagePath(slug, og),
+    socialImages: social.map((image) => imagePath(slug, image)),
+    galleryImages: gallery.map((image) => imagePath(slug, image)),
+    altText: hero?.altText ?? "CWI India Unanswered Files visual."
+  };
+}
+
+function getImageRecords(slug: string) {
+  return ((unansweredFileImages as Record<string, UnansweredFileImage[]>)[slug] ?? []).filter((image) => image.type !== "original" && image.type !== "review");
+}
+
+function imagePath(slug: string, image: UnansweredFileImage | undefined) {
+  const folder = (unansweredFileImageFolders as Record<string, string>)[slug];
+
+  if (!folder || !image) {
+    return "";
+  }
+
+  return `${unansweredFileImageRoot}/${folder}/${image.filename}`;
+}
+
+function buildDateWiseTimeline(file: UnansweredFileSeed): FileTimelineItem[] {
   const timeline = [...file.timeline];
   const primarySource = file.sources[0] ? [0] : [];
   const governmentSource = file.sections.find((section) => section.heading === "Government response")?.sourceIndex ?? primarySource;
@@ -1065,13 +1118,14 @@ export function getFileVisuals(file: UnansweredFile): FileVisual[] {
   }
 
   return images.map((image) => ({
-    src: `/images/cwi-unanswered-files/${folder}/${image.filename}`,
-    alt: `${file.title} - ${image.caption}`,
+    src: `${unansweredFileImageRoot}/${folder}/${image.filename}`,
+    alt: image.altText || `${file.title} - ${image.caption}`,
     caption: image.caption,
     credit: image.source,
     isPhoto: true,
     brief: image.caption,
     filename: image.filename,
+    type: image.type,
     source: image.source,
     sourceUrl: image.sourceUrl,
     photographer: image.photographer,
@@ -1082,11 +1136,19 @@ export function getFileVisuals(file: UnansweredFile): FileVisual[] {
 }
 
 export function getGalleryVisuals(file: UnansweredFile) {
-  return getFileVisuals(file).filter((visual) => visual.filename !== "hero.jpg").slice(0, 10);
+  return getFileVisuals(file).filter((visual) => visual.type === "gallery").slice(0, 6);
 }
 
 export function getInlineVisuals(file: UnansweredFile) {
   return getGalleryVisuals(file).slice(0, 5);
+}
+
+export function getThumbnailVisual(file: UnansweredFile) {
+  return getFileVisuals(file).find((visual) => visual.type === "thumbnail") ?? getFileVisual(file);
+}
+
+export function getOgVisual(file: UnansweredFile) {
+  return getFileVisuals(file).find((visual) => visual.type === "og") ?? getFileVisual(file);
 }
 
 export function getNaturalArticleVisuals(file: UnansweredFile) {

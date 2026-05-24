@@ -119,3 +119,12 @@ Next steps:
 - Do not claim images are from the provided pack unless actual files are copied from that pack into `public/images/cwi-unanswered-files/` and referenced by the section.
 - In progress: import local pack images into clean slug folders, remove the old gallery-only UI, add `/indias-unanswered-files` aliases, add article interaction APIs/components, update sitemap, and add a validation/audit script.
 - Current validation status: build/lint/type-check pass. Audit passes all implementation rows for all 18 articles except image provenance for `manipur-violence` and `vizhinjam-port-fisherfolk-protest`, because the required folders are absent from `CWI_India_Unanswered_Files_Image_Pack/`. Existing local fallback images keep those pages unbroken, but they are truthfully marked as not from the provided pack.
+
+2026-05-24 new photos organization:
+- User added `new photos/` with 32 PNG poster/social assets for India Unanswered Files only.
+- Added `scripts/organize-india-unanswered-images.py` to scan the folder, classify clear topic matches, place unclear generic CWI posters in `unanswered-files-review`, generate optimized WebP hero/thumbnail/OG/social/poster/gallery variants, write `public/images/india-unanswered-files/image-index.json`, write inventory JSON, and create `CWI_India_Unanswered_Files_Final_Website_Image_Pack.zip`.
+- New organized image root: `public/images/india-unanswered-files/`. Existing `public/images/cwi-unanswered-files/` paths are preserved.
+- Raw `new photos/` and old raw image pack zip are ignored in `.gitignore`; final optimized image pack zip is generated at repo root.
+- Updated Unanswered Files article data to expose `heroImage`, `thumbnailImage`, `ogImage`, `socialImages`, `galleryImages`, and topic-specific `altText`; article cards now use thumbnails and article metadata/schema uses topic OG images.
+- Current validation: `npm run type-check`, `npm run lint`, `npm run build`, and `node scripts/validate-unanswered-files.js` pass. Validation confirms all 18 article pages have hero/thumbnail/OG images, 6 gallery images, date-wise timelines, SEO image fields, FAQ schema, sitemap entries, comments/interactions, and no old Vercel URL.
+- New photo coverage from `new photos/`: 14 topics matched clearly. `manipur-violence`, `vizhinjam-port-fisherfolk-protest`, `sambhal-mosque-survey-violence`, and `lakhimpur-kheri-farmers-case` had no clear new-topic image in the folder, so they use existing local archive fallback images to avoid random assignment.

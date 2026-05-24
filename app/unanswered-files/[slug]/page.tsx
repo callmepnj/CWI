@@ -17,6 +17,7 @@ import {
   getFileVisual,
   getFileFaqs,
   getInlineVisuals,
+  getOgVisual,
   getUnansweredFile,
   unansweredFiles
 } from "@/data/unanswered-files";
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
   }
 
-  const visual = getFileVisual(file);
+  const visual = getOgVisual(file);
   const baseMetadata = createMetadata({
     title: file.seoTitle,
     description: file.seoDescription,
@@ -107,7 +108,7 @@ export default async function UnansweredFilePage({ params }: Props) {
     .filter((item) => item.slug !== file.slug)
     .sort((first, second) => Number(second.category === file.category) - Number(first.category === file.category))
     .slice(0, 3);
-  const visual = getFileVisual(file);
+  const ogVisual = getOgVisual(file);
   const inlineVisuals = getInlineVisuals(file);
   const faqs = getFileFaqs(file);
   const inlineVisualByHeading = new Map(
@@ -117,7 +118,7 @@ export default async function UnansweredFilePage({ params }: Props) {
     ])
   );
   const pageUrl = absoluteUrl(`${unansweredFilesPath}/${file.slug}`);
-  const jsonLd = buildJsonLd(file, visual.src, pageUrl, faqs);
+  const jsonLd = buildJsonLd(file, ogVisual.src, pageUrl, faqs);
 
   return (
     <>

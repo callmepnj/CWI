@@ -7,7 +7,7 @@ import { ArrowRight, FileText, HelpCircle, MapPin, Search, UsersRound } from "lu
 import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
 import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
 import { UnansweredStatusBadge } from "@/components/UnansweredStatusBadge";
-import type { UnansweredFile } from "@/data/unanswered-files";
+import { getThumbnailVisual, type UnansweredFile } from "@/data/unanswered-files";
 
 const unansweredFilesPath = "/indias-unanswered-files";
 
@@ -73,7 +73,7 @@ export function UnansweredFilesGrid({ files }: { files: UnansweredFile[] }) {
             key={file.slug}
             className="group overflow-hidden rounded-[2rem] border border-line bg-paper shadow-card transition hover:-translate-y-1 hover:border-royal/30 hover:shadow-soft"
           >
-            <UnansweredFileVisual file={file} imageClassName="transition duration-500 group-hover:scale-[1.03]" />
+            <UnansweredFileVisual file={file} visual={getThumbnailVisual(file)} imageClassName="transition duration-500 group-hover:scale-[1.03]" />
             <div className="p-5 sm:p-6">
               <div className="flex flex-wrap items-center gap-2">
                 <UnansweredStatusBadge status={file.status} />

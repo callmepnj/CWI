@@ -1,0 +1,1 @@
+This image pack is organized for Cockroach Watch India — CWI India Unanswered Files. Folder names are preserved for website compatibility. Images are organized by topic for article hero images, thumbnails, social posts, OpenGraph previews, and gallery use.

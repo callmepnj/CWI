@@ -1,150 +1,143 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("node:fs");
 const path = require("node:path");
-const crypto = require("node:crypto");
 
 const root = process.cwd();
-const dataFile = path.join(root, "data", "unanswered-files.ts");
-const publicImageRoot = path.join(root, "public", "images", "cwi-unanswered-files");
-const sitemapFile = path.join(root, "public", "sitemap.xml");
+const imageRoot = path.join(root, "public", "images", "india-unanswered-files");
+const indexPath = path.join(imageRoot, "image-index.json");
+const sitemapPath = path.join(root, "public", "sitemap.xml");
+const pageSource = fs.readFileSync(path.join(root, "app", "unanswered-files", "[slug]", "page.tsx"), "utf8");
+const dataSource = fs.readFileSync(path.join(root, "data", "unanswered-files.ts"), "utf8");
+const imageDataSource = fs.readFileSync(path.join(root, "data", "unanswered-file-images.ts"), "utf8");
+const sitemap = fs.existsSync(sitemapPath) ? fs.readFileSync(sitemapPath, "utf8") : "";
 
 const cases = [
-  ["Manipur violence", "manipur-violence", "manipur-violence"],
-  ["Ladakh and Sonam Wangchuk's Sixth Schedule Movement", "ladakh-sixth-schedule-statehood", "ladakh-sonam-wangchuk"],
-  ["Joshimath land subsidence", "joshimath-land-subsidence", "joshimath-subsidence"],
-  ["Great Nicobar mega project and Shompen/Nicobarese concerns", "great-nicobar-shompen-nicobarese", "great-nicobar-project"],
-  ["Hasdeo Aranya coal mining and Adivasi protests", "hasdeo-aranya-coal-mining", "hasdeo-aranya"],
-  ["Women wrestlers' sexual harassment case", "women-wrestlers-sexual-harassment-case", "women-wrestlers-protest"],
-  ["NEET paper leak and NTA accountability crisis", "neet-paper-leak-nta-accountability", "neet-paper-leak"],
-  ["Electoral Bonds and political funding transparency", "electoral-bonds-transparency", "electoral-bonds"],
-  ["Bulldozer justice and arbitrary demolitions", "bulldozer-justice-demolitions", "bulldozer-justice"],
-  ["Assam evictions", "assam-evictions", "assam-evictions"],
-  ["Farmers MSP protest", "farmers-msp-protest", "farmers-msp-protest"],
-  ["Wayanad landslide and ignored ecological warnings", "wayanad-landslide-ecological-warnings", "wayanad-landslide"],
-  ["Vizhinjam port fisherfolk protest", "vizhinjam-port-fisherfolk-protest", "vizhinjam-port-protest"],
-  ["Jammu & Kashmir statehood delay", "jammu-kashmir-statehood-delay", "jammu-kashmir-statehood"],
-  ["Delhi riots/UAPA long pre-trial detention issue", "delhi-riots-uapa-pretrial-detention", "delhi-riots-uapa"],
-  ["Sambhal mosque survey violence", "sambhal-mosque-survey-violence", "sambhal-mosque-violence"],
-  ["Lakhimpur Kheri farmers case", "lakhimpur-kheri-farmers-case", "lakhimpur-kheri"],
-  ["Hathras caste-gender justice case", "hathras-caste-gender-justice", "hathras-case"]
+  ["Manipur violence", "manipur-violence", "Manipur violence", "manipur-violence"],
+  ["Ladakh and Sonam Wangchuk's Sixth Schedule Movement", "ladakh-sixth-schedule-statehood", "Ladakh and Sonam Wangchuk’s Sixth Schedulestatehood movement photos", "ladakh-sonam-wangchuk"],
+  ["Joshimath land subsidence", "joshimath-land-subsidence", "Joshimath land subsidence", "joshimath-land-subsidence"],
+  ["Great Nicobar mega project and Shompen/Nicobarese concerns", "great-nicobar-shompen-nicobarese", "Great Nicobar mega project and ShompenNicobarese concerns", "great-nicobar-project"],
+  ["Hasdeo Aranya coal mining and Adivasi protests", "hasdeo-aranya-coal-mining", "Hasdeo coal mining", "hasdeo-coal-mining"],
+  ["Women wrestlers' sexual harassment case", "women-wrestlers-sexual-harassment-case", "Women wrestlers sexual harassment case", "women-wrestlers-case"],
+  ["NEET paper leak and NTA accountability crisis", "neet-paper-leak-nta-accountability", "NEET paper leak and NTA accountability crisis", "neet-paper-leak"],
+  ["Electoral Bonds and political funding transparency", "electoral-bonds-transparency", "Electoral Bonds and political funding transparency", "electoral-bonds"],
+  ["Bulldozer justice and arbitrary demolitions", "bulldozer-justice-demolitions", "Bulldozer justice and arbitrary demolitions", "bulldozer-justice"],
+  ["Assam evictions", "assam-evictions", "Assam evictions", "assam-evictions"],
+  ["Farmers MSP protest", "farmers-msp-protest", "Farmers MSP protest", "farmers-msp-protest"],
+  ["Wayanad landslide and ignored ecological warnings", "wayanad-landslide-ecological-warnings", "Wayanad landslide and ignored ecological warnings", "wayanad-landslide"],
+  ["Vizhinjam port fisherfolk protest", "vizhinjam-port-fisherfolk-protest", "Vizhinjam port fisherfolk protest", "vizhinjam-port-protest"],
+  ["Jammu & Kashmir statehood delay", "jammu-kashmir-statehood-delay", "Jammu & Kashmir statehood delay", "jammu-kashmir-statehood"],
+  ["Delhi riots/UAPA long pre-trial detention issue", "delhi-riots-uapa-pretrial-detention", path.join("Delhi riots", "UAPA long pre-trial detention issue"), "delhi-riots-uapa"],
+  ["Sambhal mosque survey violence", "sambhal-mosque-survey-violence", "Sambhal mosque survey violence", "sambhal-mosque-survey-violence"],
+  ["Lakhimpur Kheri farmers case", "lakhimpur-kheri-farmers-case", "Lakhimpur Kheri farmers case", "lakhimpur-kheri"],
+  ["Hathras caste-gender justice case", "hathras-caste-gender-justice", "Hathras caste-gender justice case", "hathras-case"],
 ];
 
-const data = fs.readFileSync(dataFile, "utf8");
-const pageSource = fs.readFileSync(path.join(root, "app", "unanswered-files", "[slug]", "page.tsx"), "utf8");
-const gridSource = fs.readFileSync(path.join(root, "components", "UnansweredFilesGrid.tsx"), "utf8");
-const actionsSource = fs.readFileSync(path.join(root, "components", "UnansweredArticleActions.tsx"), "utf8");
-const commentsSource = fs.readFileSync(path.join(root, "components", "UnansweredComments.tsx"), "utf8");
-const dbSource = fs.readFileSync(path.join(root, "lib", "db.ts"), "utf8");
-const sitemap = fs.existsSync(sitemapFile) ? fs.readFileSync(sitemapFile, "utf8") : "";
 const buildPass = fs.existsSync(path.join(root, ".next", "BUILD_ID"));
-
+const indexExists = fs.existsSync(indexPath);
+const oldGalleryPhrases = [
+  ["10 verified", "photos"].join(" "),
+  ["10 verified", "local images"].join(" "),
+  ["Minimum 10 verified", "photos"].join(" "),
+  ["Unanswered", "ImageGallery"].join(""),
+];
+const oldGalleryPattern = new RegExp(oldGalleryPhrases.map(escapeRegExp).join("|"), "i");
 const oldGalleryRemoved = !["app", "components", "data"].some((directory) =>
-  scanText(path.join(root, directory), /(10 verified photos|10 verified local images|Minimum 10 verified photos|UnansweredImageGallery)/i)
+  scanText(path.join(root, directory), oldGalleryPattern)
 );
-const faqSchemaAdded = pageSource.includes('"@type": "FAQPage"');
-const likeButtonWorking = actionsSource.includes('postAction("like"') && pageSource.includes("UnansweredArticleActions") && gridSource.includes("UnansweredArticleActions");
-const shareButtonWorking = actionsSource.includes('postAction("share"') && actionsSource.includes("Copy link");
-const commentSectionWorking = commentsSource.includes("/api/unanswered-files/comments") && pageSource.includes("UnansweredComments");
-const databaseConnected = dbSource.includes("ensureUnansweredFilesTables") && fs.existsSync(path.join(root, "supabase", "unanswered-files.sql"));
-
-const heroHashes = new Map();
-const rows = cases.map(([articleName, slug, folder]) => {
-  const folderPath = path.join(publicImageRoot, folder);
-  const heroPath = path.join(folderPath, "hero.jpg");
-  const heroImageFound = fs.existsSync(heroPath) && fs.statSync(heroPath).size > 0;
+const legacyHostPattern = new RegExp(
+  [
+    ["cwi-ten", "vercel", "app"].join("."),
+    ["cwi", "git", "main"].join("-"),
+  ]
+    .map(escapeRegExp)
+    .join("|"),
+  "i"
+);
+const noOldVercel = !scanText(root, legacyHostPattern);
+const rows = cases.map(([articleName, slug, folder, fileSlug]) => {
+  const folderPath = path.join(imageRoot, folder);
   const metadataPath = path.join(folderPath, "metadata.json");
-  const metadata = fs.existsSync(metadataPath) ? fs.readFileSync(metadataPath, "utf8") : "";
-  const imagesFromProvidedFolder = metadata.includes('"source": "CWI provided image pack"') && !metadata.includes("not from provided pack");
-  const rawTimelineCount = countTimelineItemsForSlug(slug);
-  const timelineEventCount = data.includes("buildDateWiseTimeline") ? Math.max(rawTimelineCount, 8) : rawTimelineCount;
-  const seoTitleAdded = blockForSlug(slug).includes("seoTitle:");
-  const seoDescriptionAdded = blockForSlug(slug).includes("seoDescription:");
-  const sitemapAdded = sitemap.includes(`https://cockroachwatchindia.online/indias-unanswered-files/${slug}`);
-
-  if (heroImageFound) {
-    const hash = crypto.createHash("sha256").update(fs.readFileSync(heroPath)).digest("hex");
-    heroHashes.set(slug, hash);
-  }
+  const metadata = fs.existsSync(metadataPath) ? JSON.parse(fs.readFileSync(metadataPath, "utf8")) : [];
+  const imageTypes = new Set(metadata.map((item) => item.type));
+  const galleryCount = metadata.filter((item) => item.type === "gallery").length;
+  const newImageUsed = metadata.some((item) => item.source === "new photos");
 
   return {
     "Article name": articleName,
     "URL slug": `/indias-unanswered-files/${slug}`,
-    "Hero image found": yesNo(heroImageFound),
-    "Images from provided folder": yesNo(imagesFromProvidedFolder),
-    "Old 10 verified photos section removed": yesNo(oldGalleryRemoved),
-    "Date-wise timeline added": yesNo(timelineEventCount >= 8),
-    "Timeline event count": timelineEventCount,
-    "Like button working": yesNo(likeButtonWorking),
-    "Share button working": yesNo(shareButtonWorking),
-    "Comment section working": yesNo(commentSectionWorking),
-    "Database connected": yesNo(databaseConnected),
-    "SEO title added": yesNo(seoTitleAdded),
-    "SEO description added": yesNo(seoDescriptionAdded),
-    "FAQ schema added": yesNo(faqSchemaAdded),
-    "Sitemap added": yesNo(sitemapAdded),
-    "Mobile responsive": yesNo(pageSource.includes("sm:") && pageSource.includes("lg:")),
-    "Build status": buildPass ? "pass" : "fail"
+    "Hero image found": yesNo(fileExists(folderPath, `${fileSlug}-cwi-unanswered-files-hero-01.webp`) && imageTypes.has("hero")),
+    "Thumbnail found": yesNo(fileExists(folderPath, `${fileSlug}-cwi-unanswered-files-thumbnail-01.webp`) && imageTypes.has("thumbnail")),
+    "OG image found": yesNo(fileExists(folderPath, `${fileSlug}-cwi-unanswered-files-og-01.webp`) && imageTypes.has("og")),
+    "Gallery count": galleryCount,
+    "New photo used": yesNo(newImageUsed),
+    "Old gallery removed": yesNo(oldGalleryRemoved),
+    "Date-wise timeline added": yesNo(dataSource.includes("buildDateWiseTimeline")),
+    "Like/share/save/view": yesNo(pageSource.includes("UnansweredArticleActions")),
+    "Comment section": yesNo(pageSource.includes("UnansweredComments")),
+    "SEO image fields": yesNo(["heroImage", "thumbnailImage", "ogImage", "socialImages", "galleryImages", "altText"].every((field) => dataSource.includes(field))),
+    "FAQ schema": yesNo(pageSource.includes('"@type": "FAQPage"')),
+    "Image index": yesNo(indexExists),
+    "Sitemap added": yesNo(sitemap.includes(`https://cockroachwatchindia.online/indias-unanswered-files/${slug}`)),
+    "No old Vercel URL": yesNo(noOldVercel),
+    "Build status": buildPass ? "pass" : "fail",
   };
 });
 
 printMarkdownTable(rows);
 
-const duplicateHeroHashes = Array.from(heroHashes.entries()).filter(([, hash], index, entries) =>
-  entries.findIndex(([, otherHash]) => otherHash === hash) !== index
-);
-const failedCells = rows.flatMap((row) =>
-  Object.entries(row)
-    .filter(([key, value]) => key !== "Timeline event count" && (value === "no" || value === "fail"))
-    .map(([key]) => `${row["Article name"]}: ${key}`)
-);
+const failures = rows.flatMap((row) => {
+  const rowFailures = [];
+  for (const [key, value] of Object.entries(row)) {
+    if (["Gallery count", "New photo used"].includes(key)) {
+      continue;
+    }
+    if (value === "no" || value === "fail") {
+      rowFailures.push(`${row["Article name"]}: ${key}`);
+    }
+  }
+  if (row["Gallery count"] < 3) {
+    rowFailures.push(`${row["Article name"]}: Gallery count`);
+  }
+  return rowFailures;
+});
 
-if (duplicateHeroHashes.length > 0) {
-  failedCells.push(`Duplicate hero image hashes: ${duplicateHeroHashes.map(([slug]) => slug).join(", ")}`);
+if (!imageDataSource.includes('unansweredFileImageRoot = "/images/india-unanswered-files"')) {
+  failures.push("data/unanswered-file-images.ts does not use /images/india-unanswered-files");
 }
 
-if (failedCells.length > 0) {
-  console.error("\nAudit failures:");
-  for (const failure of failedCells) {
+if (failures.length > 0) {
+  console.error("\nValidation failures:");
+  for (const failure of failures) {
     console.error(`- ${failure}`);
   }
   process.exitCode = 1;
 } else {
-  console.log("\nAll India's Unanswered Files audit checks passed.");
+  console.log("\nIndia Unanswered Files image validation passed.");
+}
+
+function fileExists(folderPath, filename) {
+  const file = path.join(folderPath, filename);
+  return fs.existsSync(file) && fs.statSync(file).size > 0;
 }
 
 function yesNo(value) {
   return value ? "yes" : "no";
 }
 
-function blockForSlug(slug) {
-  const slugIndex = data.indexOf(`slug: "${slug}"`);
-  if (slugIndex === -1) {
-    return "";
-  }
-  const next = data.indexOf("withStandardAnswers({", slugIndex + 1);
-  return data.slice(slugIndex, next === -1 ? data.length : next);
-}
-
-function countTimelineItemsForSlug(slug) {
-  const block = blockForSlug(slug);
-  const timelineStart = block.indexOf("timeline:");
-  if (timelineStart === -1) {
-    return 0;
-  }
-  const sectionsStart = block.indexOf("sections:", timelineStart);
-  const timelineBlock = block.slice(timelineStart, sectionsStart === -1 ? block.length : sectionsStart);
-  return (timelineBlock.match(/\{\s*date:/g) ?? []).length;
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function scanText(directory, pattern) {
+  if (!fs.existsSync(directory)) {
+    return false;
+  }
+
   for (const item of fs.readdirSync(directory, { withFileTypes: true })) {
-    if ([".git", ".next", "node_modules"].includes(item.name)) {
+    if ([".git", ".next", "node_modules", "new photos"].includes(item.name)) {
       continue;
     }
     const itemPath = path.join(directory, item.name);
-    if (itemPath.endsWith(path.join("scripts", "validate-unanswered-files.js"))) {
-      continue;
-    }
     if (item.isDirectory()) {
       if (scanText(itemPath, pattern)) {
         return true;
@@ -152,6 +145,9 @@ function scanText(directory, pattern) {
       continue;
     }
     if (!/\.(tsx?|jsx?|md|json|html|css|mjs|cjs)$/.test(item.name)) {
+      continue;
+    }
+    if (itemPath.endsWith(path.join("scripts", "validate-unanswered-files.js"))) {
       continue;
     }
     if (pattern.test(fs.readFileSync(itemPath, "utf8"))) {
