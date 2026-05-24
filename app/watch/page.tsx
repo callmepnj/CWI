@@ -7,9 +7,11 @@ import { WatchCategoryCard } from "@/components/WatchCategoryCard";
 import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { WatchPageHero } from "@/components/WatchPageHero";
 import { WatchVerificationPromise } from "@/components/WatchVerificationPromise";
+import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
 import { posts } from "@/data/posts";
+import { unansweredFiles } from "@/data/unanswered-files";
 import { watchAdvisories, watchCategories } from "@/data/watch";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 
@@ -108,6 +110,39 @@ export default function WatchPage() {
                 <span>Searchable source archive</span>
                 <span>Source-bound AI research box</span>
               </div>
+            </div>
+          </div>
+        </Card>
+      </Section>
+
+      <Section
+        eyebrow="Investigative Archive"
+        title="India's Unanswered Files"
+        subtitle="A source-backed CWI section for under-reported public-interest cases where citizens demanded justice, rehabilitation, transparency, or accountability."
+      >
+        <Card className="overflow-hidden bg-gradient-to-br from-white via-skywash to-white">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-center">
+            <div>
+              <CardLabel>18 case files / searchable sources</CardLabel>
+              <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-ink sm:text-5xl">
+                We are not against a party. We are against silence.
+              </h2>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-ink/70">
+                Explore Manipur, Ladakh, Joshimath, Great Nicobar, Hasdeo, NEET, Electoral Bonds, bulldozer demolitions, farmers&apos; protests, and other files with source labels, timelines, case filters, and CWI AI explainers.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button asChild>
+                  <Link href="/unanswered-files">Open India&apos;s Unanswered Files <FileSearch className="h-4 w-4" /></Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/submit">Submit source or correction</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-3">
+              {unansweredFiles.slice(0, 2).map((file) => (
+                <UnansweredFileVisual key={file.slug} file={file} />
+              ))}
             </div>
           </div>
         </Card>

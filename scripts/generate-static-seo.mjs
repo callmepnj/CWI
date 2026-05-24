@@ -12,6 +12,7 @@ const staticRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
+  "/unanswered-files",
   "/watch-desk",
   "/issues",
   "/join",
@@ -49,6 +50,8 @@ function slugifyTopic(value) {
 
 const postsSource = readFileSync(join(root, "data", "posts.ts"), "utf8");
 const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
+const unansweredFilesSource = readFileSync(join(root, "data", "unanswered-files.ts"), "utf8");
+const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 const tagBlocks = Array.from(postsSource.matchAll(/tags:\s*\[([^\]]+)\]/g), (match) => match[1]);
 const tags = Array.from(
   new Set(tagBlocks.flatMap((block) => Array.from(block.matchAll(/"([^"]+)"/g), (match) => match[1])))
@@ -57,7 +60,8 @@ const routes = [
   ...staticRoutes,
   ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
   ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
-  ...postSlugs.map((slug) => `/watch-desk/${slug}`)
+  ...postSlugs.map((slug) => `/watch-desk/${slug}`),
+  ...unansweredFileSlugs.map((slug) => `/unanswered-files/${slug}`)
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

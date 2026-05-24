@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 const footerLinks = [
   { label: "Home", href: "/" },
   { label: "Watch", href: "/watch" },
+  { label: "Unanswered Files", href: "/unanswered-files" },
   { label: "Manipur Investigation", href: "/watch/manipur-crisis" },
   { label: "About", href: "/about" },
   { label: "Charter", href: "/charter" },

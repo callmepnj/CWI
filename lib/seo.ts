@@ -25,6 +25,7 @@ export const importantRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
+  "/unanswered-files",
   "/watch-desk",
   "/issues",
   "/join",
