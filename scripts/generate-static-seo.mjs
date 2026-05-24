@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const baseUrl = "https://cockroachwatchindia.online";
-const lastModified = "2026-05-21";
+const lastModified = "2026-05-24";
 
 const staticRoutes = [
   "/",
@@ -11,6 +11,7 @@ const staticRoutes = [
   "/contact",
   "/charter",
   "/watch",
+  "/watch/manipur-crisis",
   "/watch-desk",
   "/issues",
   "/join",

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Send } from "lucide-react";
+import { ArrowRight, FileSearch, Send } from "lucide-react";
 import { Section } from "@/components/Section";
 import { SocialLinks } from "@/components/SocialLinks";
 import { WatchCarousel } from "@/components/WatchCarousel";
@@ -71,6 +71,46 @@ export default function WatchPage() {
         >
           <WatchCarousel alerts={watchAdvisories} />
         </div>
+      </Section>
+
+      <Section
+        eyebrow="Investigative Watch"
+        title="Manipur: The State India Forgot?"
+        subtitle="A source-backed CWI investigation into the Manipur crisis from 2023 to 2026, covering violence, displacement, delayed response, political accountability, and unanswered questions."
+      >
+        <Card className="overflow-hidden bg-gradient-to-br from-[#040711] via-[#071225] to-[#13080d] text-white before:from-red-500 before:via-sky-400 before:to-saffron">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
+            <div>
+              <CardLabel className="bg-sky-400/[0.12] text-sky-100 ring-sky-300/20">CWI Investigative Page</CardLabel>
+              <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-white sm:text-5xl">
+                A complete evidence-based timeline of Manipur
+              </h2>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-white/70">
+                Track what began in May 2023, what remained unresolved through 2026, what official sources claimed, what independent reporting showed, and why many Manipuris felt abandoned.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button asChild variant="saffron">
+                  <Link href="/watch/manipur-crisis">Open Investigation <FileSearch className="h-4 w-4" /></Link>
+                </Button>
+                <Button asChild variant="outline" className="border-white/20 bg-white/[0.08] text-white hover:bg-white/[0.14]">
+                  <Link href="/submit">Submit source or correction</Link>
+                </Button>
+              </div>
+            </div>
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.06] p-5">
+              <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">
+                Includes
+              </p>
+              <div className="mt-4 grid gap-2 text-sm font-bold leading-6 text-white/70">
+                <span>Timeline 2023-2026</span>
+                <span>Human cost and relief camps</span>
+                <span>Political accountability frames</span>
+                <span>Searchable source archive</span>
+                <span>Source-bound AI research box</span>
+              </div>
+            </div>
+          </div>
+        </Card>
       </Section>
 
       <Section

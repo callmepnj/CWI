@@ -78,6 +78,16 @@ Next steps:
 - Added Google Search Console verification meta tag with token `Wqz_bAcrTX-o4uXV83OWMUA3qSLYj3lHYanoWci9BPY`.
 - Current SEO optimization pass added homepage WebPage JSON-LD, homepage FAQ JSON-LD, crawlable FAQ content, stronger internal homepage links to About/Credit Policy/Submit, Telegram in Organization `sameAs`, and extra README ranking checklist items.
 - Verified after current SEO pass: `npm run lint`, `npm run typecheck`, `npm run build`, secret scan excluding `.env.local`, and generated homepage HTML contains FAQPage/WebPage schema plus Google verification metadata.
+
+2026-05-24 Manipur investigative page task:
+- User requested a new source-backed investigative Watch page about the Manipur crisis from 2023 to 2026.
+- Working route assumption: `/watch/manipur-crisis`, linked from the existing `/watch` hub.
+- Copied selected user-provided Manipur-relevant images from `manipur article photos/` into `public/manipur/`.
+- Editorial guardrail for this task: use cautious, attributed wording for political/accountability claims; no hate against Meitei, Kuki-Zo, Naga, Hindu, Christian, tribal, or any community.
+- Source trail being used includes AP, BBC, Al Jazeera, Human Rights Watch, Indian Express, PIB, ThePrint/PTI, Supreme Court Observer, and Parliament/PIB references.
+- Implemented typed Manipur investigation data in `data/manipur.ts`, source-bound research UI, searchable source archive, animated timeline, and route `app/watch/manipur-crisis/page.tsx`.
+- Added Watch hub and footer links to the Manipur investigation, copied selected images into `public/manipur/`, and ignored the raw `manipur article photos/` source folder to avoid committing unrelated/unoptimized files.
+- Verified after implementation: `npm run typecheck`, `npm run lint`, and `npm run build` passed. Build generated `public/sitemap.xml` with `/watch/manipur-crisis`.
 - User uploaded Google Search Console HTML verification file `public/google9c2f6600a0be4f79.html`; file content is only the Google verification token and is safe to commit.
 - Live check after push showed `https://cockroachwatchindia.online/google9c2f6600a0be4f79.html` still returning 404 while GitHub raw served the file, indicating Vercel had not deployed the latest commit yet.
 - Current sitemap fix: `app/sitemap.ts` now hardcodes production base URL `https://cockroachwatchindia.online` and returns explicit static routes plus Watch Desk post routes; `app/robots.ts` hardcodes the production sitemap URL for Google Search Console.
