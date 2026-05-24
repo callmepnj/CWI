@@ -1,11 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import Image from "next/image";
-import type { UnansweredFile } from "@/data/unanswered-files";
+import type { FileVisual, UnansweredFile } from "@/data/unanswered-files";
 import { getFileVisual } from "@/data/unanswered-files";
 import { cn } from "@/lib/utils";
 
 type UnansweredFileVisualProps = {
   file: UnansweredFile;
+  visual?: FileVisual;
   priority?: boolean;
   className?: string;
   imageClassName?: string;
@@ -14,12 +15,13 @@ type UnansweredFileVisualProps = {
 
 export function UnansweredFileVisual({
   file,
+  visual: providedVisual,
   priority = false,
   className,
   imageClassName,
   showCaption = false
 }: UnansweredFileVisualProps) {
-  const visual = getFileVisual(file);
+  const visual = providedVisual ?? getFileVisual(file);
 
   return (
     <figure className={cn("overflow-hidden rounded-[1.75rem] border border-white/10 bg-ink shadow-card", className)}>

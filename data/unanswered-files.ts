@@ -33,6 +33,7 @@ export type FileVisual = {
   caption: string;
   credit: string;
   isPhoto: boolean;
+  brief: string;
 };
 
 export type UnansweredFile = {
@@ -970,21 +971,202 @@ export function getFileSources(file: UnansweredFile, indexes: number[]) {
 }
 
 export function getFileVisual(file: UnansweredFile): FileVisual {
+  return getFileVisuals(file)[0];
+}
+
+export function getFileVisuals(file: UnansweredFile): FileVisual[] {
   if (file.slug === "manipur-violence") {
-    return {
-      src: "/manipur/manipur-vigil-banner.jpg",
-      alt: "Cockroach Watch India documentary visual for the Manipur violence file",
-      caption: "CWI Manipur archive visual used for documentary context. No graphic victim imagery is shown.",
-      credit: "CWI visual archive",
-      isPhoto: true
-    };
+    return [
+      {
+        src: "/manipur/manipur-vigil-banner.jpg",
+        alt: "Cockroach Watch India documentary visual for the Manipur violence file",
+        caption: "CWI Manipur archive visual used for documentary context. No graphic victim imagery is shown.",
+        credit: "CWI visual archive",
+        isPhoto: true,
+        brief: "Manipur public memory and peace vigil visual"
+      },
+      {
+        src: "/manipur/burned-place-of-worship.jpg",
+        alt: "Non-graphic documentary visual of destruction in Manipur",
+        caption: "Non-graphic CWI archive visual used to represent destruction without identifying private victims.",
+        credit: "CWI visual archive",
+        isPhoto: true,
+        brief: "Burned homes and worship spaces after violence"
+      },
+      {
+        src: "/manipur/security-patrol.jpg",
+        alt: "Security patrol visual for Manipur crisis context",
+        caption: "Security deployment became part of ordinary life, but deployment alone did not rebuild trust.",
+        credit: "CWI visual archive",
+        isPhoto: true,
+        brief: "Security deployment and guarded zones"
+      },
+      {
+        src: "/manipur/burned-vehicle-road.jpg",
+        alt: "Road damage and burned vehicle visual for Manipur crisis context",
+        caption: "Roads, debris, and disrupted mobility became part of the human cost of the crisis.",
+        credit: "CWI visual archive",
+        isPhoto: true,
+        brief: "Roads, debris, and disrupted mobility"
+      }
+    ];
   }
 
-  return {
-    src: `/unanswered-files/visual/${file.slug}`,
-    alt: `CWI editorial visual for ${file.title}`,
-    caption: "CWI editorial visual generated from the case metadata. It is not presented as an incident photograph.",
-    credit: "CWI editorial visual",
-    isPhoto: false
-  };
+  const briefs = unansweredFileVisualBriefs[file.slug] ?? [
+    "public records and source archive",
+    "citizen testimony and official response",
+    "timeline, legal status, and unanswered questions"
+  ];
+
+  return briefs.map((brief, index) => ({
+    src: `/unanswered-files/visual/${file.slug}/${index + 1}`,
+    alt: `CWI image-pack visual for ${file.title}: ${brief}`,
+    caption: `Image-pack brief: ${brief}. This is a CWI editorial research visual, not an incident photograph.`,
+    credit: "CWI image-pack visual brief",
+    isPhoto: false,
+    brief
+  }));
 }
+
+export function getVisualBrief(file: UnansweredFile, index: number) {
+  return getFileVisuals(file)[index] ?? getFileVisual(file);
+}
+
+export const unansweredFileVisualBriefs: Record<string, string[]> = {
+  "ladakh-sixth-schedule-statehood": [
+    "Sonam Wangchuk and Ladakh statehood protest context",
+    "Sixth Schedule and constitutional safeguard placards",
+    "Himalayan ecology, glaciers, and local land protection",
+    "Leh and Kargil civil society mobilisation",
+    "pastoral communities, border livelihoods, and representation",
+    "Delhi march, detention, and democratic-rights questions"
+  ],
+  "joshimath-land-subsidence": [
+    "cracked homes and unsafe buildings in a sinking Himalayan town",
+    "evacuated families and temporary accommodation",
+    "mountain roads, construction pressure, and warning signs",
+    "hydropower and tunnelling concerns in fragile terrain",
+    "compensation, relocation, and livelihood uncertainty",
+    "scientific monitoring and public risk communication"
+  ],
+  "great-nicobar-shompen-nicobarese": [
+    "Great Nicobar rainforest and coastal biodiversity",
+    "Galathea Bay and transshipment port project context",
+    "Shompen and Nicobarese rights shown without intrusive imagery",
+    "strategic infrastructure, ecological clearance, and consultation",
+    "coastal habitat, turtles, forests, and protected areas",
+    "official project map, public hearings, and unanswered safeguards"
+  ],
+  "hasdeo-aranya-coal-mining": [
+    "Hasdeo Aranya forest and coal block conflict",
+    "Adivasi Gram Sabha consent and forest-rights protest",
+    "tree felling, mining roads, and elephant habitat concerns",
+    "village sit-ins and forest protection slogans",
+    "coal machinery beside forest-dependent livelihoods",
+    "public records, clearances, and rehabilitation questions"
+  ],
+  "women-wrestlers-sexual-harassment-case": [
+    "women wrestlers' protest at Jantar Mantar",
+    "athlete testimony, court process, and institutional accountability",
+    "candle march and public support for complainants",
+    "Delhi Police action and protest-site tension",
+    "WFI governance, charges framed, and trial status",
+    "sports, gender justice, and survivor dignity"
+  ],
+  "neet-paper-leak-nta-accountability": [
+    "NEET-UG student protest and exam accountability",
+    "NTA office, petitions, and demand for transparency",
+    "Supreme Court hearing and source-backed legal record",
+    "answer sheets, exam centres, and verification process",
+    "students, coaching hubs, and uncertainty after results",
+    "paper leak allegations, retest debate, and public trust"
+  ],
+  "electoral-bonds-transparency": [
+    "Supreme Court electoral bonds verdict and political funding",
+    "SBI disclosure timeline and donor data transparency",
+    "Election Commission publication of electoral bond data",
+    "money trail, anonymous donations, and voter right to know",
+    "party funding records and public-interest scrutiny",
+    "constitutional accountability and campaign finance reform"
+  ],
+  "bulldozer-justice-demolitions": [
+    "bulldozer demolition and due-process question",
+    "families after demolition without graphic imagery",
+    "municipal notices, property records, and legal safeguards",
+    "Supreme Court pan-India demolition guidelines",
+    "punitive demolition debate and arbitrary state power",
+    "housing rights, compensation, and accountability"
+  ],
+  "assam-evictions": [
+    "Assam eviction drive and displaced families",
+    "char areas, riverine land, and shelter uncertainty",
+    "police operation, bulldozers, and rehabilitation questions",
+    "land rights, identity politics, and due process",
+    "temporary shelters after demolition",
+    "state response, public records, and human cost"
+  ],
+  "farmers-msp-protest": [
+    "farmers' MSP protest at Delhi borders",
+    "tractor lines, barricades, and march restrictions",
+    "Shambhu border, tear gas, and protest safety",
+    "MSP legal guarantee placards and union demands",
+    "langar, protest camps, and rural solidarity",
+    "women farmers and public policy accountability"
+  ],
+  "wayanad-landslide-ecological-warnings": [
+    "Wayanad landslide rescue and disaster response",
+    "destroyed homes, mud, and non-graphic aftermath",
+    "Chooralmala and Mundakkai ecological risk context",
+    "relief camps, missing families, and rehabilitation",
+    "rainfall, fragile slopes, plantations, and tourism pressure",
+    "ignored warnings, official alerts, and public accountability"
+  ],
+  "vizhinjam-port-fisherfolk-protest": [
+    "Vizhinjam port fisherfolk protest",
+    "coastal erosion and homes near the sea",
+    "fishing boats, harbour livelihoods, and protest lines",
+    "port cranes, breakwater construction, and public claims",
+    "rehabilitation package and livelihood protection",
+    "church-led protest, state talks, and unanswered concerns"
+  ],
+  "jammu-kashmir-statehood-delay": [
+    "Jammu and Kashmir statehood demand after Union Territory status",
+    "assembly election and restoration-of-statehood promises",
+    "Srinagar public spaces, security presence, and civic rights",
+    "Article 370 verdict and statehood timeline questions",
+    "government offices, elected assembly, and limited powers",
+    "federalism, representation, and democratic accountability"
+  ],
+  "delhi-riots-uapa-pretrial-detention": [
+    "Delhi riots court record and UAPA bail hearings",
+    "burned vehicles and aftermath shown non-graphically",
+    "due process, prison bars, and long pre-trial detention",
+    "court building, bail orders, and legal status",
+    "families, accused persons, and victims awaiting closure",
+    "communal violence coverage without communal blame"
+  ],
+  "sambhal-mosque-survey-violence": [
+    "Sambhal mosque survey and court-order context",
+    "police barricades, crowd control, and public-order risk",
+    "religious-site dispute handled without communal targeting",
+    "Supreme Court pause and High Court route",
+    "judicial probe, official claims, and deaths reported",
+    "media framing, rumours, and source verification"
+  ],
+  "lakhimpur-kheri-farmers-case": [
+    "Lakhimpur Kheri farmers case and protest context",
+    "victim families, memorials, and trial delay",
+    "court record, bail conditions, and witness concerns",
+    "farm protest route, vehicles, and public accountability",
+    "politically connected accused and independent prosecution",
+    "Supreme Court concern over trial pace"
+  ],
+  "hathras-caste-gender-justice": [
+    "Hathras caste-gender justice protest",
+    "village lane, police barricade, and family dignity",
+    "court verdict, appeal concerns, and legal process",
+    "Dalit rights protest and gender justice demands",
+    "night cremation controversy represented without graphic imagery",
+    "evidence, investigation, and survivor-family dignity"
+  ]
+};

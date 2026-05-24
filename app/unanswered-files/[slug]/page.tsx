@@ -5,6 +5,7 @@ import { ArrowRight, CalendarDays, ExternalLink, FileText, Scale, ShieldCheck } 
 import { ArticleProgress } from "@/components/ArticleProgress";
 import { ShareButtons } from "@/components/ShareButtons";
 import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
+import { UnansweredImageGallery } from "@/components/UnansweredImageGallery";
 import { UnansweredResearchBox } from "@/components/UnansweredResearchBox";
 import { UnansweredSourceArchive, type UnansweredSourceRecord } from "@/components/UnansweredSourceArchive";
 import { UnansweredStatusBadge } from "@/components/UnansweredStatusBadge";
@@ -182,6 +183,8 @@ export default async function UnansweredFilePage({ params }: Props) {
                 <MiniFact label="Ground reality" value={file.groundReality} />
               </div>
             </Card>
+
+            <UnansweredImageGallery file={file} />
 
             <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card sm:p-8">
               <div className="space-y-10">
