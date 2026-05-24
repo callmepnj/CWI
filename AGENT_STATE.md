@@ -88,6 +88,8 @@ Next steps:
 - Implemented typed Manipur investigation data in `data/manipur.ts`, source-bound research UI, searchable source archive, animated timeline, and route `app/watch/manipur-crisis/page.tsx`.
 - Added Watch hub and footer links to the Manipur investigation, copied selected images into `public/manipur/`, and ignored the raw `manipur article photos/` source folder to avoid committing unrelated/unoptimized files.
 - Verified after implementation: `npm run typecheck`, `npm run lint`, and `npm run build` passed. Build generated `public/sitemap.xml` with `/watch/manipur-crisis`.
+- Follow-up UI polish: user said Manipur page was too dark. Converted the route and Manipur-specific timeline/source archive/research components to the bright CWI UI system: paper background, white cards, royal blue highlights, amber notices, ink text, and limited navy accents.
+- Verified after UI polish: `npm run typecheck`, `npm run lint`, and `npm run build` passed.
 - User uploaded Google Search Console HTML verification file `public/google9c2f6600a0be4f79.html`; file content is only the Google verification token and is safe to commit.
 - Live check after push showed `https://cockroachwatchindia.online/google9c2f6600a0be4f79.html` still returning 404 while GitHub raw served the file, indicating Vercel had not deployed the latest commit yet.
 - Current sitemap fix: `app/sitemap.ts` now hardcodes production base URL `https://cockroachwatchindia.online` and returns explicit static routes plus Watch Desk post routes; `app/robots.ts` hardcodes the production sitemap URL for Google Search Console.

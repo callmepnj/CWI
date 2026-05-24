@@ -31,16 +31,16 @@ export function ManipurResearchBox({ answers }: { answers: ManipurResearchAnswer
   }
 
   return (
-    <div className="rounded-[2rem] border border-sky-300/20 bg-[#071225] p-5 shadow-[0_24px_90px_rgba(14,165,233,0.14)] sm:p-6">
+    <div className="rounded-[2rem] border border-line bg-white p-5 shadow-card sm:p-6">
       <div className="flex items-center gap-3">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-sky-400/[0.12] text-sky-200 ring-1 ring-sky-300/20">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-skywash text-royal ring-1 ring-royal/15">
           <BrainCircuit className="h-5 w-5" />
         </span>
         <div>
-          <h3 className="font-display text-2xl font-black uppercase leading-none tracking-[-0.04em] text-white">
+          <h3 className="font-display text-2xl font-black uppercase leading-none tracking-[-0.04em] text-ink">
             CWI AI Research Box
           </h3>
-          <p className="mt-1 text-sm font-semibold text-white/50">
+          <p className="mt-1 text-sm font-semibold text-ink/58">
             Source-bound answers only. No speculation, no private data, no propaganda.
           </p>
         </div>
@@ -53,12 +53,12 @@ export function ManipurResearchBox({ answers }: { answers: ManipurResearchAnswer
             value={prompt}
             onChange={(event) => setPrompt(event.target.value)}
             placeholder="Ask from the verified source archive"
-            className="min-h-14 w-full rounded-2xl border border-white/10 bg-[#040914] px-4 py-3 text-sm font-semibold text-white outline-none placeholder:text-white/40 focus:border-sky-300/60"
+            className="min-h-14 w-full rounded-2xl border border-line bg-paper px-4 py-3 text-sm font-semibold text-ink outline-none placeholder:text-ink/35 focus:border-royal/50"
           />
         </label>
         <button
           type="submit"
-          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-sky-400 px-5 text-xs font-black uppercase tracking-[0.14em] text-[#061326] transition hover:bg-amber-200"
+          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-ink px-5 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-royal"
         >
           Ask <SendHorizontal className="h-4 w-4" />
         </button>
@@ -73,23 +73,23 @@ export function ManipurResearchBox({ answers }: { answers: ManipurResearchAnswer
               setPrompt(answer.question);
               setActiveQuestion(answer.question);
             }}
-            className="rounded-full border border-white/10 bg-white/[0.055] px-3 py-2 text-left text-[0.68rem] font-black uppercase tracking-[0.1em] text-white/60 transition hover:border-sky-300/50 hover:text-sky-100"
+            className="rounded-full border border-line bg-paper px-3 py-2 text-left text-[0.68rem] font-black uppercase tracking-[0.1em] text-ink/58 transition hover:border-royal/35 hover:bg-skywash hover:text-royal"
           >
             {answer.question}
           </button>
         ))}
       </div>
 
-      <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/[0.045] p-5">
+      <div className="mt-6 rounded-[1.5rem] border border-royal/15 bg-skywash p-5">
         {activeAnswer ? (
           <>
-            <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-amber-100">
+            <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-royal">
               Source-bound answer
             </p>
-            <h4 className="mt-3 font-display text-2xl font-black uppercase leading-tight tracking-[-0.04em] text-white">
+            <h4 className="mt-3 font-display text-2xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">
               {activeAnswer.question}
             </h4>
-            <p className="mt-3 text-base leading-8 text-white/70">{activeAnswer.answer}</p>
+            <p className="mt-3 text-base leading-8 text-ink/72">{activeAnswer.answer}</p>
             <div className="mt-5 flex flex-wrap gap-2">
               {citations.map((source) => (
                 <a
@@ -97,7 +97,7 @@ export function ManipurResearchBox({ answers }: { answers: ManipurResearchAnswer
                   href={source.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-full bg-white/[0.08] px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-sky-100 ring-1 ring-white/10 hover:bg-white/[0.12]"
+                  className="rounded-full bg-white px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-royal ring-1 ring-line hover:bg-paper"
                 >
                   {source.publisher}
                 </a>
@@ -105,7 +105,7 @@ export function ManipurResearchBox({ answers }: { answers: ManipurResearchAnswer
             </div>
           </>
         ) : (
-          <p className="text-base leading-8 text-white/70">
+          <p className="text-base leading-8 text-ink/72">
             CWI can only answer from the verified source archive on this page. Choose one of the listed questions or search the archive for more context.
           </p>
         )}
