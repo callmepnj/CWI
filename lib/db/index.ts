@@ -373,6 +373,14 @@ async function adminOsSchemaLooksReady() {
         to_regclass('public.system_health_logs') is not null as system_health_logs,
         to_regclass('public.cost_usage_logs') is not null as cost_usage_logs,
         to_regclass('public.settings') is not null as settings,
+        to_regclass('public.cwi_memory_nodes') is not null as cwi_memory_nodes,
+        to_regclass('public.cwi_memory_edges') is not null as cwi_memory_edges,
+        to_regclass('public.cwi_memory_claims') is not null as cwi_memory_claims,
+        to_regclass('public.cwi_agent_workflows') is not null as cwi_agent_workflows,
+        to_regclass('public.cwi_agent_workflow_steps') is not null as cwi_agent_workflow_steps,
+        to_regclass('public.cwi_verification_gates') is not null as cwi_verification_gates,
+        to_regclass('public.cwi_quality_scores') is not null as cwi_quality_scores,
+        to_regclass('public.cwi_trend_radar_items') is not null as cwi_trend_radar_items,
         exists (
           select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'agent_name'
@@ -716,6 +724,136 @@ export async function ensureAdminOsTables() {
         updated_at timestamptz not null default now()
       );
 
+      create table if not exists cwi_memory_nodes (
+        id uuid primary key default gen_random_uuid(),
+        node_type text not null,
+        label text not null,
+        slug text not null,
+        summary text,
+        confidence_score integer not null default 50,
+        source_count integer not null default 0,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now(),
+        mention_count integer not null default 1,
+        source_url text,
+        metadata jsonb not null default '{}'::jsonb,
+        unique (node_type, slug)
+      );
+
+      create table if not exists cwi_memory_edges (
+        id uuid primary key default gen_random_uuid(),
+        from_node_id uuid not null references cwi_memory_nodes(id) on delete cascade,
+        to_node_id uuid not null references cwi_memory_nodes(id) on delete cascade,
+        relation_type text not null,
+        confidence_score integer not null default 50,
+        evidence jsonb not null default '[]'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique (from_node_id, to_node_id, relation_type)
+      );
+
+      create table if not exists cwi_memory_claims (
+        id uuid primary key default gen_random_uuid(),
+        topic text not null,
+        claim_text text not null,
+        claim_hash text not null unique,
+        status text not null default 'needs_verification',
+        confidence_score integer not null default 50,
+        risk_level text not null default 'Medium',
+        source_count integer not null default 0,
+        source_urls jsonb not null default '[]'::jsonb,
+        article_slug text,
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now()
+      );
+
+      create table if not exists cwi_agent_workflows (
+        id uuid primary key default gen_random_uuid(),
+        workflow_type text not null,
+        topic text not null,
+        status text not null default 'queued',
+        current_step text not null default 'queued',
+        progress_percent integer not null default 0,
+        approval_queue_id uuid,
+        article_draft_id uuid references article_drafts(id) on delete set null,
+        public_url text,
+        input jsonb not null default '{}'::jsonb,
+        output jsonb not null default '{}'::jsonb,
+        error_message text,
+        started_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        completed_at timestamptz
+      );
+
+      create table if not exists cwi_agent_workflow_steps (
+        id uuid primary key default gen_random_uuid(),
+        workflow_id uuid not null references cwi_agent_workflows(id) on delete cascade,
+        step_key text not null,
+        label text not null,
+        status text not null default 'queued',
+        progress_percent integer not null default 0,
+        input jsonb not null default '{}'::jsonb,
+        output jsonb not null default '{}'::jsonb,
+        error_message text,
+        started_at timestamptz,
+        completed_at timestamptz,
+        updated_at timestamptz not null default now(),
+        unique (workflow_id, step_key)
+      );
+
+      create table if not exists cwi_verification_gates (
+        id uuid primary key default gen_random_uuid(),
+        research_pack_id uuid references research_packs(id) on delete cascade,
+        verification_report_id uuid references verification_reports(id) on delete set null,
+        topic text not null,
+        status text not null default 'needs_review',
+        can_draft boolean not null default false,
+        confidence_score integer not null default 0,
+        source_count integer not null default 0,
+        official_source_available boolean not null default false,
+        risky_claims jsonb not null default '[]'::jsonb,
+        missing_dates jsonb not null default '[]'::jsonb,
+        contradictions jsonb not null default '[]'::jsonb,
+        legal_risk text not null default 'Medium',
+        checks jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now()
+      );
+
+      create table if not exists cwi_quality_scores (
+        id uuid primary key default gen_random_uuid(),
+        article_draft_id uuid references article_drafts(id) on delete cascade,
+        approval_queue_id uuid,
+        topic text not null,
+        factual_accuracy_score integer not null default 0,
+        source_strength_score integer not null default 0,
+        legal_risk_score integer not null default 0,
+        seo_score integer not null default 0,
+        readability_score integer not null default 0,
+        cwi_voice_score integer not null default 0,
+        publish_readiness_score integer not null default 0,
+        status text not null default 'needs_review',
+        issues jsonb not null default '[]'::jsonb,
+        improvements jsonb not null default '[]'::jsonb,
+        created_at timestamptz not null default now()
+      );
+
+      create table if not exists cwi_trend_radar_items (
+        id uuid primary key default gen_random_uuid(),
+        topic text not null,
+        trend_type text not null default 'watch_desk',
+        priority_score integer not null default 50,
+        evidence_count integer not null default 0,
+        suggested_action text not null default 'Review manually',
+        why_it_matters text,
+        source_urls jsonb not null default '[]'::jsonb,
+        status text not null default 'new',
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique (topic, trend_type)
+      );
+
       create table if not exists approval_queue (
         id uuid primary key default gen_random_uuid(),
         topic text not null,
@@ -743,6 +881,18 @@ export async function ensureAdminOsTables() {
 
       create index if not exists agent_tasks_status_created_idx
       on agent_tasks (status, created_at desc);
+
+      create index if not exists cwi_memory_nodes_type_seen_idx
+      on cwi_memory_nodes (node_type, last_seen_at desc);
+
+      create index if not exists cwi_memory_claims_topic_seen_idx
+      on cwi_memory_claims (topic, last_seen_at desc);
+
+      create index if not exists cwi_agent_workflows_status_updated_idx
+      on cwi_agent_workflows (status, updated_at desc);
+
+      create index if not exists cwi_trend_radar_priority_idx
+      on cwi_trend_radar_items (priority_score desc, updated_at desc);
 
       alter table agent_tasks add column if not exists agent_name text;
       alter table agent_tasks add column if not exists input_json jsonb not null default '{}'::jsonb;

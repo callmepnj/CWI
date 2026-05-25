@@ -1,5 +1,8 @@
 import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
 import { runArticleAgent } from "@/lib/ai/agents/article-agent";
+import { improveArticleDraft, saveQualityScore, scoreArticleQuality } from "@/lib/ai/quality-engine";
+import { rememberArticleDraft } from "@/lib/ai/source-memory";
+import { assertArticleDraftAllowed } from "@/lib/ai/verification-engine";
 import { getPool } from "@/lib/db";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { attachDraftToApprovalItem, getApprovalItem, saveApprovalItem } from "@/lib/db/approval";
@@ -25,7 +28,14 @@ export async function POST(request: Request) {
 
     const taskId = await createAgentTask({ agentName: "CWI Article AI", taskType: "article_draft", input: { researchPackId, verificationReportId } });
     try {
-      const article = await runArticleAgent({ researchPackId, verificationReportId });
+      const verificationGate = await assertArticleDraftAllowed({ researchPackId, verificationReportId });
+      const rawArticle = await runArticleAgent({ researchPackId, verificationReportId });
+      const firstQuality = scoreArticleQuality(rawArticle);
+      const article = improveArticleDraft(rawArticle, firstQuality);
+      const quality = scoreArticleQuality(article);
+      if (quality.status === "blocked") {
+        throw new Error(`Article quality gate blocked the draft. Readiness ${quality.publishReadinessScore}/100.`);
+      }
       await completeAgentTask(taskId, article, article._meta?.estimatedCost ?? 0);
       const articleDraftId = await saveArticleDraft({
         researchPackId,
@@ -37,6 +47,8 @@ export async function POST(request: Request) {
         verificationStatus: "Developing",
         sourceCount: article.sources.length
       });
+      await saveQualityScore(quality, { topic: article.title, articleDraftId, approvalQueueId: approvalItem?.id });
+      await rememberArticleDraft(article, { articleDraftId, approvalQueueId: approvalItem?.id });
 
       if (approvalItem?.id) {
         const updatedApproval = await attachDraftToApprovalItem({
@@ -46,7 +58,7 @@ export async function POST(request: Request) {
           adminNotes: "Article AI attached a draft to this approval item. Review it, then use Approve & Publish if ready."
         });
 
-        return ok({ articleDraftId, approvalQueueId: updatedApproval?.id, article, updatedApproval }, "Article draft attached to this approval item.");
+        return ok({ articleDraftId, approvalQueueId: updatedApproval?.id, article, updatedApproval, verificationGate, quality }, "Article draft attached to this approval item.");
       }
 
       const approvalQueueId = await saveApprovalItem({
@@ -62,7 +74,7 @@ export async function POST(request: Request) {
         status: "waiting_for_approval",
         adminNotes: "Review article before SEO/social/publish."
       });
-      return ok({ articleDraftId, approvalQueueId, article }, "Article draft saved.");
+      return ok({ articleDraftId, approvalQueueId, article, verificationGate, quality }, "Article draft saved.");
     } catch (error) {
       await failAgentTask(taskId, error instanceof Error ? error.message : "Article AI failed.");
       throw error;

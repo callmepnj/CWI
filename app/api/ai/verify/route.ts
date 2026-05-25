@@ -1,5 +1,6 @@
 import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
 import { runVerifyAgent } from "@/lib/ai/agents/verify-agent";
+import { runVerificationGate } from "@/lib/ai/verification-engine";
 import { getPool } from "@/lib/db";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { saveApprovalItem } from "@/lib/db/approval";
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
         sourceGaps: verification.sourceGaps,
         publishRecommendation: verification.publishRecommendation
       });
+      const verificationGate = await runVerificationGate({ researchPackId, verificationReportId });
       const approvalQueueId = await saveApprovalItem({
         topic: "Verification report",
         itemType: "Verification Report",
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
         status: "waiting_for_approval",
         adminNotes: "Review verification before drafting or publishing."
       });
-      return ok({ verificationReportId, approvalQueueId, verification }, "Verification report saved.");
+      return ok({ verificationReportId, approvalQueueId, verification, verificationGate }, "Verification report saved.");
     } catch (error) {
       await failAgentTask(taskId, error instanceof Error ? error.message : "Verify AI failed.");
       throw error;

@@ -50,7 +50,11 @@ function buildSetupModeDashboard() {
       articlesReady: 0,
       seoPacksReady: 0,
       socialPacksReady: 0,
-      uiuxIssuesFound: 0
+      uiuxIssuesFound: 0,
+      memoryNodes: 0,
+      activeWorkflows: 0,
+      trendRadarItems: 0,
+      qualityReviews: 0
     },
     agents: [],
     approvals: [],
@@ -85,6 +89,12 @@ function buildSetupModeDashboard() {
     },
     reports: [],
     comments: [],
+    workflows: [],
+    memoryNodes: [],
+    memoryClaims: [],
+    verificationGates: [],
+    qualityScores: [],
+    trendRadarItems: [],
     latestPublicArticles: [],
     latestUnansweredFiles: []
   };

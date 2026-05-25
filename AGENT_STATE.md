@@ -206,3 +206,12 @@ Next steps:
 - DB hardening: admin schema now adds missing approval columns on existing databases and indexes `published_articles` by slug/published date.
 - Verification after fix: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, and `npm run env:check:vercel` pass. Build now shows `/watch-desk/[slug]` and `/rss.xml` as dynamic routes.
 - Local `npm run db:check` still fails `28P01`; this confirms local `.env.local` DB credentials are invalid, not a code-path failure. Production still requires valid Vercel `DATABASE_URL`/AI env values for DB-backed publish actions.
+
+2026-05-25 powerful CWI AI architecture implementation in progress:
+- User requested implementing the recommended five AI upgrades: Source Memory + Knowledge Graph, Verification Engine before writing, real workflow state machine with progress, Trend Radar, and AI Quality Scoring + Self-Correction.
+- Added admin DB schema for `cwi_memory_nodes`, `cwi_memory_edges`, `cwi_memory_claims`, `cwi_agent_workflows`, `cwi_agent_workflow_steps`, `cwi_verification_gates`, `cwi_quality_scores`, and `cwi_trend_radar_items`.
+- Added backend modules: `lib/ai/source-memory.ts`, `lib/ai/verification-engine.ts`, `lib/ai/workflow-state.ts`, `lib/ai/quality-engine.ts`, and `lib/ai/trend-radar.ts`.
+- Wired manual-link/article/publish AI flows through workflow state, verification gates, quality scoring/self-correction, source memory updates, and approval metadata.
+- Admin dashboard now exposes Workflows, Source Memory, Trend Radar, and Quality Scores sections, plus Sync Memory and Run Trend Radar actions.
+- Verification after implementation: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run env:check:vercel`, `npm run build`, and `git diff --check` pass.
+- Remaining environment blocker: `npm run db:check` still fails `28P01`, meaning the local `.env.local` Postgres credentials are still rejected. The new AI architecture needs valid Supabase/Vercel `DATABASE_URL` to create/read the new memory, workflow, verification, quality, and radar tables in production.

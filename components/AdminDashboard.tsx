@@ -59,6 +59,12 @@ type AdminData = {
   health: AdminRecord;
   reports: AdminRecord[];
   comments: AdminRecord[];
+  workflows: AdminRecord[];
+  memoryNodes: AdminRecord[];
+  memoryClaims: AdminRecord[];
+  verificationGates: AdminRecord[];
+  qualityScores: AdminRecord[];
+  trendRadarItems: AdminRecord[];
   latestPublicArticles: AdminRecord[];
   latestUnansweredFiles: AdminRecord[];
 };
@@ -66,8 +72,12 @@ type AdminData = {
 const sections = [
   ["overview", "Overview", Activity],
   ["agents", "Agent Control Center", Bot],
+  ["workflows", "Workflows", Activity],
   ["approval", "Approval Queue", ClipboardCheck],
   ["manual-link", "Manual Link", LinkIcon],
+  ["source-memory", "Source Memory", Database],
+  ["trend-radar", "Trend Radar", Search],
+  ["quality-scores", "Quality Scores", ShieldCheck],
   ["research-packs", "Research Packs", FileSearch],
   ["articles", "Articles", Newspaper],
   ["seo-packs", "SEO Packs", TrendingUp],
@@ -85,6 +95,8 @@ const sections = [
 
 const agentActions = [
   ["daily-workflow", "Run Daily Workflow"],
+  ["sync-memory", "Sync Source Memory"],
+  ["trend-radar", "Run Trend Radar"],
   ["research-only", "Run Research Only"],
   ["verify", "Run Verify"],
   ["article-draft", "Generate Article Draft"],
@@ -524,6 +536,15 @@ function AdminSection({
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
   if (section === "agents") return <AgentsSection data={data} pending={pending} runAction={runAction} />;
+  if (section === "workflows") {
+    return (
+      <RecordList
+        title="Agent Workflows"
+        records={data.workflows}
+        fields={["workflow_type", "topic", "status", "current_step", "progress_percent", "public_url", "error_message"]}
+      />
+    );
+  }
   if (section === "approval") {
     return (
       <ApprovalSection
@@ -537,6 +558,9 @@ function AdminSection({
     );
   }
   if (section === "manual-link") return <ManualLinkSection onComplete={refresh} />;
+  if (section === "source-memory") return <SourceMemorySection data={data} pending={pending} runAction={runAction} />;
+  if (section === "trend-radar") return <TrendRadarSection data={data} pending={pending} runAction={runAction} />;
+  if (section === "quality-scores") return <QualityScoresSection data={data} />;
   if (section === "research-packs") return <RecordList title="Research Packs" records={data.researchPacks} fields={["topic", "category", "source_confidence", "status", "source_count"]} />;
   if (section === "articles") return <RecordList title="Articles" records={data.articleDrafts} fields={["title", "slug", "category", "verification_status", "approval_status", "publish_status"]} />;
   if (section === "seo-packs") return <RecordList title="SEO Packs" records={data.seoPacks} fields={["seo_title", "meta_description", "canonical_url", "sitemap_status", "approval_status"]} />;
@@ -562,6 +586,10 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
     ["SEO packs", data.counts.seoPacksReady, TrendingUp],
     ["Social packs", data.counts.socialPacksReady, MessageSquare],
     ["UI/UX issues", data.counts.uiuxIssuesFound, Sparkles],
+    ["Memory nodes", data.counts.memoryNodes ?? 0, Database],
+    ["Active workflows", data.counts.activeWorkflows ?? 0, Activity],
+    ["Radar items", data.counts.trendRadarItems ?? 0, Search],
+    ["Quality reviews", data.counts.qualityReviews ?? 0, ShieldCheck],
     ["Monthly cost", `₹${number(data.budget.estimatedMonthlyCost)}`, WalletCards],
     ["AI provider", data.ai.configured ? data.ai.provider : "Not configured", Bot]
   ] as const;
@@ -592,6 +620,8 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
 
       <div className="grid gap-6 xl:grid-cols-2">
         <PreviewList title="Ready for approval" records={data.approvals} fields={["topic", "type", "verification_status", "risk_level", "status"]} />
+        <PreviewList title="Trend radar" records={data.trendRadarItems} fields={["topic", "trend_type", "priority_score", "suggested_action"]} />
+        <PreviewList title="Recent workflows" records={data.workflows} fields={["workflow_type", "topic", "status", "progress_percent"]} />
         <PreviewList title="Latest reports" records={data.reports} fields={["type", "city", "state", "message", "status"]} />
         <PreviewList title="Latest Watch Desk articles" records={data.latestPublicArticles} fields={["title", "category", "href"]} />
         <PreviewList title="Latest Unanswered Files" records={data.latestUnansweredFiles} fields={["title", "category", "href"]} />
@@ -639,6 +669,84 @@ function AgentsSection({ data, pending, runAction }: { data: AdminData; pending:
         ))}
       </div>
     </>
+  );
+}
+
+function SourceMemorySection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <CardLabel>CWI Memory</CardLabel>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Source memory and knowledge graph</h2>
+            <p className="mt-3 leading-7 text-ink/70">
+              Public articles, Unanswered Files, research packs, approvals, and corrections are indexed into reusable source memory.
+            </p>
+          </div>
+          <Button type="button" disabled={pending === "sync-memory"} onClick={() => runAction("sync-memory")}>
+            <Database className="h-4 w-4" />
+            {pending === "sync-memory" ? "Syncing..." : "Sync Memory"}
+          </Button>
+        </div>
+      </Card>
+      <RecordList title="Knowledge Graph Nodes" records={data.memoryNodes} fields={["node_type", "label", "confidence_score", "source_count", "mention_count", "summary"]} />
+      <RecordList title="Memory Claims" records={data.memoryClaims} fields={["topic", "claim_text", "status", "confidence_score", "risk_level", "source_count"]} />
+    </div>
+  );
+}
+
+function TrendRadarSection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <CardLabel>CWI Radar</CardLabel>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Trend radar</h2>
+            <p className="mt-3 leading-7 text-ink/70">
+              Manual links, reports, keywords, comments, Watch Desk posts, and Unanswered Files are ranked into daily topic leads.
+            </p>
+          </div>
+          <Button type="button" disabled={pending === "trend-radar"} onClick={() => runAction("trend-radar")}>
+            <Search className="h-4 w-4" />
+            {pending === "trend-radar" ? "Scanning..." : "Run Radar"}
+          </Button>
+        </div>
+      </Card>
+      <RecordList
+        title="Radar Items"
+        records={data.trendRadarItems}
+        fields={["topic", "trend_type", "priority_score", "evidence_count", "suggested_action", "why_it_matters", "status"]}
+      />
+    </div>
+  );
+}
+
+function QualityScoresSection({ data }: { data: AdminData }) {
+  return (
+    <div className="grid gap-5">
+      <RecordList
+        title="Verification Gates"
+        records={data.verificationGates}
+        fields={["topic", "status", "can_draft", "confidence_score", "source_count", "official_source_available", "legal_risk"]}
+      />
+      <RecordList
+        title="Quality Scores"
+        records={data.qualityScores}
+        fields={[
+          "topic",
+          "status",
+          "factual_accuracy_score",
+          "source_strength_score",
+          "legal_risk_score",
+          "seo_score",
+          "readability_score",
+          "cwi_voice_score",
+          "publish_readiness_score"
+        ]}
+      />
+    </div>
   );
 }
 

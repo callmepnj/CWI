@@ -1,5 +1,8 @@
 import { runArticleAgent } from "@/lib/ai/agents/article-agent";
 import { posts } from "@/data/posts";
+import { improveArticleDraft, saveQualityScore, scoreArticleQuality } from "@/lib/ai/quality-engine";
+import { rememberArticleDraft } from "@/lib/ai/source-memory";
+import { assertArticleDraftAllowed } from "@/lib/ai/verification-engine";
 import { attachDraftToApprovalItem, getApprovalItem, isPublishApproved, updateApprovalItem } from "@/lib/db/approval";
 import { getArticleDraft, saveArticleDraft, savePublishedArticle } from "@/lib/db/articles";
 import { site } from "@/lib/site";
@@ -46,6 +49,7 @@ export async function runPublishAgent(approvalQueueId: string) {
 
   return {
     publishedArticleId,
+    articleDraftId: articleDraft.id,
     articleUrl: url,
     generatedArticleDraft,
     sitemapStatus: "Dynamic public route is live immediately. Static sitemap regeneration is still recommended before major deploys.",
@@ -72,10 +76,21 @@ async function getOrCreatePublishableDraft(approval: Record<string, unknown>) {
     throw new Error("Publishing blocked. Approved item has no article draft or research pack attached.");
   }
 
-  const article = await runArticleAgent({
+  await assertArticleDraftAllowed({
     researchPackId,
     verificationReportId: asText(approval.verification_report_id) || undefined
   });
+
+  const rawArticle = await runArticleAgent({
+    researchPackId,
+    verificationReportId: asText(approval.verification_report_id) || undefined
+  });
+  const firstQuality = scoreArticleQuality(rawArticle);
+  const article = improveArticleDraft(rawArticle, firstQuality);
+  const quality = scoreArticleQuality(article);
+  if (quality.status === "blocked") {
+    throw new Error(`Publishing blocked. Article quality score is ${quality.publishReadinessScore}/100.`);
+  }
   const articleDraftId = await saveArticleDraft({
     researchPackId,
     title: article.title,
@@ -86,6 +101,8 @@ async function getOrCreatePublishableDraft(approval: Record<string, unknown>) {
     verificationStatus: asText(approval.verification_status) || "Developing",
     sourceCount: article.sources.length || Number(approval.source_count ?? 0)
   });
+  await saveQualityScore(quality, { topic: article.title, articleDraftId, approvalQueueId: asText(approval.id) });
+  await rememberArticleDraft(article, { articleDraftId, approvalQueueId: asText(approval.id) });
 
   await attachDraftToApprovalItem({
     approvalQueueId: asText(approval.id),

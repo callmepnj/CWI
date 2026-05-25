@@ -6,6 +6,8 @@ import { normalizeApprovalStatus } from "@/lib/db/approval";
 import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
+import { syncStaticPublicMemory } from "@/lib/ai/source-memory";
+import { runTrendRadar } from "@/lib/ai/trend-radar";
 
 export const monthlyBudgetInr = 8000;
 export const dailyBudgetInr = 250;
@@ -174,7 +176,13 @@ async function buildAdminDashboardData() {
     costs,
     reports,
     watchComments,
-    unansweredComments
+    unansweredComments,
+    workflows,
+    memoryNodes,
+    memoryClaims,
+    verificationGates,
+    qualityScores,
+    trendRadarItems
   ] = await Promise.all([
     pool.query(`select * from agents order by id;`),
     pool.query(`select * from approval_queue order by created_at desc limit 80;`),
@@ -206,7 +214,13 @@ async function buildAdminDashboardData() {
       from cwi_unanswered_comments
       order by created_at desc
       limit 40;
-    `).catch(() => ({ rows: [] }))
+    `).catch(() => ({ rows: [] })),
+    pool.query(`select * from cwi_agent_workflows order by updated_at desc limit 50;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from cwi_memory_nodes order by last_seen_at desc limit 80;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from cwi_memory_claims order by last_seen_at desc limit 80;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from cwi_verification_gates order by created_at desc limit 50;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from cwi_quality_scores order by created_at desc limit 50;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from cwi_trend_radar_items order by priority_score desc, updated_at desc limit 50;`).catch(() => ({ rows: [] }))
   ]);
 
   const approvalRows = approvals.rows;
@@ -231,7 +245,11 @@ async function buildAdminDashboardData() {
       articlesReady: articleDrafts.rows.length,
       seoPacksReady: seoPacks.rows.length,
       socialPacksReady: socialPacks.rows.length,
-      uiuxIssuesFound: uiuxAudits.rows.length
+      uiuxIssuesFound: uiuxAudits.rows.length,
+      memoryNodes: memoryNodes.rows.length,
+      activeWorkflows: workflows.rows.filter((row) => ["queued", "running", "awaiting_approval"].includes(String(row.status))).length,
+      trendRadarItems: trendRadarItems.rows.length,
+      qualityReviews: qualityScores.rows.length
     },
     agents: agents.rows,
     approvals: approvalRows,
@@ -246,6 +264,12 @@ async function buildAdminDashboardData() {
     dailyBriefings: briefings.rows,
     health: latestHealth,
     reports: reports.rows,
+    workflows: workflows.rows,
+    memoryNodes: memoryNodes.rows,
+    memoryClaims: memoryClaims.rows,
+    verificationGates: verificationGates.rows,
+    qualityScores: qualityScores.rows,
+    trendRadarItems: trendRadarItems.rows,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
     latestPublicArticles: mergeAdminArticles([
       ...dbPublishedPosts.map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),
@@ -408,6 +432,20 @@ export async function runAgentAction(action: string) {
 
   if (action === "article-draft") {
     return createStandaloneArticleDraft();
+  }
+
+  if (action === "sync-memory") {
+    const result = await syncStaticPublicMemory();
+    await logTask("research-ai", "Synced CWI source memory and knowledge graph", "completed", 2, result);
+    invalidateAdminDashboardCache();
+    return { ok: true, message: `Source memory synced: ${result.synced} public records indexed.`, data: result };
+  }
+
+  if (action === "trend-radar") {
+    const result = await runTrendRadar();
+    await logTask("command-ai", "Generated CWI Trend Radar", "completed", 4, result);
+    invalidateAdminDashboardCache();
+    return { ok: true, message: `Trend radar generated ${result.generated} items.`, data: result };
   }
 
   if (action === "stop-non-essential") {

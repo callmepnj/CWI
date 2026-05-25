@@ -1,5 +1,6 @@
 import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
 import { runResearchAgent } from "@/lib/ai/agents/research-agent";
+import { rememberApprovalItem, rememberResearchPack } from "@/lib/ai/source-memory";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { saveApprovalItem } from "@/lib/db/approval";
 import { saveResearchPack } from "@/lib/db/research";
@@ -42,6 +43,8 @@ export async function POST(request: Request) {
         status: "waiting_for_approval",
         adminNotes: "Review research before sending to Article AI."
       });
+      await rememberResearchPack({ ...research, id: researchPackId, source_count: research.sourceCount });
+      await rememberApprovalItem({ id: approvalQueueId, topic: research.topic, summary: research.summary, status: "waiting_for_approval", verification_status: "Research Ready", risk_level: "Medium", source_count: research.sourceCount });
       return ok({ researchPackId, approvalQueueId, research }, "Research pack saved and sent to approval queue.");
     } catch (error) {
       await failAgentTask(taskId, error instanceof Error ? error.message : "Research AI failed.");
