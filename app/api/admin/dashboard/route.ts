@@ -10,7 +10,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const data = await getAdminDashboardData();
+    const url = new URL(request.url);
+    const data = await getAdminDashboardData({ force: url.searchParams.get("force") === "1" });
     return NextResponse.json({ ok: true, data });
   } catch (error) {
     console.error("CWI admin dashboard failed", error);

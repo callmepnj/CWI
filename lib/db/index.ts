@@ -355,9 +355,68 @@ export async function ensureUnansweredFilesTables() {
   return globalThis.cwiUnansweredFilesTableReady;
 }
 
+async function adminOsSchemaLooksReady() {
+  try {
+    const result = await getPool().query<Record<string, boolean>>(`
+      select
+        to_regclass('public.agents') is not null as agents,
+        to_regclass('public.agent_tasks') is not null as agent_tasks,
+        to_regclass('public.approval_queue') is not null as approval_queue,
+        to_regclass('public.research_packs') is not null as research_packs,
+        to_regclass('public.verification_reports') is not null as verification_reports,
+        to_regclass('public.article_drafts') is not null as article_drafts,
+        to_regclass('public.seo_packs') is not null as seo_packs,
+        to_regclass('public.social_packs') is not null as social_packs,
+        to_regclass('public.image_library') is not null as image_library,
+        to_regclass('public.uiux_audits') is not null as uiux_audits,
+        to_regclass('public.daily_briefings') is not null as daily_briefings,
+        to_regclass('public.system_health_logs') is not null as system_health_logs,
+        to_regclass('public.cost_usage_logs') is not null as cost_usage_logs,
+        to_regclass('public.settings') is not null as settings,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'agent_name'
+        ) as agent_tasks_agent_name,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'input_json'
+        ) as agent_tasks_input_json,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'output_json'
+        ) as agent_tasks_output_json,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'item_type'
+        ) as approval_queue_item_type,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'research_pack_id'
+        ) as approval_queue_research_pack_id,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'verification_report_id'
+        ) as approval_queue_verification_report_id,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'admin_notes'
+        ) as approval_queue_admin_notes
+    `);
+
+    return Object.values(result.rows[0] ?? {}).every(Boolean);
+  } catch {
+    return false;
+  }
+}
+
 export async function ensureAdminOsTables() {
   if (!globalThis.cwiAdminOsTablesReady) {
-    globalThis.cwiAdminOsTablesReady = runSqlBatch(`
+    globalThis.cwiAdminOsTablesReady = (async () => {
+      if (await adminOsSchemaLooksReady()) {
+        return;
+      }
+
+      await runSqlBatch(`
       create extension if not exists pgcrypto;
 
       create table if not exists agents (
@@ -708,6 +767,10 @@ export async function ensureAdminOsTables() {
           admin_notes = coalesce(admin_notes, notes)
       where item_type is null or admin_notes is null;
     `);
+    })().catch((error) => {
+      globalThis.cwiAdminOsTablesReady = undefined;
+      throw error;
+    });
   }
 
   return globalThis.cwiAdminOsTablesReady;

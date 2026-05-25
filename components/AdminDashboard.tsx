@@ -25,7 +25,6 @@ import {
   TrendingUp,
   WalletCards
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
 
@@ -90,31 +89,67 @@ const agentActions = [
   ["stop-non-essential", "Stop Non-Essential Tasks"]
 ] as const;
 
+type SectionId = (typeof sections)[number][0];
+
 export function AdminDashboard({ activeSection }: { activeSection: string }) {
   const [data, setData] = useState<AdminData | null>(null);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [degradedMessage, setDegradedMessage] = useState("");
   const [pending, setPending] = useState("");
+  const [currentSection, setCurrentSection] = useState(activeSection);
 
-  const safeSection = sections.some(([id]) => id === activeSection) ? activeSection : "overview";
+  const safeSection = normalizeSection(currentSection);
 
   useEffect(() => {
     loadDashboard();
   }, []);
 
-  async function loadDashboard() {
+  useEffect(() => {
+    setCurrentSection(activeSection);
+  }, [activeSection]);
+
+  useEffect(() => {
+    function handlePopState() {
+      setCurrentSection(sectionFromPath(window.location.pathname));
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  async function loadDashboard(force = false) {
     setError("");
-    const response = await fetch("/api/admin/dashboard").catch(() => null);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    let timedOut = false;
+    const response = await fetch(`/api/admin/dashboard${force ? "?force=1" : ""}`, {
+      signal: controller.signal,
+      cache: "no-store"
+    }).catch((fetchError: unknown) => {
+      timedOut = fetchError instanceof DOMException && fetchError.name === "AbortError";
+      return null;
+    });
+    window.clearTimeout(timeout);
     const json = await response?.json().catch(() => null);
 
     if (!response?.ok || !json?.ok) {
-      setError(json?.error ?? "Admin dashboard could not load.");
+      setError(
+        timedOut
+          ? "Admin dashboard data timed out after 15 seconds. Refresh once; if it repeats, check Vercel DATABASE_URL and Supabase pooler status."
+          : json?.error ?? "Admin dashboard could not load."
+      );
       return;
     }
 
     setDegradedMessage(json.degraded ? json.error ?? "Admin dashboard is in setup mode." : "");
     setData(json.data);
+  }
+
+  function changeSection(section: SectionId) {
+    setCurrentSection(section);
+    const path = section === "overview" ? "/admin" : `/admin/${section}`;
+    window.history.pushState(null, "", path);
   }
 
   async function logout() {
@@ -142,7 +177,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }
 
     setMessage(json.message ?? "Agent action completed.");
-    await loadDashboard();
+    await loadDashboard(true);
   }
 
   async function updateApproval(id: string, status: string) {
@@ -164,7 +199,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }
 
     setMessage(`Approval queue updated: ${status}`);
-    await loadDashboard();
+    await loadDashboard(true);
   }
 
   async function publishApproval(id: string) {
@@ -186,7 +221,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }
 
     setMessage(json.message ?? "Publish AI completed.");
-    await loadDashboard();
+    await loadDashboard(true);
   }
 
   async function updateComment(source: string, id: string, status: string) {
@@ -208,7 +243,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }
 
     setMessage(`Comment marked ${status}.`);
-    await loadDashboard();
+    await loadDashboard(true);
   }
 
   return (
@@ -224,7 +259,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={loadDashboard}>
+          <Button type="button" variant="outline" onClick={() => loadDashboard(true)}>
             <RefreshCcw className="h-4 w-4" />
             Refresh
           </Button>
@@ -239,16 +274,17 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
         <aside className="space-y-3 lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-3xl border border-line bg-white p-3 shadow-card">
             {sections.map(([id, label, Icon]) => (
-              <Link
+              <button
                 key={id}
-                href={id === "overview" ? "/admin" : `/admin/${id}`}
-                className={`mb-1 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-black uppercase tracking-[0.08em] transition last:mb-0 ${
+                type="button"
+                onClick={() => changeSection(id)}
+                className={`mb-1 flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-black uppercase tracking-[0.08em] transition last:mb-0 ${
                   safeSection === id ? "bg-royal text-white shadow-soft" : "text-ink/64 hover:bg-skywash hover:text-royal"
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 {label}
-              </Link>
+              </button>
             ))}
           </div>
           <Card>
@@ -280,7 +316,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
               data={data}
               pending={pending}
               runAction={runAction}
-              refresh={loadDashboard}
+              refresh={() => loadDashboard(true)}
               updateApproval={updateApproval}
               publishApproval={publishApproval}
               updateComment={updateComment}
@@ -815,4 +851,14 @@ function actionRequest(action: string) {
   }
 
   return { endpoint: "/api/admin/agent-actions", body: { action } };
+}
+
+function normalizeSection(value: string): SectionId {
+  const match = sections.find(([id]) => id === value)?.[0];
+  return match ?? "overview";
+}
+
+function sectionFromPath(pathname: string): SectionId {
+  const section = pathname.split("/").filter(Boolean)[1] ?? "overview";
+  return normalizeSection(section);
 }

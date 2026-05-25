@@ -8,6 +8,11 @@ export const dailyBudgetInr = 250;
 
 export type AdminDashboardData = Awaited<ReturnType<typeof getAdminDashboardData>>;
 
+declare global {
+  var cwiAdminSeedReady: Promise<void> | undefined;
+  var cwiAdminDashboardCache: { data: unknown; expiresAt: number } | undefined;
+}
+
 const agentDefinitions = [
   ["command-ai", "CWI Command AI", "Main controller, editor-in-chief, and daily operations manager."],
   ["research-ai", "CWI Research AI", "Finds and extracts authentic information from low-cost sources."],
@@ -61,7 +66,18 @@ const defaultKeywords = [
 
 export async function initializeAdminOs() {
   await ensureAdminOsTables();
-  await seedAdminDefaults();
+  if (!globalThis.cwiAdminSeedReady) {
+    globalThis.cwiAdminSeedReady = seedAdminDefaults().catch((error) => {
+      globalThis.cwiAdminSeedReady = undefined;
+      throw error;
+    });
+  }
+
+  await globalThis.cwiAdminSeedReady;
+}
+
+export function invalidateAdminDashboardCache() {
+  globalThis.cwiAdminDashboardCache = undefined;
 }
 
 export async function seedAdminDefaults() {
@@ -117,7 +133,21 @@ export async function seedAdminDefaults() {
   );
 }
 
-export async function getAdminDashboardData() {
+export async function getAdminDashboardData(options: { force?: boolean } = {}) {
+  if (!options.force && globalThis.cwiAdminDashboardCache && globalThis.cwiAdminDashboardCache.expiresAt > Date.now()) {
+    return globalThis.cwiAdminDashboardCache.data as Awaited<ReturnType<typeof buildAdminDashboardData>>;
+  }
+
+  const data = await buildAdminDashboardData();
+  globalThis.cwiAdminDashboardCache = {
+    data,
+    expiresAt: Date.now() + 15_000
+  };
+
+  return data;
+}
+
+async function buildAdminDashboardData() {
   await initializeAdminOs();
   await ensureReportsTable().catch(() => undefined);
   await ensureCommentsTable().catch(() => undefined);
@@ -320,6 +350,7 @@ export async function createManualLinkWorkflow(input: {
   await logTask("article-ai", `Prepared draft shell: ${topic}`, "completed", 8);
   await logTask("seo-ai", `Prepared SEO pack: ${topic}`, "completed", 3);
   await logTask("social-ai", `Prepared social pack: ${topic}`, "completed", 3);
+  invalidateAdminDashboardCache();
 
   return {
     manualLinkId: manualLink.rows[0].id,
@@ -358,6 +389,7 @@ export async function runAgentAction(action: string) {
   if (action === "stop-non-essential") {
     await getPool().query(`update agents set status = 'paused', updated_at = now() where id not in ('command-ai', 'system-health-ai', 'publish-ai');`);
     await logTask("system-health-ai", "Stopped all non-essential tasks", "completed", 0);
+    invalidateAdminDashboardCache();
     return { ok: true, message: "Non-essential agents paused. Command, Publish, and System Health remain available." };
   }
 
@@ -382,6 +414,7 @@ export async function updateApprovalStatus(id: string, status: string, notes?: s
   );
 
   await logTask("publish-ai", `Approval queue status changed to ${safeStatus}`, "completed", 0);
+  invalidateAdminDashboardCache();
   return result.rows[0] ?? null;
 }
 
@@ -397,6 +430,7 @@ export async function updateCommentModeration(input: { source: string; id: strin
   }
 
   await logTask("verify-ai", `Comment moderation: ${status}`, "completed", 0);
+  invalidateAdminDashboardCache();
   return { ok: true, status };
 }
 
@@ -440,6 +474,7 @@ async function createDailyBriefing() {
     suggestedAction: "Review priorities, approve tasks, or request changes."
   });
   await logTask("command-ai", "Generated Daily Command Briefing", "completed", 12);
+  invalidateAdminDashboardCache();
 
   return { ok: true, message: "Daily briefing generated and sent to approval queue.", id: result.rows[0].id };
 }
@@ -483,6 +518,7 @@ async function createPriorityResearchPack() {
     suggestedAction: "Review source freshness before assigning Article AI."
   });
   await logTask("research-ai", `Prepared priority research pack: ${file.title}`, "completed", 7);
+  invalidateAdminDashboardCache();
 
   return { ok: true, message: "Research pack generated for approval.", id: result.rows[0].id };
 }
@@ -511,6 +547,7 @@ async function createSeoAuditPack() {
     suggestedAction: "Review sitemap and inspect priority URLs after deploy."
   });
   await logTask("seo-ai", "Ran SEO system check", "completed", 3);
+  invalidateAdminDashboardCache();
 
   return { ok: true, message: "SEO check generated.", id: result.rows[0].id };
 }
@@ -542,6 +579,7 @@ async function createUiuxAudit() {
     suggestedAction: "Approve specific fixes only."
   });
   await logTask("uiux-ai", "Generated UI/UX audit pack", "completed", 5);
+  invalidateAdminDashboardCache();
 
   return { ok: true, message: "UI/UX audit generated." };
 }
@@ -560,6 +598,7 @@ async function createStandaloneSocialPack() {
     suggestedAction: "Approve captions manually before posting."
   });
   await logTask("social-ai", `Generated social pack: ${post.title}`, "completed", 3);
+  invalidateAdminDashboardCache();
 
   return { ok: true, message: "Social pack generated for approval.", id: social.id };
 }
@@ -580,6 +619,7 @@ async function createStandaloneArticleDraft() {
     suggestedAction: "Review, edit, verify sources, then approve or request changes."
   });
   await logTask("article-ai", `Generated article draft: ${post.title}`, "completed", 8);
+  invalidateAdminDashboardCache();
 
   return { ok: true, message: "Article draft generated for approval.", id: article.id };
 }
