@@ -58,7 +58,7 @@ export async function saveResearchPack(pack: {
         what_we_know, what_remains_unclear, timeline, key_facts, risks,
         suggested_article_angle, source_confidence, status
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'AI-generated from supplied sources; human verification required', 'Research Ready')
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'AI-generated from supplied sources - human verification required', 'Research Ready')
       returning id;
     `,
     [

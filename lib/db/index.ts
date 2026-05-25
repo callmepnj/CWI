@@ -26,14 +26,155 @@ export function getPool() {
       max: 3,
       ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false }
     });
+    installSafeQueryGuard(globalThis.cwiPgPool);
   }
 
   return globalThis.cwiPgPool;
 }
 
+async function runSqlBatch(sql: string) {
+  const statements = splitSqlStatements(sql);
+  const pool = getPool();
+
+  for (const statement of statements) {
+    await pool.query(statement);
+  }
+}
+
+function installSafeQueryGuard(pool: Pool) {
+  type LooseQuery = (...args: unknown[]) => unknown;
+  const guardedPool = pool as Pool & {
+    cwiSafeQueryGuardInstalled?: boolean;
+  };
+
+  if (guardedPool.cwiSafeQueryGuardInstalled) {
+    return;
+  }
+
+  const originalQuery = pool.query.bind(pool) as LooseQuery;
+
+  (guardedPool as { query: LooseQuery }).query = (first: unknown, second?: unknown, third?: unknown) => {
+    if (typeof first === "string") {
+      const hasValues = Array.isArray(second);
+      const text = hasValues ? normalizePreparedSql(first) : stripTrailingSemicolons(first);
+      return originalQuery(text, second, third);
+    }
+
+    if (first && typeof first === "object" && "text" in first) {
+      const config = { ...(first as { text?: string; values?: unknown[] }) };
+      if (typeof config.text === "string") {
+        config.text = Array.isArray(config.values) ? normalizePreparedSql(config.text) : stripTrailingSemicolons(config.text);
+      }
+      return originalQuery(config, second, third);
+    }
+
+    return originalQuery(first, second, third);
+  };
+
+  guardedPool.cwiSafeQueryGuardInstalled = true;
+}
+
+function normalizePreparedSql(sql: string) {
+  const normalized = stripTrailingSemicolons(sql);
+
+  if (hasStatementSeparator(normalized)) {
+    throw new Error(
+      "CWI database guard blocked a multi-statement prepared query. Split this SQL into separate getPool().query calls before running it on Supabase."
+    );
+  }
+
+  return normalized;
+}
+
+function stripTrailingSemicolons(sql: string) {
+  let output = sql.trimEnd();
+  while (output.endsWith(";")) {
+    output = output.slice(0, -1).trimEnd();
+  }
+  return output;
+}
+
+function splitSqlStatements(sql: string) {
+  const statements: string[] = [];
+  let current = "";
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  for (let index = 0; index < sql.length; index += 1) {
+    const char = sql[index];
+    const next = sql[index + 1];
+
+    if (inLineComment) {
+      current += char;
+      if (char === "\n") inLineComment = false;
+      continue;
+    }
+
+    if (inBlockComment) {
+      current += char;
+      if (char === "*" && next === "/") {
+        current += next;
+        index += 1;
+        inBlockComment = false;
+      }
+      continue;
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && char === "-" && next === "-") {
+      current += char + next;
+      index += 1;
+      inLineComment = true;
+      continue;
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && char === "/" && next === "*") {
+      current += char + next;
+      index += 1;
+      inBlockComment = true;
+      continue;
+    }
+
+    if (!inDoubleQuote && char === "'") {
+      current += char;
+      if (inSingleQuote && next === "'") {
+        current += next;
+        index += 1;
+        continue;
+      }
+      inSingleQuote = !inSingleQuote;
+      continue;
+    }
+
+    if (!inSingleQuote && char === '"') {
+      current += char;
+      inDoubleQuote = !inDoubleQuote;
+      continue;
+    }
+
+    if (!inSingleQuote && !inDoubleQuote && char === ";") {
+      const statement = current.trim();
+      if (statement) statements.push(statement);
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  const finalStatement = current.trim();
+  if (finalStatement) statements.push(finalStatement);
+  return statements;
+}
+
+function hasStatementSeparator(sql: string) {
+  return splitSqlStatements(sql).length > 1;
+}
+
 export async function ensureReportsTable() {
   if (!globalThis.cwiReportsTableReady) {
-    globalThis.cwiReportsTableReady = getPool().query(`
+    globalThis.cwiReportsTableReady = runSqlBatch(`
       create table if not exists cwi_report_submissions (
         id bigserial primary key,
         created_at timestamptz not null default now(),
@@ -64,7 +205,7 @@ export async function ensureReportsTable() {
 
       create index if not exists cwi_report_evidence_files_report_id_idx
       on cwi_report_evidence_files (report_id);
-    `).then(() => undefined);
+    `);
   }
 
   return globalThis.cwiReportsTableReady;
@@ -72,7 +213,7 @@ export async function ensureReportsTable() {
 
 export async function ensureCommentsTable() {
   if (!globalThis.cwiCommentsTableReady) {
-    globalThis.cwiCommentsTableReady = getPool().query(`
+    globalThis.cwiCommentsTableReady = runSqlBatch(`
       create extension if not exists pgcrypto;
 
       create table if not exists cwi_article_comments (
@@ -89,7 +230,7 @@ export async function ensureCommentsTable() {
 
       create index if not exists cwi_article_comments_slug_status_created_idx
       on cwi_article_comments (article_slug, status, created_at desc);
-    `).then(() => undefined);
+    `);
   }
 
   return globalThis.cwiCommentsTableReady;
@@ -97,7 +238,7 @@ export async function ensureCommentsTable() {
 
 export async function ensureArticleRatingsTable() {
   if (!globalThis.cwiArticleRatingsTableReady) {
-    globalThis.cwiArticleRatingsTableReady = getPool().query(`
+    globalThis.cwiArticleRatingsTableReady = runSqlBatch(`
       create extension if not exists pgcrypto;
 
       create table if not exists cwi_article_ratings (
@@ -114,7 +255,7 @@ export async function ensureArticleRatingsTable() {
 
       create index if not exists cwi_article_ratings_article_idx
       on cwi_article_ratings (article_type, article_slug, updated_at desc);
-    `).then(() => undefined);
+    `);
   }
 
   return globalThis.cwiArticleRatingsTableReady;
@@ -122,7 +263,7 @@ export async function ensureArticleRatingsTable() {
 
 export async function ensureUnansweredFilesTables() {
   if (!globalThis.cwiUnansweredFilesTableReady) {
-    globalThis.cwiUnansweredFilesTableReady = getPool().query(`
+    globalThis.cwiUnansweredFilesTableReady = runSqlBatch(`
       create extension if not exists pgcrypto;
 
       create table if not exists cwi_unanswered_articles (
@@ -208,7 +349,7 @@ export async function ensureUnansweredFilesTables() {
 
       create index if not exists cwi_unanswered_comments_article_status_idx
       on cwi_unanswered_comments (article_id, status, created_at desc);
-    `).then(() => undefined);
+    `);
   }
 
   return globalThis.cwiUnansweredFilesTableReady;
@@ -216,7 +357,7 @@ export async function ensureUnansweredFilesTables() {
 
 export async function ensureAdminOsTables() {
   if (!globalThis.cwiAdminOsTablesReady) {
-    globalThis.cwiAdminOsTablesReady = getPool().query(`
+    globalThis.cwiAdminOsTablesReady = runSqlBatch(`
       create extension if not exists pgcrypto;
 
       create table if not exists agents (
@@ -566,7 +707,7 @@ export async function ensureAdminOsTables() {
       set item_type = coalesce(item_type, type),
           admin_notes = coalesce(admin_notes, notes)
       where item_type is null or admin_notes is null;
-    `).then(() => undefined);
+    `);
   }
 
   return globalThis.cwiAdminOsTablesReady;
