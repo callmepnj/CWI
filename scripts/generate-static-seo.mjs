@@ -12,7 +12,7 @@ const staticRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
-  "/indias-unanswered-files",
+  "/india-unanswered-files",
   "/watch-desk",
   "/issues",
   "/join",
@@ -21,6 +21,9 @@ const staticRoutes = [
   "/youth-voice",
   "/media-bank",
   "/credit-policy",
+  "/editorial-policy",
+  "/privacy-policy",
+  "/terms",
   "/what-is-cwi",
   "/rss.xml"
 ];
@@ -61,7 +64,7 @@ const routes = [
   ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
   ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
   ...postSlugs.map((slug) => `/watch-desk/${slug}`),
-  ...unansweredFileSlugs.map((slug) => `/indias-unanswered-files/${slug}`)
+  ...unansweredFileSlugs.map((slug) => `/india-unanswered-files/${slug}`)
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -69,9 +72,19 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${routes
   .map((route) => {
     const isHome = route === "/";
-    const isPost = route.startsWith("/watch-desk/");
-    const changefreq = isHome ? "daily" : isPost ? "monthly" : "weekly";
-    const priority = isHome ? "1.0" : route === "/watch-desk" || route === "/submit" ? "0.9" : isPost ? "0.6" : "0.8";
+    const isWatchDeskArticle = route.startsWith("/watch-desk/") && !route.startsWith("/watch-desk/category/") && !route.startsWith("/watch-desk/tag/");
+    const isUnansweredArticle = route.startsWith("/india-unanswered-files/");
+    const isTaxonomy = route.startsWith("/watch-desk/category/") || route.startsWith("/watch-desk/tag/");
+    const changefreq = isHome ? "daily" : isWatchDeskArticle || isUnansweredArticle ? "monthly" : isTaxonomy ? "weekly" : "weekly";
+    const priority = isHome
+      ? "1.0"
+      : ["/watch", "/watch-desk", "/india-unanswered-files"].includes(route)
+        ? "0.9"
+        : isWatchDeskArticle || isUnansweredArticle
+          ? "0.8"
+          : isTaxonomy
+            ? "0.6"
+            : "0.8";
 
     return `  <url>
     <loc>${baseUrl}${route}</loc>

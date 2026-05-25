@@ -10,10 +10,10 @@ import { unansweredFiles, unansweredFilesKeywords } from "@/data/unanswered-file
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-const pagePath = "/indias-unanswered-files";
-const pageTitle = "India's Unanswered Files - Cockroach Watch India";
+const pagePath = "/india-unanswered-files";
+const pageTitle = "CWI India Unanswered Files — Cockroach Watch India";
 const pageDescription =
-  "CWI's source-backed investigative archive of under-reported Indian public-interest cases where citizens asked for justice, rehabilitation, transparency, or accountability.";
+  "CWI India Unanswered Files by Cockroach Watch India documents public issues, civic memory, source-backed questions, and unresolved stories from across India.";
 
 export const metadata = createMetadata({
   title: pageTitle,
@@ -88,10 +88,10 @@ export default function UnansweredFilesPage() {
                 CWI Investigative Watch / Public-interest archive
               </Link>
               <h1 className="mt-7 max-w-5xl font-display text-5xl font-black uppercase leading-[0.88] tracking-[-0.07em] sm:text-7xl lg:text-8xl">
-                India&apos;s Unanswered Files
+                CWI India Unanswered Files
               </h1>
               <p className="mt-6 max-w-3xl text-xl font-semibold leading-9 text-white/76">
-                Stories where citizens asked for justice, but power moved slowly.
+                India Unanswered Files is a Cockroach Watch India archive tracking public issues, civic memory, and the questions that still need answers.
               </p>
               <p className="mt-6 max-w-3xl border-l-4 border-urgent pl-5 text-lg leading-8 text-white/70">
                 This CWI section covers public-interest cases where action, accountability, rehabilitation, or transparency appeared delayed, weak, incomplete, or politically selective. The record is source-backed, not propaganda.

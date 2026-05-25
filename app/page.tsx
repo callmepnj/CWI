@@ -20,6 +20,7 @@ import { charterPrinciples } from "@/data/charter";
 import { issues } from "@/data/issues";
 import { posts, trendingTopics } from "@/data/posts";
 import { roles } from "@/data/roles";
+import { unansweredFiles } from "@/data/unanswered-files";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -96,8 +97,19 @@ const homepageWebPageJsonLd = {
 export const metadata = createMetadata({
   title: "Cockroach Watch India — CWI Civic Watch Platform",
   description:
-    "Cockroach Watch India is a founder-led civic watch, satire, and commentary platform documenting youth voice, public issues, viral civic moments, creator-led commentary, and the Cockroach wave across India.",
-  path: "/"
+    "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform documenting youth voice, public issues, creator credit, viral claims, and India's unanswered files.",
+  path: "/",
+  keywords: [
+    "Cockroach Watch India",
+    "CWI",
+    "CWI Watch Desk",
+    "CWI articles",
+    "India Unanswered Files",
+    "public issues India",
+    "youth voice India",
+    "civic watch India",
+    "Document Verify Amplify"
+  ]
 });
 
 export default function HomePage() {
@@ -179,7 +191,7 @@ export default function HomePage() {
           <Link href="/issues">Explore public issues tracked by CWI</Link>
         </Button>
       </Section>
-      <Section eyebrow="Watch Desk" title="Watch Desk" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from CWI.">
+      <Section eyebrow="Watch Desk" title="Latest from CWI Watch Desk" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from Cockroach Watch India articles.">
         <div className="mb-6 rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
           <CardLabel className="bg-white/12 text-saffron ring-white/15">Source-backed Watch Desk</CardLabel>
           <h3 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">{featuredPost.title}</h3>
@@ -220,6 +232,43 @@ export default function HomePage() {
           {dateSortedPosts.slice(0, 8).map((post) => (
             <WatchDeskCard key={post.slug} post={post} />
           ))}
+        </div>
+      </Section>
+      <Section
+        eyebrow="CWI India Unanswered Files"
+        title="CWI India Unanswered Files"
+        subtitle="India Unanswered Files is a Cockroach Watch India archive tracking public issues, civic memory, and the questions that still need answers."
+      >
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <Card className="bg-gradient-to-br from-white via-skywash to-white">
+            <CardLabel>Public memory archive</CardLabel>
+            <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">
+              Source-backed files for unanswered civic questions.
+            </h2>
+            <p className="mt-4 leading-8 text-ink/70">
+              CWI India Unanswered Files documents public issues, civic memory, official responses, source archives, and unresolved stories across India. It links readers from Cockroach Watch India articles to deeper case timelines.
+            </p>
+            <Button asChild className="mt-7" variant="green">
+              <Link href="/india-unanswered-files">Explore CWI India Unanswered Files</Link>
+            </Button>
+          </Card>
+          <div className="grid gap-4">
+            {unansweredFiles.slice(0, 3).map((file) => (
+              <Link
+                key={file.slug}
+                href={`/india-unanswered-files/${file.slug}`}
+                className="group rounded-[1.5rem] border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-royal/35 hover:shadow-soft"
+              >
+                <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-royal">
+                  {file.category} / {file.sourceCount} sources
+                </p>
+                <h3 className="mt-2 font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">
+                  {file.title} - CWI India Unanswered Files
+                </h3>
+                <p className="mt-3 text-sm font-semibold leading-7 text-ink/66">{file.unansweredQuestion}</p>
+              </Link>
+            ))}
+          </div>
         </div>
       </Section>
       <Section eyebrow="Latest Signals" title="Latest public issue and youth voice">

@@ -896,8 +896,8 @@ function limitText(text: string, maxLength: number) {
 }
 
 function metaTitle(title: string) {
-  const suffix = " - CWI Watch Desk";
-  const maxTitleLength = 60 - suffix.length;
+  const suffix = " - CWI Watch Desk | Cockroach Watch India";
+  const maxTitleLength = 74 - suffix.length;
   return `${limitText(title, maxTitleLength)}${suffix}`;
 }
 
@@ -1018,7 +1018,7 @@ function datesFor(seed: ArticleSeed, index: number) {
 function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "relatedSlugs"> {
   const summary = limitText(`CWI Watch Desk: ${seed.angle}`, 190);
   const metaDescription = limitText(
-    `Cockroach Watch India explains ${seed.focus}. The CWI Watch Desk separates what is known, what remains unclear, and why it matters.`,
+    `Cockroach Watch India explains ${seed.focus}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this public-interest update.`,
     155
   );
   const readingMinutes = 4 + (index % 4);

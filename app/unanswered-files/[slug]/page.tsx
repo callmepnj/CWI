@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, ExternalLink, FileText, Scale, ShieldCheck } from "lucide-react";
 import { ArticleProgress } from "@/components/ArticleProgress";
+import { ArticleDiscussionPrompts } from "@/components/ArticleDiscussionPrompts";
+import { ArticleRating } from "@/components/ArticleRating";
 import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
 import { UnansweredComments } from "@/components/UnansweredComments";
 import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
@@ -30,7 +32,7 @@ type Props = {
 
 const articleDisclaimer =
   "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.";
-const unansweredFilesPath = "/indias-unanswered-files";
+const unansweredFilesPath = "/india-unanswered-files";
 
 export async function generateStaticParams() {
   return unansweredFiles.map((file) => ({ slug: file.slug }));
@@ -42,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!file) {
     return createMetadata({
-      title: "India's Unanswered Files - Cockroach Watch India",
+      title: "CWI India Unanswered Files - Cockroach Watch India",
       description: site.description,
       path: unansweredFilesPath
     });
@@ -119,6 +121,8 @@ export default async function UnansweredFilePage({ params }: Props) {
   );
   const pageUrl = absoluteUrl(`${unansweredFilesPath}/${file.slug}`);
   const jsonLd = buildJsonLd(file, ogVisual.src, pageUrl, faqs);
+  const discussionPrompts = buildUnansweredDiscussionPrompts(file);
+  const readerQuestions = buildUnansweredReaderQuestions(file);
 
   return (
     <>
@@ -135,7 +139,7 @@ export default async function UnansweredFilePage({ params }: Props) {
               <div className="mb-6 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-white/58">
                 <Link href="/" className="hover:text-saffron">Home</Link>
                 <span>/</span>
-                <Link href={unansweredFilesPath} className="hover:text-saffron">India&apos;s Unanswered Files</Link>
+                <Link href={unansweredFilesPath} className="hover:text-saffron">CWI India Unanswered Files</Link>
                 <span>/</span>
                 <span>{file.category}</span>
               </div>
@@ -298,8 +302,21 @@ export default async function UnansweredFilePage({ params }: Props) {
               <p className="leading-8 text-ink/72">
                 CWI is not against a community or party. CWI is against silence, delayed transparency, and public suffering without sustained accountability. This file uses source labels and cautious language because public-interest journalism should question power without inventing facts.
               </p>
+              <p className="mt-4 leading-8 text-ink/72">
+                Cockroach Watch India — CWI connects this case file to the wider CWI Watch Desk and the official website at{" "}
+                <Link href="/" className="font-bold text-royal underline-offset-4 hover:underline">
+                  https://cockroachwatchindia.online
+                </Link>
+                . Submit corrections, source links, and report updates through{" "}
+                <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">
+                  Cockroach Watch India
+                </Link>
+                .
+              </p>
               <p className="mt-4 leading-8 text-ink/72">{articleDisclaimer}</p>
             </Card>
+
+            <ArticleDiscussionPrompts prompts={discussionPrompts} questions={readerQuestions} />
 
             <UnansweredComments articleSlug={file.slug} />
 
@@ -342,6 +359,8 @@ export default async function UnansweredFilePage({ params }: Props) {
               />
             </Card>
 
+            <ArticleRating articleType="unanswered-files" articleSlug={file.slug} />
+
             <Card>
               <CardLabel>Case status</CardLabel>
               <div className="space-y-4">
@@ -364,7 +383,7 @@ export default async function UnansweredFilePage({ params }: Props) {
               <CardLabel>Internal links</CardLabel>
               <div className="grid gap-2">
                 {[
-                  ["India's Unanswered Files", unansweredFilesPath],
+                  ["CWI India Unanswered Files", unansweredFilesPath],
                   ["The Watch", "/watch"],
                   ["Watch Desk", "/watch-desk"],
                   ["Submit Report", "/submit"],
@@ -384,6 +403,22 @@ export default async function UnansweredFilePage({ params }: Props) {
   );
 }
 
+function buildUnansweredDiscussionPrompts(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
+  return [
+    `Share dated source links, court records, official replies, or ground reports that add context to ${file.title}.`,
+    `If you are familiar with ${file.location}, identify what is missing from the public record without naming private individuals.`,
+    "Help CWI separate verified facts, reported claims, official responses, and unresolved questions."
+  ];
+}
+
+function buildUnansweredReaderQuestions(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
+  return [
+    ...file.unansweredQuestions.slice(0, 3),
+    "What source would help readers verify the next major update?",
+    "What should Cockroach Watch India track next: rehabilitation, court status, policy response, or media accountability?"
+  ];
+}
+
 function buildJsonLd(
   file: NonNullable<ReturnType<typeof getUnansweredFile>>,
   imagePath: string,
@@ -391,7 +426,7 @@ function buildJsonLd(
   faqs: ReturnType<typeof getFileFaqs>
 ) {
   const articleBase = {
-    headline: file.title,
+    headline: file.seoTitle,
     description: file.seoDescription,
     image: [
       {
@@ -431,6 +466,11 @@ function buildJsonLd(
     },
     {
       "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      ...articleBase
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
         {
@@ -442,7 +482,7 @@ function buildJsonLd(
         {
           "@type": "ListItem",
           position: 2,
-          name: "India's Unanswered Files",
+          name: "CWI India Unanswered Files",
           item: absoluteUrl(unansweredFilesPath)
         },
         {

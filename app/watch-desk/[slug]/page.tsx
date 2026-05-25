@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, Clock, FileText, ShieldCheck, Tag } from "lucide-react";
 import { ArticleProgress } from "@/components/ArticleProgress";
+import { ArticleDiscussionPrompts } from "@/components/ArticleDiscussionPrompts";
+import { ArticleRating } from "@/components/ArticleRating";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButtons } from "@/components/ShareButtons";
 import { VerificationBadge } from "@/components/VerificationBadge";
@@ -36,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
   }
 
-  return createMetadata({
+  const baseMetadata = createMetadata({
     title: post.seoTitle,
     description: post.seoDescription,
     path: `/watch-desk/${post.slug}`,
@@ -44,13 +46,43 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     publishedTime: post.publishedAt,
     keywords: post.tags
   });
+
+  return {
+    ...baseMetadata,
+    openGraph: {
+      ...baseMetadata.openGraph,
+      title: post.seoTitle,
+      description: post.seoDescription,
+      url: absoluteUrl(`/watch-desk/${post.slug}`),
+      siteName: site.name,
+      images: [
+        {
+          url: post.ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.imageAlt
+        }
+      ],
+      locale: "en_IN",
+      type: "article",
+      publishedTime: post.publishedAt
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.seoTitle,
+      description: post.seoDescription,
+      images: [post.ogImage],
+      creator: "@CWatchIndia",
+      site: "@CWatchIndia"
+    }
+  };
 }
 
 function jsonLdForPost(post: (typeof posts)[number]) {
   const url = absoluteUrl(`/watch-desk/${post.slug}`);
-  const image = absoluteUrl("/opengraph-image");
+  const image = post.ogImage;
   const articleBase = {
-    headline: post.title,
+    headline: post.seoTitle,
     description: post.metaDescription,
     image,
     datePublished: post.publishedAt,
@@ -128,6 +160,8 @@ export default async function WatchPostPage({ params }: Props) {
     .slice(0, 3);
   const latestPosts = posts.filter((item) => item.slug !== post.slug).slice(0, 5);
   const jsonLd = jsonLdForPost(post);
+  const discussionPrompts = buildWatchDiscussionPrompts(post);
+  const readerQuestions = buildWatchReaderQuestions(post);
 
   return (
     <>
@@ -157,7 +191,7 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
 
               <h1 className="mt-6 font-display text-4xl font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink sm:text-6xl">
-                {post.title}
+                {post.title} - CWI Watch Desk
               </h1>
               <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
               <p className="mt-5 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
@@ -243,6 +277,8 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
             </div>
 
+            <ArticleDiscussionPrompts prompts={discussionPrompts} questions={readerQuestions} />
+
             <Card className="mt-8">
               <CardLabel>Article disclaimer</CardLabel>
               <p className="leading-8 text-ink/72">{articleDisclaimer}</p>
@@ -292,6 +328,8 @@ export default async function WatchPostPage({ params }: Props) {
               <ShareButtons title={post.title} path={`/watch-desk/${post.slug}`} summary={post.summary} />
             </Card>
 
+            <ArticleRating articleType="watch-desk" articleSlug={post.slug} />
+
             <Card>
               <CardLabel>Author</CardLabel>
               <h2 className="font-display text-2xl font-black uppercase tracking-[-0.03em]">{post.author}</h2>
@@ -309,7 +347,8 @@ export default async function WatchPostPage({ params }: Props) {
                 {[
                   ["Cockroach Watch India", "/"],
                   ["The Watch", "/watch"],
-                  ["Watch Desk", "/watch-desk"],
+                  ["CWI Watch Desk", "/watch-desk"],
+                  ["CWI India Unanswered Files", "/india-unanswered-files"],
                   ["Submit Report", "/submit"],
                   ["Issue Watch", "/issues"],
                   ["Youth Voice", "/youth-voice"],
@@ -338,6 +377,23 @@ export default async function WatchPostPage({ params }: Props) {
       </article>
     </>
   );
+}
+
+function buildWatchDiscussionPrompts(post: (typeof posts)[number]) {
+  return [
+    `Share a source, public statement, creator credit note, or correction that could improve CWI's context on "${post.title}".`,
+    "Point out what is verified, what is only reported, and what still needs official clarification.",
+    "If this topic is circulating in your feed, explain what people are misunderstanding without posting private data or unverified allegations."
+  ];
+}
+
+function buildWatchReaderQuestions(post: (typeof posts)[number]) {
+  return [
+    `What does the CWI Watch Desk clearly know about ${post.title}?`,
+    "Which claim in this article needs the strongest source before it is amplified further?",
+    "What should Cockroach Watch India follow next: public reaction, creator credit, official response, or correction?",
+    "Does this update affect youth voice, public issues, civic satire, or digital rights in a way CWI should archive?"
+  ];
 }
 
 function formatArticleDate(value: string) {

@@ -101,7 +101,7 @@ export function UnansweredComments({ articleSlug }: { articleSlug: string }) {
         Comments and public context
       </h2>
       <p className="mt-3 leading-7 text-ink/70">
-        Comments are moderated. No hate, threats, doxxing, personal information, harassment, or unverified allegations presented as fact.
+        Comments are moderated and only approved real submissions appear publicly. No hate, threats, doxxing, personal information, harassment, or unverified allegations presented as fact.
       </p>
 
       <form onSubmit={submitComment} className="mt-6 grid gap-4">

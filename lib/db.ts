@@ -5,6 +5,7 @@ declare global {
   var cwiReportsTableReady: Promise<void> | undefined;
   var cwiCommentsTableReady: Promise<void> | undefined;
   var cwiUnansweredFilesTableReady: Promise<void> | undefined;
+  var cwiArticleRatingsTableReady: Promise<void> | undefined;
 }
 
 function getDatabaseUrl() {
@@ -91,6 +92,31 @@ export async function ensureCommentsTable() {
   }
 
   return globalThis.cwiCommentsTableReady;
+}
+
+export async function ensureArticleRatingsTable() {
+  if (!globalThis.cwiArticleRatingsTableReady) {
+    globalThis.cwiArticleRatingsTableReady = getPool().query(`
+      create extension if not exists pgcrypto;
+
+      create table if not exists cwi_article_ratings (
+        id uuid primary key default gen_random_uuid(),
+        article_type text not null,
+        article_slug text not null,
+        rating integer not null check (rating between 1 and 5),
+        ip_hash text not null,
+        user_agent_hash text,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique (article_type, article_slug, ip_hash)
+      );
+
+      create index if not exists cwi_article_ratings_article_idx
+      on cwi_article_ratings (article_type, article_slug, updated_at desc);
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiArticleRatingsTableReady;
 }
 
 export async function ensureUnansweredFilesTables() {

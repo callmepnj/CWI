@@ -27,9 +27,14 @@ Do not commit `.env.local`.
 ## SEO Launch Checklist
 
 - Add the production site to Google Search Console.
-- Request indexing for `https://cockroachwatchindia.online/`.
 - Submit `https://cockroachwatchindia.online/sitemap.xml`.
 - Confirm `https://cockroachwatchindia.online/robots.txt` allows crawling.
+- After deploy, submit `https://cockroachwatchindia.online/sitemap.xml` in Google Search Console.
+- Use URL Inspection for `https://cockroachwatchindia.online/`.
+- Use URL Inspection for `https://cockroachwatchindia.online/watch-desk`.
+- Use URL Inspection for `https://cockroachwatchindia.online/india-unanswered-files`.
+- Use URL Inspection for `https://cockroachwatchindia.online/watch`.
+- Use URL Inspection for `https://cockroachwatchindia.online/submit`.
 - Add the website link to X, Instagram, YouTube, Reddit, Facebook, and other official CWI profiles.
 - Use the consistent public name "Cockroach Watch India" and abbreviation "CWI" across all social bios and posts.
 - Test social previews with the OpenGraph image before major campaigns.

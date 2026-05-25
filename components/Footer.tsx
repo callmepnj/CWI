@@ -6,19 +6,24 @@ import { site } from "@/lib/site";
 const footerLinks = [
   { label: "Home", href: "/" },
   { label: "Watch", href: "/watch" },
-  { label: "Unanswered Files", href: "/indias-unanswered-files" },
+  { label: "Cockroach Watch India", href: "/" },
+  { label: "CWI Watch Desk", href: "/watch-desk" },
+  { label: "India Unanswered Files", href: "/india-unanswered-files" },
   { label: "Manipur Investigation", href: "/watch/manipur-crisis" },
-  { label: "About", href: "/about" },
+  { label: "About CWI", href: "/about" },
   { label: "Charter", href: "/charter" },
   { label: "Watch Desk", href: "/watch-desk" },
   { label: "Issues", href: "/issues" },
   { label: "Join", href: "/join" },
   { label: "Submit Report", href: "/submit" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contact CWI", href: "/contact" },
   { label: "Five-Point Agenda", href: "/five-point-agenda" },
   { label: "Youth Voice", href: "/youth-voice" },
   { label: "Media Bank", href: "/media-bank" },
+  { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Credit Policy", href: "/credit-policy" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms", href: "/terms" },
   { label: "X", href: site.x },
   { label: "Instagram", href: site.instagram },
   { label: "YouTube", href: site.youtube },
@@ -50,7 +55,7 @@ export function Footer() {
             </p>
           </div>
           <p className="mt-4 max-w-xl text-white/72">
-            Founded to document, verify, and amplify the youth voice.
+            Cockroach Watch India — CWI is an independent civic watch, satire, and commentary platform. We document, verify, and amplify youth voice, public issues, civic satire, creator credit, and source-backed updates.
           </p>
           <p className="mt-6 max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-4 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-white/78">
             {site.disclaimer}

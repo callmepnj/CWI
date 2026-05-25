@@ -9,7 +9,7 @@ import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
 import { UnansweredStatusBadge } from "@/components/UnansweredStatusBadge";
 import { getThumbnailVisual, type UnansweredFile } from "@/data/unanswered-files";
 
-const unansweredFilesPath = "/indias-unanswered-files";
+const unansweredFilesPath = "/india-unanswered-files";
 
 export function UnansweredFilesGrid({ files }: { files: UnansweredFile[] }) {
   const [query, setQuery] = useState("");

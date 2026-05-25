@@ -73,7 +73,7 @@ export function CommentSection({ articleSlug }: { articleSlug: string }) {
       <CardLabel>Join the discussion</CardLabel>
       <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Comments</h2>
       <p className="mt-3 leading-7 text-ink/70">
-        Comments are moderated. No hate, threats, doxxing, harassment, or unverified allegations presented as fact.
+        Comments are moderated and only approved real submissions appear publicly. No hate, threats, doxxing, harassment, or unverified allegations presented as fact.
       </p>
 
       <form onSubmit={submitComment} className="mt-6 grid gap-4">

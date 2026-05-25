@@ -24,13 +24,13 @@ export function HeroSection() {
             Founder-led civic watch platform
           </p>
           <h1 className="max-w-5xl font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.06em] text-ink sm:text-7xl lg:text-8xl">
-            Cockroach Watch India
+            Cockroach Watch India — CWI Civic Watch Platform
           </h1>
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-ink/82">
             A founder-led civic watch platform documenting youth voice, public issues, civic satire, viral moments, creator culture, and the Cockroach wave across India.
           </p>
           <p className="mt-5 max-w-3xl leading-8 text-ink/68">
-            Cockroach Watch India is built to document, verify, and amplify the new wave of youth-led civic expression in India. We track viral moments, public issues, citizen reports, explainers, satire, youth reactions, and the larger movement forming around the Cockroach identity.
+            Cockroach Watch India, also known as CWI, is a founder-led independent civic watch platform documenting youth voice, public issues, civic satire, creator credit, viral claims, and public memory across India.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>

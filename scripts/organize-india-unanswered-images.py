@@ -418,7 +418,7 @@ def image_entry(topic: Topic, filename: str, image_type: str, source: Path, outp
         "fileName": filename,
         "path": public_path(output_path),
         "type": image_type,
-        "usedIn": f"/indias-unanswered-files/{topic.slug}",
+        "usedIn": f"/india-unanswered-files/{topic.slug}",
         "altText": topic.alt,
         "recommendedUse": f"{topic.alt} Recommended as {image_type} image.",
         "source": source_label,

@@ -25,7 +25,7 @@ export const importantRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
-  "/indias-unanswered-files",
+  "/india-unanswered-files",
   "/watch-desk",
   "/issues",
   "/join",
@@ -33,7 +33,10 @@ export const importantRoutes = [
   "/five-point-agenda",
   "/youth-voice",
   "/media-bank",
-  "/credit-policy"
+  "/credit-policy",
+  "/editorial-policy",
+  "/privacy-policy",
+  "/terms"
 ] as const;
 
 export function absoluteUrl(path = "/") {

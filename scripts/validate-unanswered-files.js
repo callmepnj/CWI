@@ -64,7 +64,7 @@ const rows = cases.map(([articleName, slug, folder, fileSlug]) => {
 
   return {
     "Article name": articleName,
-    "URL slug": `/indias-unanswered-files/${slug}`,
+    "URL slug": `/india-unanswered-files/${slug}`,
     "Hero image found": yesNo(fileExists(folderPath, `${fileSlug}-cwi-unanswered-files-hero-01.webp`) && imageTypes.has("hero")),
     "Thumbnail found": yesNo(fileExists(folderPath, `${fileSlug}-cwi-unanswered-files-thumbnail-01.webp`) && imageTypes.has("thumbnail")),
     "OG image found": yesNo(fileExists(folderPath, `${fileSlug}-cwi-unanswered-files-og-01.webp`) && imageTypes.has("og")),
@@ -77,7 +77,7 @@ const rows = cases.map(([articleName, slug, folder, fileSlug]) => {
     "SEO image fields": yesNo(["heroImage", "thumbnailImage", "ogImage", "socialImages", "galleryImages", "altText"].every((field) => dataSource.includes(field))),
     "FAQ schema": yesNo(pageSource.includes('"@type": "FAQPage"')),
     "Image index": yesNo(indexExists),
-    "Sitemap added": yesNo(sitemap.includes(`https://cockroachwatchindia.online/indias-unanswered-files/${slug}`)),
+    "Sitemap added": yesNo(sitemap.includes(`https://cockroachwatchindia.online/india-unanswered-files/${slug}`)),
     "No old Vercel URL": yesNo(noOldVercel),
     "Build status": buildPass ? "pass" : "fail",
   };

@@ -5,7 +5,7 @@ import { ExternalLink, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { FileSource, FileStatus } from "@/data/unanswered-files";
 
-const unansweredFilesPath = "/indias-unanswered-files";
+const unansweredFilesPath = "/india-unanswered-files";
 
 export type UnansweredSourceRecord = {
   id: string;

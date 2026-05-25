@@ -60,7 +60,7 @@ export function UnansweredFilesGestureRail({ items, className }: Props) {
           {movingItems.map((item, index) => (
             <Link
               key={`${item.slug}-${index}`}
-              href={`/indias-unanswered-files/${item.slug}`}
+              href={`/india-unanswered-files/${item.slug}`}
               className="group w-[285px] overflow-hidden rounded-[1.35rem] border border-line bg-white shadow-[0_16px_38px_rgba(11,18,32,0.12)] outline-none transition hover:-translate-y-0.5 hover:border-royal/35 hover:shadow-[0_22px_46px_rgba(11,92,255,0.18)] focus-visible:ring-2 focus-visible:ring-royal"
             >
               <div className="relative aspect-[16/9] overflow-hidden bg-skywash">
