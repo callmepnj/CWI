@@ -43,7 +43,7 @@ export async function POST(request: Request) {
           approvalQueueId: approvalItem.id,
           articleDraftId,
           summary: article.summary,
-          adminNotes: "Article AI attached a draft to this approval item. Review it, then use Approve Publish if ready."
+          adminNotes: "Article AI attached a draft to this approval item. Review it, then use Approve & Publish if ready."
         });
 
         return ok({ articleDraftId, approvalQueueId: updatedApproval?.id, article, updatedApproval }, "Article draft attached to this approval item.");

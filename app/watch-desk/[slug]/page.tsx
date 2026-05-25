@@ -20,18 +20,17 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const articleDisclaimer =
   "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.";
-
-export async function generateStaticParams() {
-  return posts.map((post) => ({ slug: post.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post =
-    posts.find((item) => item.slug === slug) ??
-    (await getPublishedWatchPostBySlug(slug).catch(() => null));
+    (await getPublishedWatchPostBySlug(slug).catch(() => null)) ??
+    posts.find((item) => item.slug === slug);
 
   if (!post) {
     return createMetadata({
@@ -152,8 +151,8 @@ function jsonLdForPost(post: (typeof posts)[number]) {
 export default async function WatchPostPage({ params }: Props) {
   const { slug } = await params;
   const post =
-    posts.find((item) => item.slug === slug) ??
-    (await getPublishedWatchPostBySlug(slug).catch(() => null));
+    (await getPublishedWatchPostBySlug(slug).catch(() => null)) ??
+    posts.find((item) => item.slug === slug);
 
   if (!post) {
     notFound();

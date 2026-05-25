@@ -555,6 +555,12 @@ export async function ensureAdminOsTables() {
         metadata jsonb not null default '{}'::jsonb
       );
 
+      create index if not exists published_articles_slug_published_idx
+      on published_articles (slug, published_at desc);
+
+      create index if not exists published_articles_published_at_idx
+      on published_articles (published_at desc);
+
       create table if not exists seo_packs (
         id uuid primary key default gen_random_uuid(),
         article_draft_id uuid references article_drafts(id) on delete cascade,
@@ -749,6 +755,9 @@ export async function ensureAdminOsTables() {
       alter table approval_queue add column if not exists research_pack_id uuid references research_packs(id) on delete set null;
       alter table approval_queue add column if not exists verification_report_id uuid references verification_reports(id) on delete set null;
       alter table approval_queue add column if not exists admin_notes text;
+      alter table approval_queue add column if not exists approved_at timestamptz;
+      alter table approval_queue add column if not exists approved_by text;
+      alter table approval_queue add column if not exists notes text;
 
       update agent_tasks
       set agent_name = coalesce(agent_name, agent_id),

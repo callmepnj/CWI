@@ -241,12 +241,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     setMessage("");
     setError("");
 
-    const response = await fetch("/api/ai/publish", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ approvalQueueId: id })
-    }).catch(() => null);
-    const json = await response?.json().catch(() => null);
+    const { response, json } = await requestPublish(id);
     setPending("");
 
     if (!response?.ok || !json?.ok) {
@@ -255,10 +250,67 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
       return;
     }
 
-    const articleUrl = text(json.data?.articleUrl);
-    setMessage(articleUrl ? `${json.message ?? "Publish AI completed."} Public URL: ${articleUrl}` : json.message ?? "Publish AI completed.");
+    showPublishSuccess(json);
     markApprovalPublished(id);
     finishProgress("Public Watch Desk route is ready.");
+    await loadDashboard(true);
+  }
+
+  async function approveAndPublish(item: AdminRecord) {
+    const id = text(item.id);
+    setPending(`${id}:approved`);
+    startProgress("Approving and publishing", "Saving approval, preparing any missing article draft, and opening the public Watch Desk route.");
+    setMessage("");
+    setError("");
+
+    const approvalResponse = await fetch("/api/approval/update", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: "approved" })
+    }).catch(() => null);
+    const approvalJson = await approvalResponse?.json().catch(() => null);
+
+    if (!approvalResponse?.ok || !approvalJson?.ok) {
+      setPending("");
+      setError(approvalJson?.error ?? "Approval update failed.");
+      failProgress("Approval update failed.");
+      return;
+    }
+
+    updateApprovalInState(approvalJson.data);
+    setProgress((current) =>
+      current ? { ...current, detail: "Approval saved. Publish AI is writing the public article row.", percent: Math.max(current.percent, 52) } : current
+    );
+
+    const { response, json } = await requestPublish(id);
+    setPending("");
+
+    if (!response?.ok || !json?.ok) {
+      setError(json?.error ?? "Publish AI failed after approval.");
+      failProgress("Publish AI failed.");
+      return;
+    }
+
+    showPublishSuccess(json);
+    markApprovalPublished(id);
+    finishProgress("Approved article is public.");
+    await loadDashboard(true);
+  }
+
+  async function requestPublish(id: string) {
+    const response = await fetch("/api/ai/publish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ approvalQueueId: id })
+    }).catch(() => null);
+    const json = await response?.json().catch(() => null);
+    return { response, json };
+  }
+
+  function showPublishSuccess(json: { message?: string; data?: { articleUrl?: unknown; generatedArticleDraft?: unknown } }) {
+    const articleUrl = text(json.data?.articleUrl);
+    const generated = json.data?.generatedArticleDraft ? " Publish AI generated the missing draft first." : "";
+    setMessage(articleUrl ? `${json.message ?? "Publish AI completed."}${generated} Public URL: ${articleUrl}` : json.message ?? "Publish AI completed.");
   }
 
   async function generateArticleForApproval(item: AdminRecord) {
@@ -286,7 +338,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
       return;
     }
 
-    setMessage(json.message ?? "Article draft attached. Review it, then use Approve Publish.");
+    setMessage(json.message ?? "Article draft attached. Review it, then use Approve & Publish.");
     updateApprovalInState(json.data?.updatedApproval);
     finishProgress("Article draft attached.");
   }
@@ -437,6 +489,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
               refresh={() => loadDashboard(true)}
               updateApproval={updateApproval}
               publishApproval={publishApproval}
+              approveAndPublish={approveAndPublish}
               generateArticleForApproval={generateArticleForApproval}
               updateComment={updateComment}
             />
@@ -455,6 +508,7 @@ function AdminSection({
   refresh,
   updateApproval,
   publishApproval,
+  approveAndPublish,
   generateArticleForApproval,
   updateComment
 }: {
@@ -465,6 +519,7 @@ function AdminSection({
   refresh: () => Promise<void>;
   updateApproval: (id: string, status: string) => Promise<void>;
   publishApproval: (id: string) => Promise<void>;
+  approveAndPublish: (item: AdminRecord) => Promise<void>;
   generateArticleForApproval: (item: AdminRecord) => Promise<void>;
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
@@ -476,6 +531,7 @@ function AdminSection({
         pending={pending}
         updateApproval={updateApproval}
         publishApproval={publishApproval}
+        approveAndPublish={approveAndPublish}
         generateArticleForApproval={generateArticleForApproval}
       />
     );
@@ -591,12 +647,14 @@ function ApprovalSection({
   pending,
   updateApproval,
   publishApproval,
+  approveAndPublish,
   generateArticleForApproval
 }: {
   data: AdminData;
   pending: string;
   updateApproval: (id: string, status: string) => Promise<void>;
   publishApproval: (id: string) => Promise<void>;
+  approveAndPublish: (item: AdminRecord) => Promise<void>;
   generateArticleForApproval: (item: AdminRecord) => Promise<void>;
 }) {
   return (
@@ -612,10 +670,10 @@ function ApprovalSection({
         <Card><p className="font-bold text-ink/64">No approval cards yet.</p></Card>
       ) : (
         data.approvals.map((item) => {
-          const status = text(item.status);
+          const status = normalizeApprovalStatus(text(item.status));
           const articleReady = Boolean(item.article_draft_id);
           const canGenerateArticle = Boolean(item.research_pack_id) && !articleReady;
-          const canPublish = status === "approved" && articleReady;
+          const canPublish = status === "approved" && (articleReady || Boolean(item.research_pack_id));
 
           return (
           <Card key={text(item.id)}>
@@ -637,21 +695,36 @@ function ApprovalSection({
               <MiniMetric label="SEO/Social" value={`${item.seo_pack_id ? "SEO" : "-"} / ${item.social_pack_id ? "Social" : "-"}`} />
             </div>
             <p className="mt-4 rounded-2xl bg-paper p-4 text-sm font-semibold leading-6 text-ink/70">{text(item.suggested_action)}</p>
-            {!articleReady ? (
+            {!articleReady && item.research_pack_id ? (
               <p className="mt-3 rounded-2xl border border-saffron/30 bg-saffron/10 p-3 text-sm font-bold leading-6 text-[#8A5B00]">
-                Publish AI is unavailable because no article draft is attached. Generate an article draft for this card, or approve it as social/research only.
+                No article draft is attached yet. Publish AI can generate the missing draft from this card&apos;s research pack after approval.
+              </p>
+            ) : !articleReady ? (
+              <p className="mt-3 rounded-2xl border border-saffron/30 bg-saffron/10 p-3 text-sm font-bold leading-6 text-[#8A5B00]">
+                Publish AI is unavailable because no article draft or research pack is attached. Approve it as social/research only, or create a full article workflow first.
               </p>
             ) : status !== "approved" ? (
               <p className="mt-3 rounded-2xl border border-line bg-skywash p-3 text-sm font-bold leading-6 text-royal">
-                Publish AI unlocks only after this card is marked approved with Approve Publish.
+                Use Approve & Publish to approve this card and publish it in one controlled step.
               </p>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-2">
-              {approvalActions.map((action) => (
-                <Button key={action.status} type="button" size="sm" variant={action.status === "approved" ? "default" : "outline"} disabled={pending === `${text(item.id)}:${action.status}`} onClick={() => updateApproval(text(item.id), action.status)}>
-                  {action.label}
-                </Button>
-              ))}
+              {approvalActions.map((action) => {
+                const pendingKey = pending === `${text(item.id)}:${action.status}`;
+                const isPublishAction = action.status === "approved";
+                return (
+                  <Button
+                    key={action.status}
+                    type="button"
+                    size="sm"
+                    variant={isPublishAction ? "default" : "outline"}
+                    disabled={pendingKey || (isPublishAction && !canPublish)}
+                    onClick={() => (isPublishAction ? approveAndPublish(item) : updateApproval(text(item.id), action.status))}
+                  >
+                    {pendingKey && isPublishAction ? "Publishing..." : action.label}
+                  </Button>
+                );
+              })}
               {canGenerateArticle ? (
                 <Button type="button" size="sm" variant="outline" disabled={pending === `${text(item.id)}:article`} onClick={() => generateArticleForApproval(item)}>
                   {pending === `${text(item.id)}:article` ? "Generating..." : "Generate Article Draft"}
@@ -670,7 +743,7 @@ function ApprovalSection({
 }
 
 const approvalActions = [
-  { label: "Approve Publish", status: "approved" },
+  { label: "Approve & Publish", status: "approved" },
   { label: "Approve Social Only", status: "approved_social_only" },
   { label: "Approve Article Only", status: "approved_article_only" },
   { label: "Request Changes", status: "changes_requested" },
@@ -1049,6 +1122,30 @@ function actionRequest(action: string) {
 function actionLabel(action: string) {
   const match = agentActions.find(([id]) => id === action);
   return match?.[1] ?? action.replace(/-/g, " ");
+}
+
+function normalizeApprovalStatus(value: string) {
+  const normalized = value.trim().toLowerCase().replace(/[-\s]+/g, "_");
+  const statusMap: Record<string, string> = {
+    approve: "approved",
+    approved: "approved",
+    approve_publish: "approved",
+    "approve_&_publish": "approved",
+    approved_publish: "approved",
+    approved_article_only: "approved_article_only",
+    approved_social_only: "approved_social_only",
+    request_changes: "changes_requested",
+    changes_requested: "changes_requested",
+    reject: "rejected",
+    rejected: "rejected",
+    save_for_later: "waiting_for_approval",
+    waiting_for_approval: "waiting_for_approval",
+    published: "published",
+    archive: "archived",
+    archived: "archived"
+  };
+
+  return statusMap[normalized] ?? normalized;
 }
 
 function normalizeSection(value: string): SectionId {

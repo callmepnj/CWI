@@ -73,7 +73,7 @@ export async function saveArticleDraft(article: {
       article.title,
       article.slug,
       article.category,
-      JSON.stringify({ summary: article.summary, body: article.body }),
+      JSON.stringify(articleDraftPayload(article.summary, article.body)),
       article.verificationStatus,
       article.sourceCount
     ]
@@ -125,10 +125,11 @@ export async function savePublishedArticle(input: { articleDraftId: string; titl
       update article_drafts
       set publish_status = 'Published',
           approval_status = 'Approved',
+          slug = $2,
           updated_at = now()
       where id = $1;
     `,
-    [articleDraftId]
+    [articleDraftId, input.slug]
   );
   return result.rows[0].id;
 }
@@ -232,10 +233,14 @@ export async function getPublishedWatchPosts(limit = 80) {
 
 function publishedRowToWatchPost(row: PublishedArticleRow): WatchPost {
   const draft = asRecord(row.draft);
+  const nestedDraft = asRecord(draft.body);
   const sections = extractSections(draft);
-  const sources = extractSources(row.source_list);
+  const researchSources = extractSources(row.source_list);
+  const draftSources = extractSources(nestedDraft.sources || draft.sources);
+  const sources = researchSources.length ? researchSources : draftSources;
   const summary =
     asText(draft.summary) ||
+    asText(nestedDraft.summary) ||
     sections[0]?.paragraphs[0] ||
     "CWI Watch Desk article published from the approved CWI AI OS workflow.";
   const date = dateOnly(row.published_at);
@@ -284,6 +289,10 @@ function extractSections(draft: Record<string, unknown>) {
   const directSections = normalizeSectionArray(draft.sections);
   if (directSections.length) return directSections;
 
+  const bodyRecord = asRecord(draft.body);
+  const nestedSections = normalizeSectionArray(bodyRecord.body || bodyRecord.sections);
+  if (nestedSections.length) return nestedSections;
+
   const bodySections = normalizeSectionArray(draft.body);
   if (bodySections.length) return bodySections;
 
@@ -305,6 +314,18 @@ function extractSections(draft: Record<string, unknown>) {
           paragraphs: ["This approved article draft is available from the CWI admin publishing database."]
         }
       ];
+}
+
+function articleDraftPayload(summary: string, body: unknown) {
+  const bodyRecord = asRecord(body);
+  if (Object.keys(bodyRecord).length > 0) {
+    return {
+      ...bodyRecord,
+      summary: summary || asText(bodyRecord.summary)
+    };
+  }
+
+  return { summary, body };
 }
 
 function normalizeSectionArray(value: unknown) {

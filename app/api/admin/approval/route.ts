@@ -27,6 +27,7 @@ export async function PATCH(request: Request) {
 function normalizeStatus(status: string) {
   const map: Record<string, string> = {
     "Approve Publish": "approved",
+    "Approve & Publish": "approved",
     "Approved Publish": "approved",
     "Approve Article Only": "approved_article_only",
     "Approved Article Only": "approved_article_only",

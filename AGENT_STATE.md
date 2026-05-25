@@ -196,3 +196,13 @@ Next steps:
 - Hardened admin/article DB boundaries: approval queue save/update/get/attach, research pack lookup, verification report save/get, article draft save/get, published article save, SEO/social pack save, agent task complete/fail, legacy admin OS approval/comment helpers, and Unanswered Files comment parent/comment-like IDs.
 - Verification after fix: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run env:check:vercel`, and `npm run build` pass.
 - Remaining environment blocker: `npm run db:check` still fails `28P01`, meaning local Postgres credentials are invalid. The code now avoids empty UUID crashes, but production DB-backed actions still need valid Supabase credentials.
+
+2026-05-25 AI publish architecture fix:
+- User reported nothing is getting published through AI and requested a proper architecture fix.
+- Publish architecture is now DB-first and explicit: the admin approval button is `Approve & Publish`, which first saves approval status, then calls Publish AI in the same user action.
+- Publish AI now accepts legacy approved statuses through shared status normalization, refuses non-approved items, and can generate a missing article draft from the approved card's research/verification pack before publishing.
+- Public visibility fix: `/watch-desk/[slug]` is now fully dynamic and checks DB-published articles before static seed posts. `/watch-desk` and `/rss.xml` also merge DB-published posts with static posts, with DB-published content taking precedence.
+- Published article data fix: article drafts now store AI article payloads in a public-renderable shape, published rows update the draft slug used publicly, and static slug collisions get a draft-id suffix.
+- DB hardening: admin schema now adds missing approval columns on existing databases and indexes `published_articles` by slug/published date.
+- Verification after fix: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, and `npm run env:check:vercel` pass. Build now shows `/watch-desk/[slug]` and `/rss.xml` as dynamic routes.
+- Local `npm run db:check` still fails `28P01`; this confirms local `.env.local` DB credentials are invalid, not a code-path failure. Production still requires valid Vercel `DATABASE_URL`/AI env values for DB-backed publish actions.

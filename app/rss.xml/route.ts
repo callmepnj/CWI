@@ -1,7 +1,8 @@
 import { posts } from "@/data/posts";
+import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { site } from "@/lib/site";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 function escapeXml(value: string) {
   return value
@@ -12,8 +13,10 @@ function escapeXml(value: string) {
     .replaceAll("'", "&apos;");
 }
 
-export function GET() {
-  const items = posts
+export async function GET() {
+  const publishedPosts = await getPublishedWatchPosts(50).catch(() => []);
+  const feedPosts = mergePosts([...posts, ...publishedPosts]).sort((first, second) => dateValue(second.date) - dateValue(first.date));
+  const items = feedPosts
     .slice(0, 50)
     .map((post) => {
       const url = `${site.url}/watch-desk/${post.slug}`;
@@ -37,7 +40,7 @@ export function GET() {
     <link>${site.url}/watch-desk</link>
     <description>${escapeXml(site.description)}</description>
     <language>en-IN</language>
-    <lastBuildDate>${new Date(posts[0]?.updatedDate ?? "2026-05-21").toUTCString()}</lastBuildDate>
+    <lastBuildDate>${new Date(feedPosts[0]?.updatedDate ?? "2026-05-21").toUTCString()}</lastBuildDate>
 ${items}
   </channel>
 </rss>
@@ -47,7 +50,15 @@ ${items}
     status: 200,
     headers: {
       "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, max-age=0, s-maxage=86400"
+      "Cache-Control": "no-store"
     }
   });
+}
+
+function dateValue(value: string) {
+  return new Date(`${value}T00:00:00+05:30`).getTime();
+}
+
+function mergePosts<T extends { slug: string }>(items: T[]) {
+  return Array.from(new Map(items.map((item) => [item.slug, item])).values());
 }

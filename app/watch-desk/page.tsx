@@ -26,7 +26,7 @@ export const metadata = createMetadata({
 
 export default async function WatchDeskPage() {
   const publishedPosts = await getPublishedWatchPosts().catch(() => []);
-  const dateSortedPosts = mergePosts([...publishedPosts, ...posts]).sort((first, second) => dateValue(second.date) - dateValue(first.date));
+  const dateSortedPosts = mergePosts([...posts, ...publishedPosts]).sort((first, second) => dateValue(second.date) - dateValue(first.date));
   const featured = dateSortedPosts[0];
   const highlights = dateSortedPosts.slice(1, 4);
 

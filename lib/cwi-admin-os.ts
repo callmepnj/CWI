@@ -2,6 +2,8 @@ import { getFileVisual, unansweredFiles } from "@/data/unanswered-files";
 import { posts } from "@/data/posts";
 import { getAIProviderConfig } from "@/lib/ai/model-provider";
 import { ensureAdminOsTables, ensureCommentsTable, ensureReportsTable, ensureUnansweredFilesTables, getPool } from "@/lib/db";
+import { normalizeApprovalStatus } from "@/lib/db/approval";
+import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
 
@@ -208,8 +210,9 @@ async function buildAdminDashboardData() {
   ]);
 
   const approvalRows = approvals.rows;
+  const dbPublishedPosts = await getPublishedWatchPosts(8).catch(() => []);
   const estimatedMonthlyCost = Number(costs.rows[0]?.month_cost ?? 0);
-  const pendingApprovals = approvalRows.filter((row) => String(row.status).toLowerCase().includes("approval")).length;
+  const pendingApprovals = approvalRows.filter((row) => normalizeApprovalStatus(row.status) === "waiting_for_approval").length;
   const latestHealth = healthLogs.rows[0] ?? buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost });
 
   return {
@@ -221,7 +224,7 @@ async function buildAdminDashboardData() {
     },
     ai: publicAiConfig(),
     counts: {
-      totalArticles: posts.length + unansweredFiles.length,
+      totalArticles: posts.length + dbPublishedPosts.length + unansweredFiles.length,
       pendingApprovals,
       reportsReceived: reports.rows.length,
       researchPacksReady: researchPacks.rows.length,
@@ -244,7 +247,10 @@ async function buildAdminDashboardData() {
     health: latestHealth,
     reports: reports.rows,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
-    latestPublicArticles: posts.slice(0, 6).map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),
+    latestPublicArticles: mergeAdminArticles([
+      ...dbPublishedPosts.map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),
+      ...posts.slice(0, 8).map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category }))
+    ]).slice(0, 6),
     latestUnansweredFiles: unansweredFiles.slice(0, 6).map((file) => ({ title: file.title, href: `/india-unanswered-files/${file.slug}`, category: file.category }))
   };
 }
@@ -417,14 +423,14 @@ export async function runAgentAction(action: string) {
 export async function updateApprovalStatus(id: string, status: string, notes?: string) {
   await initializeAdminOs();
   const approvalQueueId = requireUuid(id, "approvalQueueId");
-  const safeStatus = clean(status) || "Waiting for Approval";
+  const safeStatus = normalizeApprovalStatus(clean(status) || "waiting_for_approval");
   const result = await getPool().query(
     `
       update approval_queue
       set status = $2,
           notes = coalesce(nullif($3, ''), notes),
-          approved_at = case when $2 in ('Approved', 'Approved Article Only', 'Approved Social Only', 'Approved Publish') then now() else approved_at end,
-          approved_by = case when $2 in ('Approved', 'Approved Article Only', 'Approved Social Only', 'Approved Publish') then 'CWI Admin' else approved_by end,
+          approved_at = case when $2 = 'approved' then coalesce(approved_at, now()) else approved_at end,
+          approved_by = case when $2 = 'approved' then coalesce(approved_by, 'CWI Admin') else approved_by end,
           updated_at = now()
       where id = $1
       returning *;
@@ -926,6 +932,10 @@ function agentSettings(id: string) {
     blockedInputs: ["paid X API", "paid Instagram API", "expensive scraping APIs", "unapproved auto-publish"],
     agentId: id
   };
+}
+
+function mergeAdminArticles(items: Array<{ href: string; title: string; category: string }>) {
+  return Array.from(new Map(items.map((item) => [item.href, item])).values());
 }
 
 function categoryFromContentType(value?: string) {
