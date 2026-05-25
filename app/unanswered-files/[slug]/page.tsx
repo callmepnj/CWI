@@ -334,7 +334,11 @@ export default async function UnansweredFilePage({ params }: Props) {
                     href={`${unansweredFilesPath}/${relatedFile.slug}`}
                     className="group overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-card transition hover:-translate-y-1 hover:border-royal/30 hover:shadow-soft"
                   >
-                    <UnansweredFileVisual file={relatedFile} imageClassName="transition duration-500 group-hover:scale-[1.03]" />
+                    <UnansweredFileVisual
+                      file={relatedFile}
+                      imageClassName="transition duration-500 group-hover:scale-[1.03]"
+                      titleClassName="inline rounded-xl bg-white/92 px-2 py-1 text-royal shadow-[0_10px_30px_rgba(255,255,255,0.25)]"
+                    />
                     <div className="p-5">
                       <UnansweredStatusBadge status={relatedFile.status} />
                       <h3 className="mt-4 font-display text-xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">

@@ -10,6 +10,7 @@ type UnansweredFileVisualProps = {
   priority?: boolean;
   className?: string;
   imageClassName?: string;
+  titleClassName?: string;
   showCaption?: boolean;
 };
 
@@ -19,6 +20,7 @@ export function UnansweredFileVisual({
   priority = false,
   className,
   imageClassName,
+  titleClassName,
   showCaption = false
 }: UnansweredFileVisualProps) {
   const visual = providedVisual ?? getFileVisual(file);
@@ -49,7 +51,7 @@ export function UnansweredFileVisual({
           <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-saffron">
             {visual.credit}
           </p>
-          <p className="mt-2 font-display text-2xl font-black uppercase leading-tight tracking-[-0.04em] text-white">
+          <p className={cn("mt-2 font-display text-2xl font-black uppercase leading-tight tracking-[-0.04em] text-white", titleClassName)}>
             {file.title}
           </p>
         </div>

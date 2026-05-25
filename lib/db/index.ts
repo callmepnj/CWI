@@ -1,0 +1,573 @@
+import { Pool } from "pg";
+
+declare global {
+  var cwiPgPool: Pool | undefined;
+  var cwiReportsTableReady: Promise<void> | undefined;
+  var cwiCommentsTableReady: Promise<void> | undefined;
+  var cwiUnansweredFilesTableReady: Promise<void> | undefined;
+  var cwiArticleRatingsTableReady: Promise<void> | undefined;
+  var cwiAdminOsTablesReady: Promise<void> | undefined;
+}
+
+function getDatabaseUrl() {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not configured.");
+  }
+
+  return databaseUrl;
+}
+
+export function getPool() {
+  if (!globalThis.cwiPgPool) {
+    globalThis.cwiPgPool = new Pool({
+      connectionString: getDatabaseUrl(),
+      max: 3,
+      ssl: process.env.DATABASE_SSL === "false" ? false : { rejectUnauthorized: false }
+    });
+  }
+
+  return globalThis.cwiPgPool;
+}
+
+export async function ensureReportsTable() {
+  if (!globalThis.cwiReportsTableReady) {
+    globalThis.cwiReportsTableReady = getPool().query(`
+      create table if not exists cwi_report_submissions (
+        id bigserial primary key,
+        created_at timestamptz not null default now(),
+        name text,
+        contact text,
+        city text,
+        state text,
+        type text not null,
+        source_url text,
+        proof_note text,
+        message text not null,
+        credit_preference text,
+        consent boolean not null default false,
+        safety boolean not null default false,
+        status text not null default 'received',
+        raw_payload jsonb not null default '{}'::jsonb
+      );
+
+      create table if not exists cwi_report_evidence_files (
+        id bigserial primary key,
+        report_id bigint not null references cwi_report_submissions(id) on delete cascade,
+        created_at timestamptz not null default now(),
+        file_name text not null,
+        file_type text not null,
+        file_size integer not null,
+        file_data bytea not null
+      );
+
+      create index if not exists cwi_report_evidence_files_report_id_idx
+      on cwi_report_evidence_files (report_id);
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiReportsTableReady;
+}
+
+export async function ensureCommentsTable() {
+  if (!globalThis.cwiCommentsTableReady) {
+    globalThis.cwiCommentsTableReady = getPool().query(`
+      create extension if not exists pgcrypto;
+
+      create table if not exists cwi_article_comments (
+        id uuid primary key default gen_random_uuid(),
+        article_slug text not null,
+        name text not null,
+        email text,
+        comment text not null,
+        status text not null default 'pending',
+        created_at timestamptz not null default now(),
+        ip_hash text,
+        user_agent text
+      );
+
+      create index if not exists cwi_article_comments_slug_status_created_idx
+      on cwi_article_comments (article_slug, status, created_at desc);
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiCommentsTableReady;
+}
+
+export async function ensureArticleRatingsTable() {
+  if (!globalThis.cwiArticleRatingsTableReady) {
+    globalThis.cwiArticleRatingsTableReady = getPool().query(`
+      create extension if not exists pgcrypto;
+
+      create table if not exists cwi_article_ratings (
+        id uuid primary key default gen_random_uuid(),
+        article_type text not null,
+        article_slug text not null,
+        rating integer not null check (rating between 1 and 5),
+        ip_hash text not null,
+        user_agent_hash text,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique (article_type, article_slug, ip_hash)
+      );
+
+      create index if not exists cwi_article_ratings_article_idx
+      on cwi_article_ratings (article_type, article_slug, updated_at desc);
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiArticleRatingsTableReady;
+}
+
+export async function ensureUnansweredFilesTables() {
+  if (!globalThis.cwiUnansweredFilesTableReady) {
+    globalThis.cwiUnansweredFilesTableReady = getPool().query(`
+      create extension if not exists pgcrypto;
+
+      create table if not exists cwi_unanswered_articles (
+        id text primary key,
+        slug text not null unique,
+        title text not null,
+        summary text,
+        category text,
+        location text,
+        start_date text,
+        current_status text,
+        hero_image text,
+        reading_time text,
+        source_count integer not null default 0,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        published_at timestamptz not null default now(),
+        seo_title text,
+        seo_description text,
+        seo_keywords text[]
+      );
+
+      create table if not exists cwi_unanswered_article_views (
+        id bigserial primary key,
+        article_id text not null references cwi_unanswered_articles(id) on delete cascade,
+        ip_hash text,
+        user_agent_hash text,
+        viewed_at timestamptz not null default now()
+      );
+
+      create table if not exists cwi_unanswered_article_likes (
+        id bigserial primary key,
+        article_id text not null references cwi_unanswered_articles(id) on delete cascade,
+        user_id text,
+        ip_hash text,
+        created_at timestamptz not null default now(),
+        unique (article_id, ip_hash)
+      );
+
+      create table if not exists cwi_unanswered_article_shares (
+        id bigserial primary key,
+        article_id text not null references cwi_unanswered_articles(id) on delete cascade,
+        platform text not null,
+        shared_at timestamptz not null default now(),
+        ip_hash text
+      );
+
+      create table if not exists cwi_unanswered_article_bookmarks (
+        id bigserial primary key,
+        article_id text not null references cwi_unanswered_articles(id) on delete cascade,
+        user_id text,
+        ip_hash text,
+        created_at timestamptz not null default now(),
+        unique (article_id, ip_hash)
+      );
+
+      create table if not exists cwi_unanswered_comments (
+        id uuid primary key default gen_random_uuid(),
+        article_id text not null references cwi_unanswered_articles(id) on delete cascade,
+        parent_id uuid references cwi_unanswered_comments(id) on delete cascade,
+        name text not null,
+        email text,
+        comment_text text not null,
+        status text not null default 'pending',
+        likes_count integer not null default 0,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        ip_hash text,
+        user_agent text
+      );
+
+      create table if not exists cwi_unanswered_comment_likes (
+        id bigserial primary key,
+        comment_id uuid not null references cwi_unanswered_comments(id) on delete cascade,
+        user_id text,
+        ip_hash text,
+        created_at timestamptz not null default now(),
+        unique (comment_id, ip_hash)
+      );
+
+      create index if not exists cwi_unanswered_views_article_idx
+      on cwi_unanswered_article_views (article_id, viewed_at desc);
+
+      create index if not exists cwi_unanswered_comments_article_status_idx
+      on cwi_unanswered_comments (article_id, status, created_at desc);
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiUnansweredFilesTableReady;
+}
+
+export async function ensureAdminOsTables() {
+  if (!globalThis.cwiAdminOsTablesReady) {
+    globalThis.cwiAdminOsTablesReady = getPool().query(`
+      create extension if not exists pgcrypto;
+
+      create table if not exists agents (
+        id text primary key,
+        name text not null,
+        role text not null,
+        status text not null default 'online',
+        last_run_at timestamptz,
+        tasks_completed integer not null default 0,
+        failed_tasks integer not null default 0,
+        current_queue integer not null default 0,
+        cost_estimate_inr numeric(10,2) not null default 0,
+        active boolean not null default true,
+        settings jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists agent_tasks (
+        id uuid primary key default gen_random_uuid(),
+        agent_id text references agents(id) on delete set null,
+        title text not null,
+        task_type text not null,
+        status text not null default 'queued',
+        priority text not null default 'normal',
+        input jsonb not null default '{}'::jsonb,
+        output jsonb not null default '{}'::jsonb,
+        cost_estimate_inr numeric(10,2) not null default 0,
+        error text,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists sources (
+        id uuid primary key default gen_random_uuid(),
+        name text not null,
+        source_type text not null,
+        url text,
+        rss_url text,
+        sitemap_url text,
+        platform text,
+        trust_level text not null default 'medium',
+        active boolean not null default true,
+        notes text,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists keywords (
+        id uuid primary key default gen_random_uuid(),
+        keyword text not null,
+        keyword_group text not null,
+        priority integer not null default 3,
+        active boolean not null default true,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique(keyword, keyword_group)
+      );
+
+      create table if not exists manual_links (
+        id uuid primary key default gen_random_uuid(),
+        url text not null,
+        topic text,
+        platform text,
+        creator_source text,
+        notes text,
+        priority text not null default 'normal',
+        content_type text not null default 'manual link',
+        extracted_title text,
+        extracted_description text,
+        extraction_status text not null default 'pending',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists research_packs (
+        id uuid primary key default gen_random_uuid(),
+        topic text not null,
+        category text not null default 'Watch Desk',
+        date_range text,
+        source_list jsonb not null default '[]'::jsonb,
+        source_count integer not null default 0,
+        summary text,
+        what_happened text,
+        what_we_know text,
+        what_remains_unclear text,
+        timeline jsonb not null default '[]'::jsonb,
+        key_facts jsonb not null default '[]'::jsonb,
+        public_reaction text,
+        source_confidence text not null default 'Needs review',
+        risks jsonb not null default '[]'::jsonb,
+        suggested_article_angle text,
+        suggested_social_angle text,
+        status text not null default 'Research Ready',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists verification_reports (
+        id uuid primary key default gen_random_uuid(),
+        research_pack_id uuid references research_packs(id) on delete cascade,
+        verification_status text not null default 'Developing',
+        risk_level text not null default 'Medium',
+        unsafe_claims jsonb not null default '[]'::jsonb,
+        safer_wording jsonb not null default '[]'::jsonb,
+        source_gaps jsonb not null default '[]'::jsonb,
+        publish_recommendation text not null default 'Human review required',
+        human_review_required boolean not null default true,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists article_drafts (
+        id uuid primary key default gen_random_uuid(),
+        research_pack_id uuid references research_packs(id) on delete set null,
+        title text not null,
+        slug text,
+        category text not null default 'Watch Desk',
+        draft jsonb not null default '{}'::jsonb,
+        verification_status text not null default 'Developing',
+        source_count integer not null default 0,
+        approval_status text not null default 'Draft Ready',
+        publish_status text not null default 'Not published',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists published_articles (
+        id uuid primary key default gen_random_uuid(),
+        article_draft_id uuid references article_drafts(id) on delete set null,
+        title text not null,
+        slug text not null,
+        url text not null,
+        category text,
+        published_at timestamptz not null default now(),
+        metadata jsonb not null default '{}'::jsonb
+      );
+
+      create table if not exists seo_packs (
+        id uuid primary key default gen_random_uuid(),
+        article_draft_id uuid references article_drafts(id) on delete cascade,
+        seo_title text not null,
+        meta_description text not null,
+        slug text,
+        canonical_url text,
+        open_graph_title text,
+        open_graph_description text,
+        open_graph_image text,
+        twitter_card jsonb not null default '{}'::jsonb,
+        schema_json jsonb not null default '{}'::jsonb,
+        breadcrumb_schema jsonb not null default '{}'::jsonb,
+        internal_links jsonb not null default '[]'::jsonb,
+        image_alt_text jsonb not null default '[]'::jsonb,
+        sitemap_status text not null default 'Pending approval',
+        search_console_checklist jsonb not null default '[]'::jsonb,
+        approval_status text not null default 'SEO Ready',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists social_packs (
+        id uuid primary key default gen_random_uuid(),
+        article_draft_id uuid references article_drafts(id) on delete cascade,
+        instagram_caption text,
+        facebook_caption text,
+        x_caption text,
+        reddit_title text,
+        reddit_body text,
+        youtube_shorts_title text,
+        youtube_shorts_description text,
+        pinned_comment text,
+        bluesky_caption text,
+        discord_announcement text,
+        hashtag_set jsonb not null default '[]'::jsonb,
+        credit_line text,
+        website_line text,
+        risk_note text,
+        approval_status text not null default 'Social Ready',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists image_library (
+        id uuid primary key default gen_random_uuid(),
+        topic text,
+        section text,
+        image_type text,
+        path text,
+        alt_text text,
+        credit text,
+        source_url text,
+        quality_status text not null default 'Needs review',
+        approval_status text not null default 'Image Ready',
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists uiux_audits (
+        id uuid primary key default gen_random_uuid(),
+        page text not null,
+        issue text not null,
+        severity text not null default 'Medium',
+        current_text text,
+        suggested_text text,
+        layout_issue text,
+        mobile_issue text,
+        screenshot_reference text,
+        fix_status text not null default 'UI Review Ready',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists reports (
+        id uuid primary key default gen_random_uuid(),
+        source_report_id text,
+        name_handle text,
+        contact text,
+        city text,
+        state text,
+        report_type text,
+        link text,
+        message text,
+        evidence jsonb not null default '[]'::jsonb,
+        status text not null default 'New',
+        assigned_agent text references agents(id) on delete set null,
+        priority text not null default 'normal',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists comments (
+        id uuid primary key default gen_random_uuid(),
+        source_table text not null,
+        source_id text not null,
+        article text,
+        name text,
+        comment text not null,
+        risk_flag text,
+        status text not null default 'pending',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists daily_briefings (
+        id uuid primary key default gen_random_uuid(),
+        briefing_date date not null default current_date,
+        top_topics jsonb not null default '[]'::jsonb,
+        urgent_updates jsonb not null default '[]'::jsonb,
+        articles_to_prepare jsonb not null default '[]'::jsonb,
+        social_posts_to_prepare jsonb not null default '[]'::jsonb,
+        images_needed jsonb not null default '[]'::jsonb,
+        seo_tasks jsonb not null default '[]'::jsonb,
+        uiux_issues jsonb not null default '[]'::jsonb,
+        risks_to_avoid jsonb not null default '[]'::jsonb,
+        approval_items jsonb not null default '[]'::jsonb,
+        status text not null default 'Waiting for approval',
+        created_at timestamptz not null default now()
+      );
+
+      create table if not exists system_health_logs (
+        id uuid primary key default gen_random_uuid(),
+        website_status text not null default 'unchecked',
+        database_status text not null default 'unchecked',
+        sitemap_status text not null default 'unchecked',
+        robots_status text not null default 'unchecked',
+        old_url_check text not null default 'unchecked',
+        broken_links integer not null default 0,
+        missing_metadata integer not null default 0,
+        missing_alt_text integer not null default 0,
+        failed_tasks integer not null default 0,
+        monthly_budget_usage_inr numeric(10,2) not null default 0,
+        daily_ai_usage_inr numeric(10,2) not null default 0,
+        pending_approvals integer not null default 0,
+        created_at timestamptz not null default now()
+      );
+
+      create table if not exists cost_usage_logs (
+        id uuid primary key default gen_random_uuid(),
+        agent_id text references agents(id) on delete set null,
+        task_id uuid,
+        provider text not null default 'template',
+        usage_type text not null,
+        estimated_cost_inr numeric(10,2) not null default 0,
+        created_at timestamptz not null default now()
+      );
+
+      create table if not exists settings (
+        key text primary key,
+        value jsonb not null default '{}'::jsonb,
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists approval_queue (
+        id uuid primary key default gen_random_uuid(),
+        topic text not null,
+        type text not null,
+        summary text,
+        verification_status text not null default 'Developing',
+        risk_level text not null default 'Medium',
+        source_count integer not null default 0,
+        article_draft_id uuid references article_drafts(id) on delete set null,
+        seo_pack_id uuid references seo_packs(id) on delete set null,
+        social_pack_id uuid references social_packs(id) on delete set null,
+        image_pack_id uuid references image_library(id) on delete set null,
+        uiux_audit_id uuid references uiux_audits(id) on delete set null,
+        status text not null default 'Waiting for Approval',
+        suggested_action text not null default 'Review before publishing',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        approved_at timestamptz,
+        approved_by text,
+        notes text
+      );
+
+      create index if not exists approval_queue_status_created_idx
+      on approval_queue (status, created_at desc);
+
+      create index if not exists agent_tasks_status_created_idx
+      on agent_tasks (status, created_at desc);
+
+      alter table agent_tasks add column if not exists agent_name text;
+      alter table agent_tasks add column if not exists input_json jsonb not null default '{}'::jsonb;
+      alter table agent_tasks add column if not exists output_json jsonb not null default '{}'::jsonb;
+      alter table agent_tasks add column if not exists error_message text;
+      alter table agent_tasks add column if not exists cost_estimate numeric(10,2) not null default 0;
+      alter table agent_tasks add column if not exists completed_at timestamptz;
+
+      alter table approval_queue add column if not exists item_type text;
+      alter table approval_queue add column if not exists research_pack_id uuid references research_packs(id) on delete set null;
+      alter table approval_queue add column if not exists verification_report_id uuid references verification_reports(id) on delete set null;
+      alter table approval_queue add column if not exists admin_notes text;
+
+      update agent_tasks
+      set agent_name = coalesce(agent_name, agent_id),
+          input_json = case when input_json = '{}'::jsonb then coalesce(input, '{}'::jsonb) else input_json end,
+          output_json = case when output_json = '{}'::jsonb then coalesce(output, '{}'::jsonb) else output_json end,
+          error_message = coalesce(error_message, error),
+          cost_estimate = case when cost_estimate = 0 then coalesce(cost_estimate_inr, 0) else cost_estimate end
+      where agent_name is null
+         or input_json = '{}'::jsonb
+         or output_json = '{}'::jsonb
+         or error_message is null
+         or cost_estimate = 0;
+
+      update approval_queue
+      set item_type = coalesce(item_type, type),
+          admin_notes = coalesce(admin_notes, notes)
+      where item_type is null or admin_notes is null;
+    `).then(() => undefined);
+  }
+
+  return globalThis.cwiAdminOsTablesReady;
+}
