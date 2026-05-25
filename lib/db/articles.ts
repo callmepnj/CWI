@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
+import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
 import type { ArticleSource, VerificationStatus, WatchCategory, WatchPost } from "@/data/posts";
 
@@ -13,6 +14,7 @@ export async function saveVerificationReport(report: {
   publishRecommendation: string;
 }) {
   await ensureAdminDatabase();
+  const researchPackId = requireUuid(report.researchPackId, "researchPackId");
   const result = await getPool().query<{ id: string }>(
     `
       insert into verification_reports (
@@ -23,7 +25,7 @@ export async function saveVerificationReport(report: {
       returning id;
     `,
     [
-      report.researchPackId,
+      researchPackId,
       report.verificationStatus,
       report.riskLevel,
       JSON.stringify(report.unsafeClaims),
@@ -36,8 +38,13 @@ export async function saveVerificationReport(report: {
 }
 
 export async function getVerificationReport(id: string) {
+  const verificationReportId = optionalUuid(id);
+  if (!verificationReportId) {
+    return null;
+  }
+
   await ensureAdminDatabase();
-  const result = await getPool().query(`select * from verification_reports where id = $1;`, [id]);
+  const result = await getPool().query(`select * from verification_reports where id = $1;`, [verificationReportId]);
   return result.rows[0] ?? null;
 }
 
@@ -62,7 +69,7 @@ export async function saveArticleDraft(article: {
       returning id;
     `,
     [
-      article.researchPackId ?? null,
+      optionalUuid(article.researchPackId),
       article.title,
       article.slug,
       article.category,
@@ -75,13 +82,19 @@ export async function saveArticleDraft(article: {
 }
 
 export async function getArticleDraft(id: string) {
+  const articleDraftId = optionalUuid(id);
+  if (!articleDraftId) {
+    return null;
+  }
+
   await ensureAdminDatabase();
-  const result = await getPool().query(`select * from article_drafts where id = $1;`, [id]);
+  const result = await getPool().query(`select * from article_drafts where id = $1;`, [articleDraftId]);
   return result.rows[0] ?? null;
 }
 
 export async function savePublishedArticle(input: { articleDraftId: string; title: string; slug: string; url: string; category?: string; metadata?: unknown }) {
   await ensureAdminDatabase();
+  const articleDraftId = requireUuid(input.articleDraftId, "articleDraftId");
   const result = await getPool().query<{ id: string }>(
     `
       with updated as (
@@ -105,7 +118,7 @@ export async function savePublishedArticle(input: { articleDraftId: string; titl
       union all
       select id from inserted;
     `,
-    [input.articleDraftId, input.title, input.slug, input.url, input.category ?? "", JSON.stringify(input.metadata ?? {})]
+    [articleDraftId, input.title, input.slug, input.url, input.category ?? "", JSON.stringify(input.metadata ?? {})]
   );
   await getPool().query(
     `
@@ -115,7 +128,7 @@ export async function savePublishedArticle(input: { articleDraftId: string; titl
           updated_at = now()
       where id = $1;
     `,
-    [input.articleDraftId]
+    [articleDraftId]
   );
   return result.rows[0].id;
 }

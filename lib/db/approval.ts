@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
+import { optionalUuid, requireUuid } from "@/lib/db/ids";
 
 export async function saveApprovalItem(input: {
   topic: string;
@@ -33,13 +34,13 @@ export async function saveApprovalItem(input: {
       input.topic,
       input.itemType,
       input.summary,
-      input.researchPackId ?? null,
-      input.verificationReportId ?? null,
-      input.articleDraftId ?? null,
-      input.seoPackId ?? null,
-      input.socialPackId ?? null,
-      input.imagePackId ?? null,
-      input.uiuxAuditId ?? null,
+      optionalUuid(input.researchPackId),
+      optionalUuid(input.verificationReportId),
+      optionalUuid(input.articleDraftId),
+      optionalUuid(input.seoPackId),
+      optionalUuid(input.socialPackId),
+      optionalUuid(input.imagePackId),
+      optionalUuid(input.uiuxAuditId),
       input.verificationStatus,
       input.riskLevel,
       input.sourceCount ?? 0,
@@ -52,6 +53,7 @@ export async function saveApprovalItem(input: {
 
 export async function updateApprovalItem(id: string, status: string, adminNotes?: string) {
   await ensureAdminDatabase();
+  const approvalQueueId = requireUuid(id, "approvalQueueId");
   const result = await getPool().query(
     `
       update approval_queue
@@ -63,7 +65,7 @@ export async function updateApprovalItem(id: string, status: string, adminNotes?
       where id = $1
       returning *;
     `,
-    [id, status, adminNotes ?? ""]
+    [approvalQueueId, status, adminNotes ?? ""]
   );
   return result.rows[0] ?? null;
 }
@@ -78,6 +80,8 @@ export async function attachDraftToApprovalItem(input: {
   adminNotes?: string;
 }) {
   await ensureAdminDatabase();
+  const approvalQueueId = requireUuid(input.approvalQueueId, "approvalQueueId");
+  const articleDraftId = requireUuid(input.articleDraftId, "articleDraftId");
   const result = await getPool().query(
     `
       update approval_queue
@@ -94,11 +98,11 @@ export async function attachDraftToApprovalItem(input: {
       returning *;
     `,
     [
-      input.approvalQueueId,
-      input.articleDraftId,
-      input.seoPackId ?? null,
-      input.socialPackId ?? null,
-      input.imagePackId ?? null,
+      approvalQueueId,
+      articleDraftId,
+      optionalUuid(input.seoPackId),
+      optionalUuid(input.socialPackId),
+      optionalUuid(input.imagePackId),
       input.summary ?? "",
       input.adminNotes ?? "Article draft attached. Review, then use Approve Publish if it is ready."
     ]
@@ -107,7 +111,12 @@ export async function attachDraftToApprovalItem(input: {
 }
 
 export async function getApprovalItem(id: string) {
+  const approvalId = optionalUuid(id);
+  if (!approvalId) {
+    return null;
+  }
+
   await ensureAdminDatabase();
-  const result = await getPool().query(`select * from approval_queue where id = $1;`, [id]);
+  const result = await getPool().query(`select * from approval_queue where id = $1;`, [approvalId]);
   return result.rows[0] ?? null;
 }

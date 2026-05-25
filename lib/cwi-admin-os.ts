@@ -2,6 +2,7 @@ import { getFileVisual, unansweredFiles } from "@/data/unanswered-files";
 import { posts } from "@/data/posts";
 import { getAIProviderConfig } from "@/lib/ai/model-provider";
 import { ensureAdminOsTables, ensureCommentsTable, ensureReportsTable, ensureUnansweredFilesTables, getPool } from "@/lib/db";
+import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
 
 export const monthlyBudgetInr = 8000;
@@ -415,6 +416,7 @@ export async function runAgentAction(action: string) {
 
 export async function updateApprovalStatus(id: string, status: string, notes?: string) {
   await initializeAdminOs();
+  const approvalQueueId = requireUuid(id, "approvalQueueId");
   const safeStatus = clean(status) || "Waiting for Approval";
   const result = await getPool().query(
     `
@@ -427,7 +429,7 @@ export async function updateApprovalStatus(id: string, status: string, notes?: s
       where id = $1
       returning *;
     `,
-    [id, safeStatus, clean(notes)]
+    [approvalQueueId, safeStatus, clean(notes)]
   );
 
   await logTask("publish-ai", `Approval queue status changed to ${safeStatus}`, "completed", 0);
@@ -437,13 +439,14 @@ export async function updateApprovalStatus(id: string, status: string, notes?: s
 
 export async function updateCommentModeration(input: { source: string; id: string; status: string }) {
   const status = ["approved", "rejected", "spam", "pending"].includes(input.status) ? input.status : "pending";
+  const commentId = requireUuid(input.id, "commentId");
 
   if (input.source === "Watch Desk") {
     await ensureCommentsTable();
-    await getPool().query(`update cwi_article_comments set status = $2 where id = $1;`, [input.id, status]);
+    await getPool().query(`update cwi_article_comments set status = $2 where id = $1;`, [commentId, status]);
   } else if (input.source === "India Unanswered Files") {
     await ensureUnansweredFilesTables();
-    await getPool().query(`update cwi_unanswered_comments set status = $2, updated_at = now() where id = $1;`, [input.id, status]);
+    await getPool().query(`update cwi_unanswered_comments set status = $2, updated_at = now() where id = $1;`, [commentId, status]);
   }
 
   await logTask("verify-ai", `Comment moderation: ${status}`, "completed", 0);
@@ -642,6 +645,7 @@ async function createStandaloneArticleDraft() {
 }
 
 async function createVerificationReport(researchPackId: string, status: string, riskLevel: string) {
+  const safeResearchPackId = requireUuid(researchPackId, "researchPackId");
   const result = await getPool().query<{ id: string }>(
     `
       insert into verification_reports (
@@ -652,7 +656,7 @@ async function createVerificationReport(researchPackId: string, status: string, 
       returning id;
     `,
     [
-      researchPackId,
+      safeResearchPackId,
       status,
       riskLevel,
       JSON.stringify(["No claim should be treated as confirmed without reliable source attribution."]),
@@ -691,7 +695,7 @@ async function createArticleDraft(researchPackId: string | null, topic: string, 
       values ($1, $2, $3, 'Watch Desk', $4, $5, $6)
       returning id, slug;
     `,
-    [researchPackId, topic, slug, JSON.stringify(draft), verificationStatus, sourceCount]
+    [optionalUuid(researchPackId), topic, slug, JSON.stringify(draft), verificationStatus, sourceCount]
   );
 
   return result.rows[0];
@@ -711,7 +715,7 @@ async function createSeoPack(articleDraftId: string | null, topic: string, slug:
       returning id;
     `,
     [
-      articleDraftId,
+      optionalUuid(articleDraftId),
       `${topic} - CWI Watch Desk | Cockroach Watch India`,
       `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this public-interest update.`,
       slug,
@@ -742,7 +746,7 @@ async function createSocialPack(articleDraftId: string | null, topic: string, ur
       returning id;
     `,
     [
-      articleDraftId,
+      optionalUuid(articleDraftId),
       `${topic}\n\nCWI is reviewing this public-interest update with source attribution and editorial caution.\n\n${ending}`,
       `${topic}\n\nCockroach Watch India is tracking this topic through a source-backed civic watch lens.\n\n${ending}`,
       `${topic}\n\nCWI is tracking this with source labels and public-interest context.\n${site.url}\n#CWI #IndiaIsWatching`,
@@ -816,11 +820,11 @@ async function createApprovalQueueItem(input: {
       input.verificationStatus,
       input.riskLevel,
       input.sourceCount,
-      input.articleDraftId ?? null,
-      input.seoPackId ?? null,
-      input.socialPackId ?? null,
-      input.imagePackId ?? null,
-      input.uiuxAuditId ?? null,
+      optionalUuid(input.articleDraftId),
+      optionalUuid(input.seoPackId),
+      optionalUuid(input.socialPackId),
+      optionalUuid(input.imagePackId),
+      optionalUuid(input.uiuxAuditId),
       input.suggestedAction
     ]
   );

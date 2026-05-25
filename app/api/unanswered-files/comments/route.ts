@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getFileVisual, getUnansweredFile } from "@/data/unanswered-files";
 import { ensureUnansweredFilesTables, getPool } from "@/lib/db";
+import { optionalUuid } from "@/lib/db/ids";
 
 export const runtime = "nodejs";
 
@@ -103,9 +104,9 @@ export async function POST(request: Request) {
         insert into cwi_unanswered_comments (
           article_id, parent_id, name, email, comment_text, status, ip_hash, user_agent
         )
-        values ($1, nullif($2, '')::uuid, $3, $4, $5, 'pending', $6, $7);
+        values ($1, $2, $3, $4, $5, 'pending', $6, $7);
       `,
-      [slug, parentId, name, email || null, comment, ipHash, request.headers.get("user-agent")]
+      [slug, optionalUuid(parentId), name, email || null, comment, ipHash, request.headers.get("user-agent")]
     );
 
     return NextResponse.json({ ok: true, message: "Comment received. It will appear after moderation." });

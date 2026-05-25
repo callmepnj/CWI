@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
+import { optionalUuid } from "@/lib/db/ids";
 
 export async function saveSocialPack(pack: {
   articleDraftId?: string;
@@ -27,7 +28,7 @@ export async function saveSocialPack(pack: {
       returning id;
     `,
     [
-      pack.articleDraftId ?? null,
+      optionalUuid(pack.articleDraftId),
       pack.instagramCaption,
       pack.facebookCaption,
       pack.xCaption,

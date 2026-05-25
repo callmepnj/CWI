@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
+import { optionalUuid } from "@/lib/db/ids";
 
 export async function saveSeoPack(pack: {
   articleDraftId?: string;
@@ -28,7 +29,7 @@ export async function saveSeoPack(pack: {
       returning id;
     `,
     [
-      pack.articleDraftId ?? null,
+      optionalUuid(pack.articleDraftId),
       pack.seoTitle,
       pack.metaDescription,
       pack.slug,

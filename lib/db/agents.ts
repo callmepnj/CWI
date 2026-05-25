@@ -1,5 +1,6 @@
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { getPool } from "@/lib/db";
+import { requireUuid } from "@/lib/db/ids";
 
 type AgentTaskInput = {
   agentName: string;
@@ -35,6 +36,7 @@ export async function createAgentTask(input: AgentTaskInput) {
 
 export async function completeAgentTask(taskId: string, output: unknown, costEstimate = 0) {
   await ensureAdminDatabase();
+  const agentTaskId = requireUuid(taskId, "taskId");
   const pool = getPool();
   await pool.query(
     `
@@ -48,19 +50,20 @@ export async function completeAgentTask(taskId: string, output: unknown, costEst
           updated_at = now()
       where id = $1;
     `,
-    [taskId, JSON.stringify(output ?? {}), costEstimate]
+    [agentTaskId, JSON.stringify(output ?? {}), costEstimate]
   );
   await pool.query(
     `
       insert into cost_usage_logs (task_id, agent_id, usage_type, estimated_cost_inr)
       select $1, agent_id, task_type, $2 from agent_tasks where id = $1;
     `,
-    [taskId, costEstimate]
+    [agentTaskId, costEstimate]
   );
 }
 
 export async function failAgentTask(taskId: string, error: string, output: unknown = {}) {
   await ensureAdminDatabase();
+  const agentTaskId = requireUuid(taskId, "taskId");
   await getPool().query(
     `
       update agent_tasks
@@ -73,7 +76,7 @@ export async function failAgentTask(taskId: string, error: string, output: unkno
           updated_at = now()
       where id = $1;
     `,
-    [taskId, error, JSON.stringify(output ?? {})]
+    [agentTaskId, error, JSON.stringify(output ?? {})]
   );
 }
 

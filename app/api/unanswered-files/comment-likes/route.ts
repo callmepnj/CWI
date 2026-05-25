@@ -1,12 +1,13 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { ensureUnansweredFilesTables, getPool } from "@/lib/db";
+import { optionalUuid } from "@/lib/db/ids";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-  const commentId = typeof body?.commentId === "string" ? body.commentId.trim() : "";
+  const commentId = optionalUuid(body?.commentId);
 
   if (!commentId) {
     return NextResponse.json({ ok: false, error: "Comment ID is required." }, { status: 400 });

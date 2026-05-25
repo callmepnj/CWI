@@ -188,3 +188,11 @@ Next steps:
 - Reduced public Watch Desk DB fallback noise: if DB is unavailable, `/watch-desk` still serves static posts without logging the full Postgres failure on every public page load.
 - Verification after follow-up: `npm run lint`, `npm run typecheck`, `npm run build`, `npm run validate:unanswered-files`, and `npm run env:check:vercel` pass. A local smoke test confirmed `/watch-desk`, `/watch-desk/what-is-cockroach-janta-party`, `/admin/login`, `/sitemap.xml`, and `/robots.txt` return 200; local admin login returns 200 and dashboard returns degraded setup mode with `aiProvider=not_configured`.
 - Remaining non-code blockers: `npm run db:check` still fails `28P01` because the configured `.env.local` Postgres credentials are invalid; `npm run env:check` still fails because `.env.local` has no valid `AI_PROVIDER`. These require real Supabase and AI provider credentials from the user/Vercel and cannot be fixed in code.
+
+2026-05-25 empty UUID article-click fix:
+- User reported clicking an article shows `invalid input syntax for type uuid: ""`.
+- Root cause class: optional admin/article/comment IDs could flow into PostgreSQL `uuid` columns as empty strings. Postgres rejects `""` before application code can recover.
+- Added `lib/db/ids.ts` with shared UUID normalization/validation. Optional UUID inputs now become `null` unless they are valid UUIDs; required UUID inputs now fail with a clear app error before reaching Postgres.
+- Hardened admin/article DB boundaries: approval queue save/update/get/attach, research pack lookup, verification report save/get, article draft save/get, published article save, SEO/social pack save, agent task complete/fail, legacy admin OS approval/comment helpers, and Unanswered Files comment parent/comment-like IDs.
+- Verification after fix: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run env:check:vercel`, and `npm run build` pass.
+- Remaining environment blocker: `npm run db:check` still fails `28P01`, meaning local Postgres credentials are invalid. The code now avoids empty UUID crashes, but production DB-backed actions still need valid Supabase credentials.

@@ -1,5 +1,6 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
+import { optionalUuid } from "@/lib/db/ids";
 
 export async function saveManualLink(input: {
   url: string;
@@ -80,7 +81,12 @@ export async function saveResearchPack(pack: {
 }
 
 export async function getResearchPack(id: string) {
+  const researchPackId = optionalUuid(id);
+  if (!researchPackId) {
+    return null;
+  }
+
   await ensureAdminDatabase();
-  const result = await getPool().query(`select * from research_packs where id = $1;`, [id]);
+  const result = await getPool().query(`select * from research_packs where id = $1;`, [researchPackId]);
   return result.rows[0] ?? null;
 }
