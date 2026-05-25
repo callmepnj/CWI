@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const officialHost = "cockroachwatchindia.online";
-const legacyHosts = new Set([["cwi-ten", "vercel", "app"].join("."), `www.${officialHost}`]);
+const officialHost = "www.cockroachwatchindia.online";
+const redirectHosts = new Set([["cwi-ten", "vercel", "app"].join("."), "cockroachwatchindia.online"]);
 
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host")?.split(":")[0].toLowerCase();
@@ -16,7 +16,7 @@ export function middleware(request: NextRequest) {
     url.pathname = url.pathname
       .replace("/unanswered-files", "/india-unanswered-files")
       .replace("/indias-unanswered-files", "/india-unanswered-files");
-    if (host && legacyHosts.has(host)) {
+    if (host && redirectHosts.has(host)) {
       url.protocol = "https:";
       url.hostname = officialHost;
       url.port = "";
@@ -24,7 +24,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  if (!host || !legacyHosts.has(host)) {
+  if (!host || !redirectHosts.has(host)) {
     return NextResponse.next();
   }
 

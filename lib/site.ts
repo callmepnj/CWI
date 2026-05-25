@@ -1,7 +1,7 @@
 export const site = {
   name: "Cockroach Watch India",
   shortName: "CWI",
-  url: "https://cockroachwatchindia.online",
+  url: "https://www.cockroachwatchindia.online",
   email: "cockroachwatchindia@gmail.com",
   x: "https://x.com/CWatchIndia",
   instagram: "https://www.instagram.com/cockroachwatchindia/",

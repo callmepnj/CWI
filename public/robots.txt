@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cockroachwatchindia.online/sitemap.xml
+Sitemap: https://www.cockroachwatchindia.online/sitemap.xml

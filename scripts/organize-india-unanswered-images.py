@@ -351,7 +351,7 @@ def main() -> None:
 
     image_index = {
         "section": "India Unanswered Files",
-        "site": "https://cockroachwatchindia.online",
+        "site": "https://www.cockroachwatchindia.online",
         "generatedAt": "2026-05-24",
         "topics": index_topics,
         "review": {

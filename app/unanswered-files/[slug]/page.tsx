@@ -305,7 +305,7 @@ export default async function UnansweredFilePage({ params }: Props) {
               <p className="mt-4 leading-8 text-ink/72">
                 Cockroach Watch India — CWI connects this case file to the wider CWI Watch Desk and the official website at{" "}
                 <Link href="/" className="font-bold text-royal underline-offset-4 hover:underline">
-                  https://cockroachwatchindia.online
+                  https://www.cockroachwatchindia.online
                 </Link>
                 . Submit corrections, source links, and report updates through{" "}
                 <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">

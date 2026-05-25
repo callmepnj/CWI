@@ -5,7 +5,7 @@ Official website codebase for Cockroach Watch India, a founder-led civic watch, 
 Production domain:
 
 ```text
-https://cockroachwatchindia.online
+https://www.cockroachwatchindia.online
 ```
 
 ## Development
@@ -27,14 +27,14 @@ Do not commit `.env.local`.
 ## SEO Launch Checklist
 
 - Add the production site to Google Search Console.
-- Submit `https://cockroachwatchindia.online/sitemap.xml`.
-- Confirm `https://cockroachwatchindia.online/robots.txt` allows crawling.
-- After deploy, submit `https://cockroachwatchindia.online/sitemap.xml` in Google Search Console.
-- Use URL Inspection for `https://cockroachwatchindia.online/`.
-- Use URL Inspection for `https://cockroachwatchindia.online/watch-desk`.
-- Use URL Inspection for `https://cockroachwatchindia.online/india-unanswered-files`.
-- Use URL Inspection for `https://cockroachwatchindia.online/watch`.
-- Use URL Inspection for `https://cockroachwatchindia.online/submit`.
+- Submit `https://www.cockroachwatchindia.online/sitemap.xml`.
+- Confirm `https://www.cockroachwatchindia.online/robots.txt` allows crawling.
+- After deploy, submit `https://www.cockroachwatchindia.online/sitemap.xml` in Google Search Console.
+- Use URL Inspection for `https://www.cockroachwatchindia.online/`.
+- Use URL Inspection for `https://www.cockroachwatchindia.online/watch-desk`.
+- Use URL Inspection for `https://www.cockroachwatchindia.online/india-unanswered-files`.
+- Use URL Inspection for `https://www.cockroachwatchindia.online/watch`.
+- Use URL Inspection for `https://www.cockroachwatchindia.online/submit`.
 - Add the website link to X, Instagram, YouTube, Reddit, Facebook, and other official CWI profiles.
 - Use the consistent public name "Cockroach Watch India" and abbreviation "CWI" across all social bios and posts.
 - Test social previews with the OpenGraph image before major campaigns.
