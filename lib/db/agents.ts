@@ -35,7 +35,8 @@ export async function createAgentTask(input: AgentTaskInput) {
 
 export async function completeAgentTask(taskId: string, output: unknown, costEstimate = 0) {
   await ensureAdminDatabase();
-  await getPool().query(
+  const pool = getPool();
+  await pool.query(
     `
       update agent_tasks
       set status = 'completed',
@@ -46,11 +47,15 @@ export async function completeAgentTask(taskId: string, output: unknown, costEst
           completed_at = now(),
           updated_at = now()
       where id = $1;
-
-      insert into cost_usage_logs (task_id, agent_id, usage_type, estimated_cost_inr)
-      select $1, agent_id, task_type, $3 from agent_tasks where id = $1;
     `,
     [taskId, JSON.stringify(output ?? {}), costEstimate]
+  );
+  await pool.query(
+    `
+      insert into cost_usage_logs (task_id, agent_id, usage_type, estimated_cost_inr)
+      select $1, agent_id, task_type, $2 from agent_tasks where id = $1;
+    `,
+    [taskId, costEstimate]
   );
 }
 

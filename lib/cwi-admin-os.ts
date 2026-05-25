@@ -772,23 +772,32 @@ async function createApprovalQueueItem(input: {
 }
 
 async function logTask(agentId: string, title: string, status: string, costEstimateInr: number, output: Record<string, unknown> = {}) {
-  await getPool().query(
+  const pool = getPool();
+  await pool.query(
     `
       insert into agent_tasks (agent_id, title, task_type, status, priority, output, cost_estimate_inr)
       values ($1, $2, 'admin-workflow', $3, 'normal', $4, $5);
-
-      update agents
-      set last_run_at = now(),
-          tasks_completed = tasks_completed + case when $3 = 'completed' then 1 else 0 end,
-          failed_tasks = failed_tasks + case when $3 = 'failed' then 1 else 0 end,
-          cost_estimate_inr = cost_estimate_inr + $5,
-          updated_at = now()
-      where id = $1;
-
-      insert into cost_usage_logs (agent_id, usage_type, estimated_cost_inr)
-      values ($1, 'template-ai-orchestration', $5);
     `,
     [agentId, title, status, JSON.stringify(output), costEstimateInr]
+  );
+  await pool.query(
+    `
+      update agents
+      set last_run_at = now(),
+          tasks_completed = tasks_completed + case when $2 = 'completed' then 1 else 0 end,
+          failed_tasks = failed_tasks + case when $2 = 'failed' then 1 else 0 end,
+          cost_estimate_inr = cost_estimate_inr + $3,
+          updated_at = now()
+      where id = $1;
+    `,
+    [agentId, status, costEstimateInr]
+  );
+  await pool.query(
+    `
+      insert into cost_usage_logs (agent_id, usage_type, estimated_cost_inr)
+      values ($1, 'template-ai-orchestration', $2);
+    `,
+    [agentId, costEstimateInr]
   );
 }
 
