@@ -28,10 +28,24 @@ function normalizeStatus(status: string) {
   const map: Record<string, string> = {
     "Approve Publish": "approved",
     "Approved Publish": "approved",
+    "Approve Article Only": "approved_article_only",
+    "Approved Article Only": "approved_article_only",
+    "Approve Social Only": "approved_social_only",
+    "Approved Social Only": "approved_social_only",
     "Request Changes": "changes_requested",
+    Reject: "rejected",
     Rejected: "rejected",
+    Archive: "archived",
     Archived: "archived",
-    "Save for Later": "waiting_for_approval"
+    "Save for Later": "waiting_for_approval",
+    approved_publish: "approved",
+    approved: "approved",
+    approved_article_only: "approved_article_only",
+    approved_social_only: "approved_social_only",
+    rejected: "rejected",
+    changes_requested: "changes_requested",
+    archived: "archived",
+    waiting_for_approval: "waiting_for_approval"
   };
   return map[status] || status;
 }

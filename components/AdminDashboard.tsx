@@ -477,7 +477,12 @@ function ApprovalSection({
       {data.approvals.length === 0 ? (
         <Card><p className="font-bold text-ink/64">No approval cards yet.</p></Card>
       ) : (
-        data.approvals.map((item) => (
+        data.approvals.map((item) => {
+          const status = text(item.status);
+          const articleReady = Boolean(item.article_draft_id);
+          const canPublish = status === "approved" && articleReady;
+
+          return (
           <Card key={text(item.id)}>
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -497,22 +502,42 @@ function ApprovalSection({
               <MiniMetric label="SEO/Social" value={`${item.seo_pack_id ? "SEO" : "-"} / ${item.social_pack_id ? "Social" : "-"}`} />
             </div>
             <p className="mt-4 rounded-2xl bg-paper p-4 text-sm font-semibold leading-6 text-ink/70">{text(item.suggested_action)}</p>
+            {!articleReady ? (
+              <p className="mt-3 rounded-2xl border border-saffron/30 bg-saffron/10 p-3 text-sm font-bold leading-6 text-[#8A5B00]">
+                Publish AI is unavailable for this item because no article draft is attached. Use Article AI or approve it as social/research only.
+              </p>
+            ) : status !== "approved" ? (
+              <p className="mt-3 rounded-2xl border border-line bg-skywash p-3 text-sm font-bold leading-6 text-royal">
+                Publish AI unlocks only after this card is marked approved with Approve Publish.
+              </p>
+            ) : null}
             <div className="mt-5 flex flex-wrap gap-2">
-              {["Approve Publish", "Approve Social Only", "Approve Article Only", "Request Changes", "Rejected", "Save for Later", "Archived"].map((status) => (
-                <Button key={status} type="button" size="sm" variant={status.startsWith("Approve") ? "default" : "outline"} disabled={pending === `${text(item.id)}:${status}`} onClick={() => updateApproval(text(item.id), status)}>
-                  {status}
+              {approvalActions.map((action) => (
+                <Button key={action.status} type="button" size="sm" variant={action.status === "approved" ? "default" : "outline"} disabled={pending === `${text(item.id)}:${action.status}`} onClick={() => updateApproval(text(item.id), action.status)}>
+                  {action.label}
                 </Button>
               ))}
-              <Button type="button" size="sm" disabled={pending === `${text(item.id)}:publish`} onClick={() => publishApproval(text(item.id))}>
+              <Button type="button" size="sm" disabled={!canPublish || pending === `${text(item.id)}:publish`} onClick={() => publishApproval(text(item.id))}>
                 {pending === `${text(item.id)}:publish` ? "Publishing..." : "Run Publish AI"}
               </Button>
             </div>
           </Card>
-        ))
+          );
+        })
       )}
     </div>
   );
 }
+
+const approvalActions = [
+  { label: "Approve Publish", status: "approved" },
+  { label: "Approve Social Only", status: "approved_social_only" },
+  { label: "Approve Article Only", status: "approved_article_only" },
+  { label: "Request Changes", status: "changes_requested" },
+  { label: "Reject", status: "rejected" },
+  { label: "Save for Later", status: "waiting_for_approval" },
+  { label: "Archive", status: "archived" }
+] as const;
 
 function ManualLinkSection({ onComplete }: { onComplete: () => Promise<void> }) {
   const [pending, setPending] = useState(false);

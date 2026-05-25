@@ -21,7 +21,10 @@ const statusMap: Record<string, string> = {
   changes_requested: "changes_requested",
   published: "published",
   archived: "archived",
-  waiting_for_approval: "waiting_for_approval"
+  waiting_for_approval: "waiting_for_approval",
+  approved_publish: "approved",
+  approved_article_only: "approved_article_only",
+  approved_social_only: "approved_social_only"
 };
 
 export async function PATCH(request: Request) {
