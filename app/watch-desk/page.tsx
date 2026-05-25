@@ -5,7 +5,10 @@ import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { WatchDeskGrid } from "@/components/WatchDeskGrid";
 import { Card, CardLabel } from "@/components/ui/card";
 import { posts, trendingTopics } from "@/data/posts";
+import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { createMetadata } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
 
 const newsroomStats = [
   { label: "Watch Desk Articles", value: `${posts.length}+`, Icon: Newspaper },
@@ -21,8 +24,9 @@ export const metadata = createMetadata({
   path: "/watch-desk"
 });
 
-export default function WatchDeskPage() {
-  const dateSortedPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date));
+export default async function WatchDeskPage() {
+  const publishedPosts = await getPublishedWatchPosts().catch(() => []);
+  const dateSortedPosts = mergePosts([...publishedPosts, ...posts]).sort((first, second) => dateValue(second.date) - dateValue(first.date));
   const featured = dateSortedPosts[0];
   const highlights = dateSortedPosts.slice(1, 4);
 
@@ -80,4 +84,8 @@ export default function WatchDeskPage() {
 
 function dateValue(value: string) {
   return new Date(`${value}T00:00:00+05:30`).getTime();
+}
+
+function mergePosts<T extends { slug: string }>(items: T[]) {
+  return Array.from(new Map(items.map((item) => [item.slug, item])).values());
 }

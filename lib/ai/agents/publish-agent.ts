@@ -33,7 +33,7 @@ export async function runPublishAgent(approvalQueueId: string) {
     category: articleDraft.category,
     metadata: {
       approvalQueueId,
-      note: "Published to CWI admin database. Static website content updates still require a deploy step."
+      note: "Published to the CWI admin database and served by the dynamic Watch Desk public route."
     }
   });
 
@@ -42,12 +42,13 @@ export async function runPublishAgent(approvalQueueId: string) {
   return {
     publishedArticleId,
     articleUrl: url,
-    sitemapStatus: "Needs deploy/regeneration if this article should become a static public page.",
+    sitemapStatus: "Dynamic public route is live immediately. Static sitemap regeneration is still recommended before major deploys.",
     metadataStatus: "SEO pack remains attached to approval item.",
-    buildStatus: "Not run by API route.",
+    buildStatus: "Not required for dynamic public visibility.",
     deploymentChecklist: [
       "Review published article row.",
-      "If public static page is needed, merge the article into the site content system.",
+      "Open the public article URL and review formatting.",
+      "If this should be permanent static seed content, merge the article into the site content system later.",
       "Run npm run build before deploy.",
       "Inspect the final URL in Google Search Console."
     ]

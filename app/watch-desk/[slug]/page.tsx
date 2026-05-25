@@ -11,6 +11,7 @@ import { VerificationBadge } from "@/components/VerificationBadge";
 import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { Card, CardLabel } from "@/components/ui/card";
 import { posts } from "@/data/posts";
+import { getPublishedWatchPostBySlug } from "@/lib/db/articles";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 import { slugifyTopic } from "@/lib/taxonomy";
@@ -28,7 +29,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = posts.find((item) => item.slug === slug);
+  const post =
+    posts.find((item) => item.slug === slug) ??
+    (await getPublishedWatchPostBySlug(slug).catch(() => null));
 
   if (!post) {
     return createMetadata({
@@ -148,7 +151,9 @@ function jsonLdForPost(post: (typeof posts)[number]) {
 
 export default async function WatchPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = posts.find((item) => item.slug === slug);
+  const post =
+    posts.find((item) => item.slug === slug) ??
+    (await getPublishedWatchPostBySlug(slug).catch(() => null));
 
   if (!post) {
     notFound();

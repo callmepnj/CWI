@@ -1,5 +1,6 @@
 import { getFileVisual, unansweredFiles } from "@/data/unanswered-files";
 import { posts } from "@/data/posts";
+import { getAIProviderConfig } from "@/lib/ai/model-provider";
 import { ensureAdminOsTables, ensureCommentsTable, ensureReportsTable, ensureUnansweredFilesTables, getPool } from "@/lib/db";
 import { site } from "@/lib/site";
 
@@ -217,6 +218,7 @@ async function buildAdminDashboardData() {
       estimatedMonthlyCost,
       safeMode: estimatedMonthlyCost > monthlyBudgetInr * 0.8
     },
+    ai: publicAiConfig(),
     counts: {
       totalArticles: posts.length + unansweredFiles.length,
       pendingApprovals,
@@ -243,6 +245,21 @@ async function buildAdminDashboardData() {
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
     latestPublicArticles: posts.slice(0, 6).map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),
     latestUnansweredFiles: unansweredFiles.slice(0, 6).map((file) => ({ title: file.title, href: `/india-unanswered-files/${file.slug}`, category: file.category }))
+  };
+}
+
+function publicAiConfig() {
+  const config = getAIProviderConfig();
+  return {
+    provider: config.provider,
+    model: config.model,
+    configured: config.configured,
+    productionReady: config.provider === "openai" || config.provider === "gemini",
+    message: config.configured
+      ? config.provider === "mock"
+        ? "Mock mode is active. Use only for local testing, not real editorial output."
+        : "Real AI provider is configured."
+      : config.error
   };
 }
 

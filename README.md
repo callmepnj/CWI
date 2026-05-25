@@ -15,6 +15,13 @@ npm install
 npm run dev
 ```
 
+Check local and Vercel-style environment files without printing secrets:
+
+```bash
+npm run env:check
+npm run env:check:vercel
+```
+
 Required server environment variables:
 
 ```env
@@ -36,6 +43,7 @@ Do not commit `.env.local`.
 - Agents prepare research packs, drafts, SEO packs, social packs, image notes, UI/UX audits, and approval cards.
 - Nothing publishes automatically. Approval queue actions are required before any public update.
 - Set `AI_PROVIDER` to `openai` or `gemini` in production and add the matching server-side API key. `mock` is only for labelled local testing and must not be treated as real editorial output.
+- `npm run env:check:vercel` validates the placeholder template syntax. After replacing placeholders in your deployment environment, use the same rules as `npm run env:check:production` before launch. Keep `vercel.env` as a placeholder template only; never paste real keys into tracked files.
 - If an AI provider key is missing, the dashboard returns a visible configuration error instead of silently generating fake output.
 - The low-cost operating target is INR 8,000/month with a daily target around INR 250. The system uses manual links, RSS/source lists, templates, caching, and approval-first workflows instead of paid social APIs or expensive crawlers.
 

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
 import { posts } from "@/data/posts";
 import { getUnansweredFile } from "@/data/unanswered-files";
+import { getPublishedWatchPostBySlug } from "@/lib/db/articles";
 import { ensureArticleRatingsTable, getPool } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
   const articleType = cleanString(searchParams.get("type")) as ArticleType;
   const slug = cleanString(searchParams.get("slug"));
 
-  if (!isValidArticle(articleType, slug)) {
+  if (!(await isValidArticle(articleType, slug))) {
     return NextResponse.json({ ok: false, error: "Article not found." }, { status: 404 });
   }
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
   const slug = cleanString(body?.slug);
   const rating = Number(body?.rating);
 
-  if (!isValidArticle(articleType, slug)) {
+  if (!(await isValidArticle(articleType, slug))) {
     return NextResponse.json({ ok: false, error: "Article not found." }, { status: 404 });
   }
 
@@ -96,13 +97,19 @@ async function getRatingSummary(articleType: ArticleType, slug: string, ipHash: 
   };
 }
 
-function isValidArticle(articleType: ArticleType, slug: string) {
+async function isValidArticle(articleType: ArticleType, slug: string) {
   if (!slug) {
     return false;
   }
 
   if (articleType === "watch-desk") {
-    return posts.some((post) => post.slug === slug);
+    if (posts.some((post) => post.slug === slug)) {
+      return true;
+    }
+
+    return Boolean(
+      await getPublishedWatchPostBySlug(slug).catch(() => null)
+    );
   }
 
   if (articleType === "unanswered-files") {

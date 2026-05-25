@@ -35,6 +35,13 @@ function buildSetupModeDashboard() {
       estimatedMonthlyCost: 0,
       safeMode: false
     },
+    ai: {
+      provider: process.env.AI_PROVIDER || "not_configured",
+      model: process.env.AI_MODEL || "not_configured",
+      configured: false,
+      productionReady: false,
+      message: "AI configuration was not checked because the database connection failed first."
+    },
     counts: {
       totalArticles: 0,
       pendingApprovals: 0,

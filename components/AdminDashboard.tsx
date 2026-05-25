@@ -37,6 +37,13 @@ type AdminData = {
     estimatedMonthlyCost: number;
     safeMode: boolean;
   };
+  ai: {
+    provider: string;
+    model: string;
+    configured: boolean;
+    productionReady: boolean;
+    message: string;
+  };
   counts: Record<string, number>;
   agents: AdminRecord[];
   approvals: AdminRecord[];
@@ -97,6 +104,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
   const [message, setMessage] = useState("");
   const [degradedMessage, setDegradedMessage] = useState("");
   const [pending, setPending] = useState("");
+  const [progress, setProgress] = useState<{ label: string; detail: string; percent: number } | null>(null);
   const [currentSection, setCurrentSection] = useState(activeSection);
 
   const safeSection = normalizeSection(currentSection);
@@ -117,6 +125,25 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  useEffect(() => {
+    if (!pending) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setProgress((current) => {
+        if (!current || current.percent >= 92) {
+          return current;
+        }
+
+        const nextPercent = current.percent + Math.max(1, Math.round((92 - current.percent) * 0.14));
+        return { ...current, percent: Math.min(92, nextPercent) };
+      });
+    }, 700);
+
+    return () => window.clearInterval(timer);
+  }, [pending]);
 
   async function loadDashboard(force = false) {
     setError("");
@@ -159,6 +186,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
   async function runAction(action: string) {
     setPending(action);
+    startProgress(`Running ${actionLabel(action)}`, "CWI bot is preparing output for review.");
     setMessage("");
     setError("");
 
@@ -173,15 +201,18 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? json?.message ?? "Agent action failed.");
+      failProgress("Agent action failed.");
       return;
     }
 
     setMessage(json.message ?? "Agent action completed.");
+    finishProgress("Agent action completed.");
     await loadDashboard(true);
   }
 
   async function updateApproval(id: string, status: string) {
     setPending(`${id}:${status}`);
+    startProgress(`Updating approval: ${status}`, "Saving approval status.");
     setMessage("");
     setError("");
 
@@ -195,15 +226,18 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Approval update failed.");
+      failProgress("Approval update failed.");
       return;
     }
 
     setMessage(`Approval queue updated: ${status}`);
-    await loadDashboard(true);
+    updateApprovalInState(json.data);
+    finishProgress("Approval updated.");
   }
 
   async function publishApproval(id: string) {
     setPending(`${id}:publish`);
+    startProgress("Publishing approved article", "Publish AI is saving the article and opening the public Watch Desk route.");
     setMessage("");
     setError("");
 
@@ -217,16 +251,20 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Publish AI failed.");
+      failProgress("Publish AI failed.");
       return;
     }
 
-    setMessage(json.message ?? "Publish AI completed.");
-    await loadDashboard(true);
+    const articleUrl = text(json.data?.articleUrl);
+    setMessage(articleUrl ? `${json.message ?? "Publish AI completed."} Public URL: ${articleUrl}` : json.message ?? "Publish AI completed.");
+    markApprovalPublished(id);
+    finishProgress("Public Watch Desk route is ready.");
   }
 
   async function generateArticleForApproval(item: AdminRecord) {
     const id = text(item.id);
     setPending(`${id}:article`);
+    startProgress("Generating article draft", "Article AI is drafting from the research and verification pack.");
     setMessage("");
     setError("");
 
@@ -244,15 +282,18 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Article draft could not be generated for this approval item.");
+      failProgress("Article draft generation failed.");
       return;
     }
 
     setMessage(json.message ?? "Article draft attached. Review it, then use Approve Publish.");
-    await loadDashboard(true);
+    updateApprovalInState(json.data?.updatedApproval);
+    finishProgress("Article draft attached.");
   }
 
   async function updateComment(source: string, id: string, status: string) {
     setPending(`${id}:${status}`);
+    startProgress(`Moderating comment: ${status}`, "Saving comment moderation decision.");
     setMessage("");
     setError("");
 
@@ -266,11 +307,60 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Comment update failed.");
+      failProgress("Comment update failed.");
       return;
     }
 
     setMessage(`Comment marked ${status}.`);
+    finishProgress("Comment moderation saved.");
     await loadDashboard(true);
+  }
+
+  function startProgress(label: string, detail: string) {
+    setProgress({ label, detail, percent: 8 });
+  }
+
+  function finishProgress(detail: string) {
+    setProgress((current) => (current ? { ...current, detail, percent: 100 } : current));
+    window.setTimeout(() => setProgress(null), 900);
+  }
+
+  function failProgress(detail: string) {
+    setProgress((current) => (current ? { ...current, detail, percent: 100 } : current));
+    window.setTimeout(() => setProgress(null), 1400);
+  }
+
+  function updateApprovalInState(updated: unknown) {
+    const updatedRecord = updated && typeof updated === "object" ? (updated as AdminRecord) : null;
+    const updatedId = text(updatedRecord?.id);
+
+    if (!updatedRecord || !updatedId) {
+      return;
+    }
+
+    setData((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        approvals: current.approvals.map((item) =>
+          text(item.id) === updatedId ? { ...item, ...updatedRecord } : item
+        )
+      };
+    });
+  }
+
+  function markApprovalPublished(id: string) {
+    setData((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        approvals: current.approvals.map((item) =>
+          text(item.id) === id ? { ...item, status: "published" } : item
+        )
+      };
+    });
   }
 
   return (
@@ -332,6 +422,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
           {message ? <p className="rounded-2xl bg-leaf/10 p-4 text-sm font-bold text-[#047766]">{message}</p> : null}
           {degradedMessage ? <p className="rounded-2xl border border-saffron/30 bg-saffron/15 p-4 text-sm font-bold leading-6 text-[#8A5B00]">{degradedMessage}</p> : null}
           {error ? <p className="rounded-2xl bg-urgent/10 p-4 text-sm font-bold text-urgent">{error}</p> : null}
+          {progress ? <ProgressNotice progress={progress} /> : null}
           {!data ? (
             <Card>
               <CardLabel>Loading</CardLabel>
@@ -415,7 +506,8 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
     ["SEO packs", data.counts.seoPacksReady, TrendingUp],
     ["Social packs", data.counts.socialPacksReady, MessageSquare],
     ["UI/UX issues", data.counts.uiuxIssuesFound, Sparkles],
-    ["Monthly cost", `₹${number(data.budget.estimatedMonthlyCost)}`, WalletCards]
+    ["Monthly cost", `₹${number(data.budget.estimatedMonthlyCost)}`, WalletCards],
+    ["AI provider", data.ai.configured ? data.ai.provider : "Not configured", Bot]
   ] as const;
 
   return (
@@ -711,10 +803,38 @@ function SettingsSection({ data }: { data: AdminData }) {
         <MiniMetric label="Daily target cap" value={`₹${number(data.budget.dailyCapInr)}`} />
         <MiniMetric label="Auto-publish" value="Disabled" />
         <MiniMetric label="Discovery sources" value="RSS, manual links, YouTube RSS, sitemaps, user reports" />
+        <MiniMetric label="AI provider" value={data.ai.provider} />
+        <MiniMetric label="AI model" value={data.ai.model} />
+        <MiniMetric label="AI configured" value={data.ai.configured ? "Yes" : "No"} />
+        <MiniMetric label="Production AI ready" value={data.ai.productionReady ? "Yes" : "No"} />
       </div>
+      <p className={`mt-5 rounded-2xl p-4 text-sm font-bold leading-6 ${data.ai.productionReady ? "bg-leaf/10 text-[#047766]" : "bg-saffron/15 text-[#8A5B00]"}`}>
+        {data.ai.message}
+      </p>
       <p className="mt-5 leading-7 text-ink/70">
         No paid X API, Instagram API, paid crawler, hardcoded credentials, or automatic high-volume crawling is required. Expensive calls should be paused when budget pressure is high.
       </p>
+    </Card>
+  );
+}
+
+function ProgressNotice({ progress }: { progress: { label: string; detail: string; percent: number } }) {
+  return (
+    <Card className="border-royal/20 bg-gradient-to-br from-white to-skywash">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <CardLabel>Bot progress</CardLabel>
+          <h2 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">{progress.label}</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-ink/68">{progress.detail}</p>
+        </div>
+        <p className="font-display text-4xl font-black text-royal">{progress.percent}%</p>
+      </div>
+      <div className="mt-5 h-3 overflow-hidden rounded-full bg-white ring-1 ring-royal/15">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-royal via-leaf to-saffron transition-all duration-500"
+          style={{ width: `${progress.percent}%` }}
+        />
+      </div>
     </Card>
   );
 }
@@ -924,6 +1044,11 @@ function actionRequest(action: string) {
   }
 
   return { endpoint: "/api/admin/agent-actions", body: { action } };
+}
+
+function actionLabel(action: string) {
+  const match = agentActions.find(([id]) => id === action);
+  return match?.[1] ?? action.replace(/-/g, " ");
 }
 
 function normalizeSection(value: string): SectionId {

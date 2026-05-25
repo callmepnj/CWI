@@ -12,6 +12,9 @@
     "typecheck": "tsc --noEmit",
     "type-check": "tsc --noEmit",
     "db:check": "node scripts/check-db.mjs",
+    "env:check": "node scripts/validate-env.mjs .env.local",
+    "env:check:vercel": "node scripts/validate-env.mjs vercel.env --allow-placeholders",
+    "env:check:production": "node scripts/validate-env.mjs vercel.env",
     "validate:unanswered-files": "node scripts/validate-unanswered-files.js"
   },
   "dependencies": {
