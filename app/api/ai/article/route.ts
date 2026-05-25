@@ -2,7 +2,7 @@ import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
 import { runArticleAgent } from "@/lib/ai/agents/article-agent";
 import { getPool } from "@/lib/db";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
-import { saveApprovalItem } from "@/lib/db/approval";
+import { attachDraftToApprovalItem, getApprovalItem, saveApprovalItem } from "@/lib/db/approval";
 import { saveArticleDraft } from "@/lib/db/articles";
 
 export const runtime = "nodejs";
@@ -11,12 +11,17 @@ export async function POST(request: Request) {
   const blocked = requireAdminApi(request);
   if (blocked) return blocked;
 
-  const body = (await request.json().catch(() => null)) as { researchPackId?: string; verificationReportId?: string } | null;
+  const body = (await request.json().catch(() => null)) as {
+    approvalQueueId?: string;
+    researchPackId?: string;
+    verificationReportId?: string;
+  } | null;
 
   try {
-    const researchPackId = body?.researchPackId || (await latestId("research_packs"));
+    const approvalItem = body?.approvalQueueId ? await getApprovalItem(body.approvalQueueId) : null;
+    const researchPackId = body?.researchPackId || approvalItem?.research_pack_id || (await latestId("research_packs"));
     if (!researchPackId) return fail(new Error("No research pack found. Run Research AI first."), 400);
-    const verificationReportId = body?.verificationReportId || (await latestId("verification_reports"));
+    const verificationReportId = body?.verificationReportId || approvalItem?.verification_report_id || (await latestId("verification_reports"));
 
     const taskId = await createAgentTask({ agentName: "CWI Article AI", taskType: "article_draft", input: { researchPackId, verificationReportId } });
     try {
@@ -32,6 +37,18 @@ export async function POST(request: Request) {
         verificationStatus: "Developing",
         sourceCount: article.sources.length
       });
+
+      if (approvalItem?.id) {
+        const updatedApproval = await attachDraftToApprovalItem({
+          approvalQueueId: approvalItem.id,
+          articleDraftId,
+          summary: article.summary,
+          adminNotes: "Article AI attached a draft to this approval item. Review it, then use Approve Publish if ready."
+        });
+
+        return ok({ articleDraftId, approvalQueueId: updatedApproval?.id, article, updatedApproval }, "Article draft attached to this approval item.");
+      }
+
       const approvalQueueId = await saveApprovalItem({
         topic: article.title,
         itemType: "Article Draft",

@@ -68,6 +68,44 @@ export async function updateApprovalItem(id: string, status: string, adminNotes?
   return result.rows[0] ?? null;
 }
 
+export async function attachDraftToApprovalItem(input: {
+  approvalQueueId: string;
+  articleDraftId: string;
+  seoPackId?: string;
+  socialPackId?: string;
+  imagePackId?: string;
+  summary?: string;
+  adminNotes?: string;
+}) {
+  await ensureAdminDatabase();
+  const result = await getPool().query(
+    `
+      update approval_queue
+      set article_draft_id = $2,
+          seo_pack_id = coalesce($3, seo_pack_id),
+          social_pack_id = coalesce($4, social_pack_id),
+          image_pack_id = coalesce($5, image_pack_id),
+          summary = coalesce(nullif($6, ''), summary),
+          status = 'waiting_for_approval',
+          notes = coalesce(nullif($7, ''), notes),
+          admin_notes = coalesce(nullif($7, ''), admin_notes),
+          updated_at = now()
+      where id = $1
+      returning *;
+    `,
+    [
+      input.approvalQueueId,
+      input.articleDraftId,
+      input.seoPackId ?? null,
+      input.socialPackId ?? null,
+      input.imagePackId ?? null,
+      input.summary ?? "",
+      input.adminNotes ?? "Article draft attached. Review, then use Approve Publish if it is ready."
+    ]
+  );
+  return result.rows[0] ?? null;
+}
+
 export async function getApprovalItem(id: string) {
   await ensureAdminDatabase();
   const result = await getPool().query(`select * from approval_queue where id = $1;`, [id]);

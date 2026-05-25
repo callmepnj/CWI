@@ -224,6 +224,33 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     await loadDashboard(true);
   }
 
+  async function generateArticleForApproval(item: AdminRecord) {
+    const id = text(item.id);
+    setPending(`${id}:article`);
+    setMessage("");
+    setError("");
+
+    const response = await fetch("/api/ai/article", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        approvalQueueId: id,
+        researchPackId: item.research_pack_id,
+        verificationReportId: item.verification_report_id
+      })
+    }).catch(() => null);
+    const json = await response?.json().catch(() => null);
+    setPending("");
+
+    if (!response?.ok || !json?.ok) {
+      setError(json?.error ?? "Article draft could not be generated for this approval item.");
+      return;
+    }
+
+    setMessage(json.message ?? "Article draft attached. Review it, then use Approve Publish.");
+    await loadDashboard(true);
+  }
+
   async function updateComment(source: string, id: string, status: string) {
     setPending(`${id}:${status}`);
     setMessage("");
@@ -319,6 +346,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
               refresh={() => loadDashboard(true)}
               updateApproval={updateApproval}
               publishApproval={publishApproval}
+              generateArticleForApproval={generateArticleForApproval}
               updateComment={updateComment}
             />
           )}
@@ -336,6 +364,7 @@ function AdminSection({
   refresh,
   updateApproval,
   publishApproval,
+  generateArticleForApproval,
   updateComment
 }: {
   section: string;
@@ -345,10 +374,21 @@ function AdminSection({
   refresh: () => Promise<void>;
   updateApproval: (id: string, status: string) => Promise<void>;
   publishApproval: (id: string) => Promise<void>;
+  generateArticleForApproval: (item: AdminRecord) => Promise<void>;
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
   if (section === "agents") return <AgentsSection data={data} pending={pending} runAction={runAction} />;
-  if (section === "approval") return <ApprovalSection data={data} pending={pending} updateApproval={updateApproval} publishApproval={publishApproval} />;
+  if (section === "approval") {
+    return (
+      <ApprovalSection
+        data={data}
+        pending={pending}
+        updateApproval={updateApproval}
+        publishApproval={publishApproval}
+        generateArticleForApproval={generateArticleForApproval}
+      />
+    );
+  }
   if (section === "manual-link") return <ManualLinkSection onComplete={refresh} />;
   if (section === "research-packs") return <RecordList title="Research Packs" records={data.researchPacks} fields={["topic", "category", "source_confidence", "status", "source_count"]} />;
   if (section === "articles") return <RecordList title="Articles" records={data.articleDrafts} fields={["title", "slug", "category", "verification_status", "approval_status", "publish_status"]} />;
@@ -458,12 +498,14 @@ function ApprovalSection({
   data,
   pending,
   updateApproval,
-  publishApproval
+  publishApproval,
+  generateArticleForApproval
 }: {
   data: AdminData;
   pending: string;
   updateApproval: (id: string, status: string) => Promise<void>;
   publishApproval: (id: string) => Promise<void>;
+  generateArticleForApproval: (item: AdminRecord) => Promise<void>;
 }) {
   return (
     <div className="space-y-5">
@@ -480,6 +522,7 @@ function ApprovalSection({
         data.approvals.map((item) => {
           const status = text(item.status);
           const articleReady = Boolean(item.article_draft_id);
+          const canGenerateArticle = Boolean(item.research_pack_id) && !articleReady;
           const canPublish = status === "approved" && articleReady;
 
           return (
@@ -504,7 +547,7 @@ function ApprovalSection({
             <p className="mt-4 rounded-2xl bg-paper p-4 text-sm font-semibold leading-6 text-ink/70">{text(item.suggested_action)}</p>
             {!articleReady ? (
               <p className="mt-3 rounded-2xl border border-saffron/30 bg-saffron/10 p-3 text-sm font-bold leading-6 text-[#8A5B00]">
-                Publish AI is unavailable for this item because no article draft is attached. Use Article AI or approve it as social/research only.
+                Publish AI is unavailable because no article draft is attached. Generate an article draft for this card, or approve it as social/research only.
               </p>
             ) : status !== "approved" ? (
               <p className="mt-3 rounded-2xl border border-line bg-skywash p-3 text-sm font-bold leading-6 text-royal">
@@ -517,6 +560,11 @@ function ApprovalSection({
                   {action.label}
                 </Button>
               ))}
+              {canGenerateArticle ? (
+                <Button type="button" size="sm" variant="outline" disabled={pending === `${text(item.id)}:article`} onClick={() => generateArticleForApproval(item)}>
+                  {pending === `${text(item.id)}:article` ? "Generating..." : "Generate Article Draft"}
+                </Button>
+              ) : null}
               <Button type="button" size="sm" disabled={!canPublish || pending === `${text(item.id)}:publish`} onClick={() => publishApproval(text(item.id))}>
                 {pending === `${text(item.id)}:publish` ? "Publishing..." : "Run Publish AI"}
               </Button>
