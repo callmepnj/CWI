@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       result,
       result.contentDestination === "live_newsroom"
         ? "Approved article is published and available on the public CWI Live Newsroom route."
-        : "Approved article is published and available on the public CWI Watch Desk route."
+        : "Approved item is published and available on the public CWI Live Newsroom route."
     );
   } catch (error) {
     console.error("CWI Publish Gate failed", error);

@@ -211,11 +211,11 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 export async function runTopicToArticle(input: TopicToArticleInput) {
   const contentDestination = normalizeContentDestination(input.contentDestination);
   return runManualLinkToApproval({
-    url: input.url || `${site.url}/${contentDestination === "live_newsroom" ? "live-newsroom" : "watch-desk"}`,
+    url: input.url || `${site.url}/${contentDestination === "archive" ? "archive" : "live-newsroom"}`,
     topic: input.topic,
     platform: "Manual Topic",
     notes: input.sourceNotes,
-    contentType: input.category || (contentDestination === "live_newsroom" ? "Live Newsroom" : "Watch Desk"),
+    contentType: input.category || (contentDestination === "archive" ? "Archive" : "Live Newsroom"),
     contentDestination
   });
 }
@@ -304,6 +304,9 @@ export async function runPublishApprovedItem(approvalQueueId: string) {
   await setWorkflowStep(workflowId, "publishing", "running");
   try {
     const result = await runTask("CWI Publish Gate", "publish_approved_item", { approvalQueueId }, () => runPublishAgent(approvalQueueId), false);
+    if (!result) {
+      throw new Error("Publish workflow failed before returning a publish report.");
+    }
     await setWorkflowStep(workflowId, "publishing", "completed", result);
     await setWorkflowStep(workflowId, "published", "completed", result);
     await completeWorkflow({
@@ -439,7 +442,8 @@ function categoryFromContentType(value?: string, destination: ContentDestination
   if (lower.includes("advisory")) return "Public Advisory";
   if (lower.includes("social")) return "Social Pack";
   if (destination === "live_newsroom") return "Live Newsroom";
-  return "Watch Desk";
+  if (destination === "archive") return "Archive";
+  return "Live Newsroom";
 }
 
 function clean(value?: unknown) {

@@ -36,6 +36,7 @@ export default async function LiveNewsroomPage() {
   const topItems = items.slice(0, 6);
   const developing = items.filter((item) => ["Developing", "Reported", "Public Advisory"].includes(item.verificationStatus)).slice(0, 6);
   const sourceBacked = items.filter((item) => ["Verified", "Source-backed"].includes(item.verificationStatus)).slice(0, 6);
+  const corrections = items.filter((item) => item.verificationStatus === "Correction" || item.category === "Corrections").slice(0, 4);
   const unanswered = items.filter((item) => item.category === "India Unanswered Files");
   const advisories = items.filter((item) => item.verificationStatus === "Public Advisory" || item.category === "Public Advisory").slice(0, 4);
   const timelineItems = items.flatMap((item) => item.timeline.slice(0, 2).map((event) => ({ ...event, slug: item.slug, title: event.title || item.title }))).slice(0, 10);
@@ -85,14 +86,14 @@ export default async function LiveNewsroomPage() {
               <Link className="rounded-full border border-line bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-royal" href="/live-newsroom#india-unanswered-files">
                 View India Unanswered Files
               </Link>
-              <Link className="rounded-full border border-line bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-royal" href="/watch-desk">
-                Read Watch Desk
+              <Link className="rounded-full border border-line bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-royal" href="/archive">
+                Browse Archive
               </Link>
             </div>
           </div>
           <div className="rounded-[2rem] border border-line bg-gradient-to-br from-skywash via-white to-[#F6FFF9] p-6 shadow-card">
             <p className="font-mono text-[0.7rem] font-black uppercase tracking-[0.16em] text-royal">
-              LIVE UPDATES | SOURCE-BACKED | VERIFY BEFORE SHARING | PUBLIC MEMORY | INDIA IS WATCHING
+              LIVE UPDATES • SOURCE-BACKED • VERIFY BEFORE SHARING • PUBLIC MEMORY • INDIA IS WATCHING
             </p>
             <div className="mt-6 grid gap-4">
               {topItems.slice(0, 3).map((item) => (
@@ -106,6 +107,10 @@ export default async function LiveNewsroomPage() {
           </div>
         </div>
       </section>
+
+      <NewsroomSection title="Lead Story" subtitle="The first source-backed update CWI is asking readers to inspect carefully.">
+        <CardGrid items={topItems.slice(0, 1)} />
+      </NewsroomSection>
 
       <NewsroomSection title="Top Live Updates" subtitle="High-priority published Live Newsroom items.">
         <CardGrid items={topItems} />
@@ -171,6 +176,22 @@ export default async function LiveNewsroomPage() {
         </div>
       </section>
 
+      <NewsroomSection title="Corrections & Clarifications" subtitle="Public correction notes and clarification records from the CWI Editorial Desk.">
+        {corrections.length ? (
+          <CardGrid items={corrections} />
+        ) : (
+          <div className="rounded-[1.5rem] border border-line bg-white p-6 shadow-card">
+            <p className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">No public correction log entry is posted yet.</p>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/66">
+              CWI will show correction and clarification records here after editorial review. Submit a correction if a source, date, credit, or context needs review.
+            </p>
+            <Link className="mt-5 inline-flex items-center gap-2 rounded-full bg-royal px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-white" href="/corrections">
+              View Correction Log <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        )}
+      </NewsroomSection>
+
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102A63] to-royal p-8 text-white shadow-soft">
@@ -226,6 +247,10 @@ function LiveCard({ item, cta = "Read More" }: { item: LiveNewsroomItem; cta?: s
         </div>
         <h3 className="mt-3 font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">{item.title}</h3>
         <p className="mt-3 text-sm font-semibold leading-6 text-ink/66">{item.summary}</p>
+        <div className="mt-4 grid gap-2 rounded-2xl border border-line bg-paper p-3 text-xs font-bold leading-5 text-ink/62">
+          <p><span className="font-black uppercase tracking-[0.08em] text-ink">What changed?</span> {item.whatChanged}</p>
+          <p><span className="font-black uppercase tracking-[0.08em] text-ink">What remains unclear?</span> {item.whatRemainsUnclear}</p>
+        </div>
         <div className="mt-4 grid gap-2 text-xs font-black uppercase tracking-[0.1em] text-ink/48 sm:grid-cols-2">
           <span>{item.sourceCount} sources</span>
           <span>Updated {formatDate(item.updatedAt)}</span>

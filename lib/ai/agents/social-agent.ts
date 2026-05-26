@@ -21,9 +21,9 @@ export async function runSocialAgent(input: { articleDraftId?: string; articleDr
   const contentDestination = normalizeContentDestination(
     input.contentDestination || (articleDraft as { content_destination?: string } | null)?.content_destination
   );
-  const topic = asText((articleDraft as { title?: string } | null)?.title, input.topic || "CWI Watch Desk update");
-  const publicPath = contentDestination === "live_newsroom" ? "/live-newsroom" : "/watch-desk";
-  const destinationName = contentDestination === "live_newsroom" ? "CWI Live Newsroom" : "CWI Watch Desk";
+  const topic = asText((articleDraft as { title?: string } | null)?.title, input.topic || "CWI Live Newsroom update");
+  const publicPath = contentDestination === "archive" ? "/archive" : "/live-newsroom";
+  const destinationName = contentDestination === "archive" ? "CWI Archive" : "CWI Live Newsroom";
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<SocialAgentOutput>({
     agentName: "CWI Signal Studio",
@@ -32,6 +32,7 @@ export async function runSocialAgent(input: { articleDraftId?: string; articleDr
     instruction: `
 Create approval-ready social captions for this CWI topic.
 No claim should be overstated. Include source/creator credit reminders where relevant.
+Avoid threat-like language, harassment, direct targeting, "attack", "destroy", "expose them", and unverified accusations.
 Return exactly: instagramCaption, facebookCaption, xCaption, redditTitle, redditBody, youtubeTitle, youtubeDescription, blueskyCaption, discordMessage, hashtags.
 When destination is live_newsroom, include the CWI Live Newsroom URL line: ${site.url}${publicPath}.
 Use the ending "Document. Verify. Amplify. The youth are not silent. India is watching. Website: ${site.url}" where suitable.

@@ -190,6 +190,7 @@ export async function ensureReportsTable() {
         consent boolean not null default false,
         safety boolean not null default false,
         status text not null default 'received',
+        tracking_id text,
         raw_payload jsonb not null default '{}'::jsonb
       );
 
@@ -205,6 +206,11 @@ export async function ensureReportsTable() {
 
       create index if not exists cwi_report_evidence_files_report_id_idx
       on cwi_report_evidence_files (report_id);
+
+      alter table cwi_report_submissions add column if not exists tracking_id text;
+      create unique index if not exists cwi_report_submissions_tracking_id_idx
+      on cwi_report_submissions (tracking_id)
+      where tracking_id is not null;
     `);
   }
 
@@ -366,6 +372,7 @@ async function adminOsSchemaLooksReady() {
         to_regclass('public.verification_reports') is not null as verification_reports,
         to_regclass('public.article_drafts') is not null as article_drafts,
         to_regclass('public.live_newsroom_items') is not null as live_newsroom_items,
+        to_regclass('public.archive_items') is not null as archive_items,
         to_regclass('public.seo_packs') is not null as seo_packs,
         to_regclass('public.social_packs') is not null as social_packs,
         to_regclass('public.image_library') is not null as image_library,
@@ -436,7 +443,11 @@ async function adminOsSchemaLooksReady() {
         exists (
           select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'admin_notes'
-        ) as approval_queue_admin_notes
+        ) as approval_queue_admin_notes,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'what_changed'
+        ) as live_newsroom_items_what_changed
     `);
 
     return Object.values(result.rows[0] ?? {}).every(Boolean);
@@ -533,7 +544,7 @@ export async function ensureAdminOsTables() {
       create table if not exists research_packs (
         id uuid primary key default gen_random_uuid(),
         topic text not null,
-        category text not null default 'Watch Desk',
+        category text not null default 'Live Newsroom',
         content_destination text not null default 'live_newsroom',
         date_range text,
         source_list jsonb not null default '[]'::jsonb,
@@ -575,7 +586,7 @@ export async function ensureAdminOsTables() {
         content_destination text not null default 'live_newsroom',
         title text not null,
         slug text,
-        category text not null default 'Watch Desk',
+        category text not null default 'Live Newsroom',
         draft jsonb not null default '{}'::jsonb,
         verification_status text not null default 'Developing',
         source_count integer not null default 0,
@@ -611,6 +622,7 @@ export async function ensureAdminOsTables() {
         source_count integer not null default 0,
         sources_json jsonb not null default '[]'::jsonb,
         what_happened text,
+        what_changed text,
         what_we_know text,
         what_remains_unclear text,
         timeline_json jsonb not null default '[]'::jsonb,
@@ -632,6 +644,23 @@ export async function ensureAdminOsTables() {
         created_at timestamptz not null default now()
       );
 
+      create table if not exists archive_items (
+        id uuid primary key default gen_random_uuid(),
+        original_route text,
+        title text not null,
+        slug text not null unique,
+        summary text,
+        body jsonb not null default '{}'::jsonb,
+        archived_at timestamptz not null default now(),
+        original_published_at timestamptz,
+        updated_at timestamptz not null default now(),
+        canonical_url text,
+        status text not null default 'archived',
+        redirect_to text,
+        seo_title text,
+        seo_description text
+      );
+
       create index if not exists published_articles_slug_published_idx
       on published_articles (slug, published_at desc);
 
@@ -643,6 +672,9 @@ export async function ensureAdminOsTables() {
 
       create index if not exists live_newsroom_items_published_idx
       on live_newsroom_items (status, published_at desc);
+
+      create index if not exists archive_items_slug_status_idx
+      on archive_items (slug, status, archived_at desc);
 
       create table if not exists seo_packs (
         id uuid primary key default gen_random_uuid(),
@@ -919,7 +951,7 @@ export async function ensureAdminOsTables() {
       create table if not exists cwi_trend_radar_items (
         id uuid primary key default gen_random_uuid(),
         topic text not null,
-        trend_type text not null default 'watch_desk',
+        trend_type text not null default 'live_newsroom',
         priority_score integer not null default 50,
         evidence_count integer not null default 0,
         suggested_action text not null default 'Review manually',
@@ -1038,6 +1070,7 @@ export async function ensureAdminOsTables() {
       alter table seo_packs add column if not exists content_destination text not null default 'live_newsroom';
       alter table social_packs add column if not exists content_destination text not null default 'live_newsroom';
       alter table image_library add column if not exists content_destination text not null default 'live_newsroom';
+      alter table live_newsroom_items add column if not exists what_changed text;
 
       alter table approval_queue add column if not exists item_type text;
       alter table approval_queue add column if not exists content_destination text not null default 'live_newsroom';

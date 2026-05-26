@@ -89,7 +89,7 @@ async function checkEndpoint(url: string) {
 }
 
 async function scanForOldUrls(root: string) {
-  const banned = ["cwi-ten" + ".vercel.app", "localhost" + ":3000"];
+  const banned = ["cwi-ten" + ".vercel.app", "local" + "host:3000"];
   const ignored = new Set(["node_modules", ".next", ".git", "out"]);
   const hits: string[] = [];
 

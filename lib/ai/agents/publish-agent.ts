@@ -1,13 +1,11 @@
 import { runArticleAgent } from "@/lib/ai/agents/article-agent";
-import { posts } from "@/data/posts";
 import { improveArticleDraft, saveQualityScore, scoreArticleQuality } from "@/lib/ai/quality-engine";
 import { rememberArticleDraft } from "@/lib/ai/source-memory";
 import { assertArticleDraftAllowed } from "@/lib/ai/verification-engine";
 import { attachDraftToApprovalItem, getApprovalItem, isPublishApproved, updateApprovalItem } from "@/lib/db/approval";
-import { getArticleDraft, saveArticleDraft, savePublishedArticle } from "@/lib/db/articles";
+import { getArticleDraft, saveArticleDraft } from "@/lib/db/articles";
 import { normalizeContentDestination } from "@/lib/ai/content-destination";
 import { saveLiveNewsroomItemFromDraft } from "@/lib/db/live-newsroom";
-import { site } from "@/lib/site";
 
 export async function runPublishAgent(approvalQueueId: string) {
   const approval = await getApprovalItem(approvalQueueId);
@@ -27,6 +25,10 @@ export async function runPublishAgent(approvalQueueId: string) {
   }
 
   const contentDestination = normalizeContentDestination(approval.content_destination || articleDraft.content_destination);
+
+  if (contentDestination !== "live_newsroom") {
+    throw new Error("Publishing blocked. CWI Publish AI only publishes approved Live Newsroom items in v1.1. Archive is passive.");
+  }
 
   if (contentDestination === "live_newsroom") {
     const liveItem = await saveLiveNewsroomItemFromDraft({
@@ -61,47 +63,6 @@ export async function runPublishAgent(approvalQueueId: string) {
       ]
     };
   }
-
-  const slug = publicSlugForDraft(articleDraft.slug, articleDraft.id);
-  const url = `${site.url}/watch-desk/${slug}`;
-  const publishedArticleId = await savePublishedArticle({
-    articleDraftId: articleDraft.id,
-    title: articleDraft.title,
-    slug,
-    url,
-    category: articleDraft.category,
-    metadata: {
-      approvalQueueId,
-      generatedArticleDraft,
-      note: "Published to the CWI admin database and served by the dynamic Watch Desk public route."
-    }
-  });
-
-  await updateApprovalItem(
-    approvalQueueId,
-    "published",
-    generatedArticleDraft
-      ? "Publish AI generated the missing article draft, saved it to published_articles, and opened the public Watch Desk route."
-      : "Publish AI saved the approved item to the published_articles table and opened the public Watch Desk route."
-  );
-
-  return {
-    publishedArticleId,
-    articleDraftId: articleDraft.id,
-    articleUrl: url,
-    contentDestination,
-    generatedArticleDraft,
-    sitemapStatus: "Dynamic public route is live immediately. Static sitemap regeneration is still recommended before major deploys.",
-    metadataStatus: "SEO pack remains attached to approval item.",
-    buildStatus: "Not required for dynamic public visibility.",
-    deploymentChecklist: [
-      "Review published article row.",
-      "Open the public article URL and review formatting.",
-      "If this should be permanent static seed content, merge the article into the site content system later.",
-      "Run npm run build before deploy.",
-      "Inspect the final URL in Google Search Console."
-    ]
-  };
 }
 
 async function getOrCreatePublishableDraft(approval: Record<string, unknown>) {
@@ -152,26 +113,6 @@ async function getOrCreatePublishableDraft(approval: Record<string, unknown>) {
   });
 
   return { articleDraft: await getArticleDraft(articleDraftId), generatedArticleDraft: true };
-}
-
-function publicSlugForDraft(value: unknown, articleDraftId: unknown) {
-  const base = slugify(asText(value) || asText(articleDraftId) || "cwi-watch-desk-update");
-  const suffix = asText(articleDraftId).slice(0, 8);
-
-  if (posts.some((post) => post.slug === base)) {
-    return suffix ? `${base}-${suffix}` : `${base}-published`;
-  }
-
-  return base;
-}
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 90) || "cwi-watch-desk-update";
 }
 
 function asText(value: unknown) {

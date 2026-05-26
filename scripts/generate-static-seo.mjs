@@ -14,7 +14,8 @@ const staticRoutes = [
   "/watch/manipur-crisis",
   "/live-newsroom",
   "/india-unanswered-files",
-  "/watch-desk",
+  "/archive",
+  "/corrections",
   "/issues",
   "/join",
   "/submit",
@@ -29,42 +30,13 @@ const staticRoutes = [
   "/rss.xml"
 ];
 
-const categories = [
-  "Movement Update",
-  "Explainer",
-  "Public Reaction",
-  "Youth Voice",
-  "Meme Watch",
-  "Fact Check",
-  "Creator Spotlight",
-  "Civic Issue",
-  "Digital Culture",
-  "Opinion",
-  "Archive"
-];
-
-function slugifyTopic(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 const postsSource = readFileSync(join(root, "data", "posts.ts"), "utf8");
 const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 const unansweredFilesSource = readFileSync(join(root, "data", "unanswered-files.ts"), "utf8");
 const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
-const tagBlocks = Array.from(postsSource.matchAll(/tags:\s*\[([^\]]+)\]/g), (match) => match[1]);
-const tags = Array.from(
-  new Set(tagBlocks.flatMap((block) => Array.from(block.matchAll(/"([^"]+)"/g), (match) => match[1])))
-);
 const routes = [
   ...staticRoutes,
-  ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
-  ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
-  ...postSlugs.map((slug) => `/watch-desk/${slug}`),
+  ...postSlugs.map((slug) => `/archive/${slug}`),
   ...postSlugs.slice(0, 12).map((slug) => `/live-newsroom/${slug}`),
   ...unansweredFileSlugs.map((slug) => `/live-newsroom/${slug}`),
   ...unansweredFileSlugs.map((slug) => `/india-unanswered-files/${slug}`)
@@ -75,20 +47,17 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${routes
   .map((route) => {
     const isHome = route === "/";
-    const isWatchDeskArticle = route.startsWith("/watch-desk/") && !route.startsWith("/watch-desk/category/") && !route.startsWith("/watch-desk/tag/");
+    const isArchiveArticle = route.startsWith("/archive/");
     const isUnansweredArticle = route.startsWith("/india-unanswered-files/");
     const isLiveNewsroomArticle = route.startsWith("/live-newsroom/");
-    const isTaxonomy = route.startsWith("/watch-desk/category/") || route.startsWith("/watch-desk/tag/");
-    const changefreq = isHome ? "daily" : isWatchDeskArticle || isUnansweredArticle || isLiveNewsroomArticle ? "monthly" : isTaxonomy ? "weekly" : "weekly";
+    const changefreq = isHome ? "daily" : isArchiveArticle || isUnansweredArticle || isLiveNewsroomArticle ? "monthly" : "weekly";
     const priority = isHome
       ? "1.0"
-      : ["/watch", "/watch-desk", "/live-newsroom", "/india-unanswered-files"].includes(route)
+      : ["/watch", "/archive", "/live-newsroom", "/india-unanswered-files"].includes(route)
         ? "0.9"
-        : isWatchDeskArticle || isUnansweredArticle || isLiveNewsroomArticle
+        : isArchiveArticle || isUnansweredArticle || isLiveNewsroomArticle
           ? "0.8"
-          : isTaxonomy
-            ? "0.6"
-            : "0.8";
+          : "0.8";
 
     return `  <url>
     <loc>${baseUrl}${route}</loc>

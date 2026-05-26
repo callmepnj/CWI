@@ -35,8 +35,8 @@ export function WatchDeskCard({ post }: { post: WatchPost }) {
       <p className="mt-5 text-xs font-bold uppercase leading-5 tracking-[0.08em] text-ink/58">
         Source/Credit: {sourceLabel} / {credit}
       </p>
-      <Link href={`/watch-desk/${post.slug}`} className="mt-6 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
-        Read on CWI Watch Desk <ArrowRight className="h-4 w-4" />
+      <Link href={`/archive/${post.slug}`} className="mt-6 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
+        Read archived context <ArrowRight className="h-4 w-4" />
       </Link>
     </Card>
   );

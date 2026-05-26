@@ -7,7 +7,7 @@ import { ensureArticleRatingsTable, getPool } from "@/lib/db";
 
 export const runtime = "nodejs";
 
-type ArticleType = "watch-desk" | "unanswered-files";
+type ArticleType = "archive" | "unanswered-files";
 
 type RatingRow = {
   average_rating: string | null;
@@ -17,7 +17,7 @@ type RatingRow = {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const articleType = cleanString(searchParams.get("type")) as ArticleType;
+  const articleType = normalizeArticleType(searchParams.get("type"));
   const slug = cleanString(searchParams.get("slug"));
 
   if (!(await isValidArticle(articleType, slug))) {
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
-  const articleType = cleanString(body?.type) as ArticleType;
+  const articleType = normalizeArticleType(body?.type);
   const slug = cleanString(body?.slug);
   const rating = Number(body?.rating);
 
@@ -102,7 +102,7 @@ async function isValidArticle(articleType: ArticleType, slug: string) {
     return false;
   }
 
-  if (articleType === "watch-desk") {
+  if (articleType === "archive") {
     if (posts.some((post) => post.slug === slug)) {
       return true;
     }
@@ -138,4 +138,9 @@ function cleanString(value: unknown) {
   }
 
   return value.trim();
+}
+
+function normalizeArticleType(value: unknown): ArticleType {
+  const normalized = cleanString(value);
+  return normalized === "unanswered-files" ? "unanswered-files" : "archive";
 }

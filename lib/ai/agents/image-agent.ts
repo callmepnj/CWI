@@ -13,7 +13,7 @@ export type ImageAgentOutput = {
 };
 
 export async function runImageAgent(input: { topic?: string; articleDraftId?: string; contentDestination?: ContentDestination }) {
-  const topic = input.topic || "CWI Watch Desk update";
+  const topic = input.topic || "CWI Live Newsroom update";
   const contentDestination = normalizeContentDestination(input.contentDestination);
   const file =
     unansweredFiles.find((item) => topic.toLowerCase().includes(item.title.toLowerCase().split(" ")[0])) ||
@@ -27,7 +27,7 @@ export async function runImageAgent(input: { topic?: string; articleDraftId?: st
     ogImage: file.ogImage || visual.src,
     socialImage: file.socialImages?.[0] || visual.src,
     altText: `Cockroach Watch India CWI visual for ${topic}.`,
-    imageNotes: "Template image mapping only. Human review required before final publishing."
+    imageNotes: "Template image mapping only. Human review required before final publishing. Check spelling, logo consistency, dimensions, compression, and safe civic framing."
   };
 
   const result = await getPool().query<{ id: string }>(

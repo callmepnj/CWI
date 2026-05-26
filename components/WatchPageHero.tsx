@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, FileText, Send, ShieldCheck } from "lucide-react";
+import { Archive, ArrowRight, Send, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function WatchPageHero() {
   return (
     <section className="relative isolate overflow-hidden bg-[#071123] px-4 py-14 text-white sm:px-6 lg:px-8 lg:py-20">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(11,92,255,0.34),transparent_32%),radial-gradient(circle_at_76%_72%,rgba(255,210,63,0.16),transparent_30%)]" />
+      <div className="absolute inset-0 -z-10 bg-[#071123]" />
       <div className="mx-auto max-w-7xl">
         <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-4 py-2 font-mono text-[0.68rem] font-black uppercase tracking-[0.2em] text-saffron ring-1 ring-white/10">
           <span className="relative flex h-2.5 w-2.5">
@@ -25,7 +25,7 @@ export function WatchPageHero() {
             <Link href="/submit">Submit Report <Send className="h-4 w-4" /></Link>
           </Button>
           <Button asChild className="bg-white text-ink hover:bg-skywash">
-            <Link href="/watch-desk">Read Watch Desk <FileText className="h-4 w-4" /></Link>
+            <Link href="/archive">Browse Archive <Archive className="h-4 w-4" /></Link>
           </Button>
           <Button asChild variant="outline" className="border-white/25 bg-white/10 text-white hover:bg-white hover:text-ink">
             <a href="#advisories">View Advisories <ArrowRight className="h-4 w-4" /></a>

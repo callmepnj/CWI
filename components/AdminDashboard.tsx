@@ -338,7 +338,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     showPublishSuccess(json);
     markApprovalPublished(id);
-    finishProgress("Public Watch Desk route is ready.");
+    finishProgress("Public Live Newsroom route is ready.");
     await loadDashboard(true);
   }
 
@@ -754,7 +754,7 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
         <PreviewList title="Trend radar" records={data.trendRadarItems} fields={["topic", "trend_type", "priority_score", "suggested_action"]} />
         <PreviewList title="Recent workflows" records={data.workflows} fields={["workflow_type", "topic", "status", "progress_percent"]} />
         <PreviewList title="Latest reports" records={data.reports} fields={["type", "city", "state", "message", "status"]} />
-        <PreviewList title="Latest Watch Desk articles" records={data.latestPublicArticles} fields={["title", "category", "href"]} />
+        <PreviewList title="Archive preview" records={data.latestPublicArticles} fields={["title", "category", "href"]} />
         <PreviewList title="Latest Unanswered Files" records={data.latestUnansweredFiles} fields={["title", "category", "href"]} />
       </div>
     </>
@@ -770,7 +770,7 @@ function CommandCenterSection({ data, pending, runAction }: { data: AdminData; p
           <div>
             <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Newsroom operating picture</h2>
             <p className="mt-3 max-w-3xl leading-7 text-ink/70">
-              Command Core coordinates priorities across Watch Desk, India Unanswered Files, reports, comments, SEO, visuals, UX, and publishing. It prepares briefing packages only for human approval.
+              Command Core coordinates priorities across Live Newsroom, India Unanswered Files, reports, comments, SEO, visuals, UX, archive cleanup, and publishing. It prepares briefing packages only for human approval.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -962,7 +962,7 @@ function MemoryGraphSection({ data, pending, runAction }: { data: AdminData; pen
             <CardLabel>CWI Memory Graph</CardLabel>
             <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Public memory engine</h2>
             <p className="mt-3 leading-7 text-ink/70">
-              Watch Desk, India Unanswered Files, reports, sources, approvals, and draft claims are connected into one central memory graph.
+              Live Newsroom, India Unanswered Files, reports, sources, approvals, archive history, and draft claims are connected into one central memory graph.
             </p>
           </div>
           <Button type="button" disabled={pending === "sync-memory"} onClick={() => runAction("sync-memory")}>
@@ -987,7 +987,7 @@ function TrendRadarSection({ data, pending, runAction }: { data: AdminData; pend
             <CardLabel>CWI Radar</CardLabel>
             <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Trend radar</h2>
             <p className="mt-3 leading-7 text-ink/70">
-              Manual links, reports, keywords, comments, Watch Desk posts, and Unanswered Files are ranked into daily topic leads.
+              Manual links, reports, keywords, comments, Live Newsroom items, archive history, and Unanswered Files are ranked into daily topic leads.
             </p>
           </div>
           <Button type="button" disabled={pending === "trend-radar"} onClick={() => runAction("trend-radar")}>
@@ -1212,7 +1212,8 @@ const approvalActions = [
   { label: "Request Changes", status: "changes_requested" },
   { label: "Reject", status: "rejected" },
   { label: "Save for Later", status: "saved_for_later" },
-  { label: "Archive", status: "archived" }
+  { label: "Archive", status: "archived" },
+  { label: "Block", status: "blocked" }
 ] as const;
 
 function ManualLinkSection({
@@ -1285,14 +1286,14 @@ function ManualLinkSection({
           <AdminInput name="platform" label="Platform" placeholder="Instagram, X, YouTube, Reddit, news..." />
           <AdminInput name="creatorSource" label="Creator / source" placeholder="Source name or public handle" />
           <AdminSelect name="priority" label="Priority" options={["normal", "high", "urgent", "low"]} />
-          <AdminSelect name="contentType" label="Content type" options={["manual link", "Watch Desk", "Public Advisory", "Social Pack", "India Unanswered Files", "Civic Issue"]} />
+          <AdminSelect name="contentType" label="Content type" options={["manual link", "Live Newsroom", "Public Advisory", "Social Pack", "India Unanswered Files", "Civic Issue", "Archive"]} />
           <AdminSelect
             name="contentDestination"
             label="Destination"
             defaultValue={defaultDestination}
             options={[
               ["live_newsroom", "Live Newsroom"],
-              ["watch_desk", "Watch Desk"],
+              ["archive", "Archive"],
               ["india_unanswered_files", "India Unanswered Files"],
               ["public_advisory", "Public Advisory"],
               ["social_only", "Social Only"]

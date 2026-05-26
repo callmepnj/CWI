@@ -10,7 +10,7 @@ export const metadata = createMetadata({
   description:
     "Learn about Cockroach Watch India, a founder-led civic watch and commentary platform documenting youth voice, public issues, creator credit, and the Cockroach wave.",
   path: "/about",
-  keywords: ["About Cockroach Watch India", "What is CWI", "CWI Watch Desk", "CWI India Unanswered Files"]
+  keywords: ["About Cockroach Watch India", "What is CWI", "CWI Live Newsroom", "CWI Archive", "CWI India Unanswered Files"]
 });
 
 const facts = ["Founded by CWI", "India-focused", "Youth-first", "Independent", "Serious civic commentary", "Satire with responsibility"];
@@ -31,9 +31,9 @@ const aboutFaqs = [
       "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform documenting youth voice, public issues, creator credit, viral claims, and civic memory."
   },
   {
-    question: "What is CWI Watch Desk?",
+    question: "What is CWI Live Newsroom?",
     answer:
-      "The CWI Watch Desk is the source-backed article and update section of Cockroach Watch India. It documents CJP updates, the Cockroach wave, youth voice, civic satire, public issues, and creator-credit questions."
+      "The CWI Live Newsroom is the main source-backed update section of Cockroach Watch India. It documents CJP updates, the Cockroach wave, youth voice, civic satire, public issues, public advisories, and creator-credit questions."
   },
   {
     question: "What is CWI India Unanswered Files?",
@@ -96,7 +96,7 @@ export default function AboutPage() {
               CWI is for young citizens, creators, students, public-interest readers, local reporters, civic volunteers, and quiet watchers who want source-backed context instead of noise.
             </p>
             <p>
-              The CWI Watch Desk publishes Cockroach Watch India articles, explainers, public reactions, correction notes, and source-backed updates. CWI India Unanswered Files tracks public issues and civic questions that still need answers.
+              The CWI Live Newsroom publishes source-backed updates, public advisories, correction notes, and India Unanswered Files coverage. The CWI Archive preserves older explainers and context posts.
             </p>
             <p>
               We are here to document the moment, verify claims, credit creators, and preserve the public memory of what young India is saying. Document. Verify. Amplify. The youth are not silent. India is watching.
@@ -111,7 +111,7 @@ export default function AboutPage() {
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
+              <Link href="/live-newsroom">Enter Live Newsroom</Link>
             </Button>
             <Button asChild variant="green">
               <Link href="/india-unanswered-files">Open CWI India Unanswered Files</Link>

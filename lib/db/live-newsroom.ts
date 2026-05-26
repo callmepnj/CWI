@@ -13,7 +13,9 @@ export type LiveNewsroomStatus =
   | "Opinion/Analysis"
   | "Satire/Context"
   | "Unverified"
-  | "Public Advisory";
+  | "Public Advisory"
+  | "Correction"
+  | "Archived";
 
 export type LiveNewsroomSource = ArticleSource;
 
@@ -36,6 +38,7 @@ export type LiveNewsroomItem = {
   sourceCount: number;
   sources: LiveNewsroomSource[];
   whatHappened: string;
+  whatChanged: string;
   whatWeKnow: string;
   whatRemainsUnclear: string;
   timeline: LiveNewsroomTimelineItem[];
@@ -68,6 +71,7 @@ type LiveNewsroomRow = {
   source_count: number | null;
   sources_json: unknown;
   what_happened: string | null;
+  what_changed: string | null;
   what_we_know: string | null;
   what_remains_unclear: string | null;
   timeline_json: unknown;
@@ -133,23 +137,24 @@ export async function saveLiveNewsroomItemFromDraft(input: {
             source_count = $11,
             sources_json = $12,
             what_happened = $13,
-            what_we_know = $14,
-            what_remains_unclear = $15,
-            timeline_json = $16,
-            cwi_context = $17,
-            tags_json = $18,
-            hero_image = $19,
-            thumbnail_image = $20,
-            og_image = $21,
-            alt_text = $22,
+            what_changed = $14,
+            what_we_know = $15,
+            what_remains_unclear = $16,
+            timeline_json = $17,
+            cwi_context = $18,
+            tags_json = $19,
+            hero_image = $20,
+            thumbnail_image = $21,
+            og_image = $22,
+            alt_text = $23,
             updated_at = now(),
-            author = $23,
-            related_items_json = $24,
-            seo_title = $25,
-            seo_description = $26,
-            canonical_url = $27,
+            author = $24,
+            related_items_json = $25,
+            seo_title = $26,
+            seo_description = $27,
+            canonical_url = $28,
             status = 'published',
-            metadata = $28
+            metadata = $29
         where article_draft_id = $1
         returning id
       ),
@@ -157,12 +162,12 @@ export async function saveLiveNewsroomItemFromDraft(input: {
         insert into live_newsroom_items (
           article_draft_id, approval_queue_id, title, slug, category, type, summary,
           body, verification_status, risk_level, source_count, sources_json,
-          what_happened, what_we_know, what_remains_unclear, timeline_json,
+          what_happened, what_changed, what_we_know, what_remains_unclear, timeline_json,
           cwi_context, tags_json, hero_image, thumbnail_image, og_image, alt_text,
           author, related_items_json, seo_title, seo_description, canonical_url, status, metadata
         )
         select $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-          $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, 'published', $28
+          $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, 'published', $29
         where not exists (select 1 from updated)
         returning id
       )
@@ -184,6 +189,12 @@ export async function saveLiveNewsroomItemFromDraft(input: {
       sourceCount,
       JSON.stringify(sources),
       asText(draft.whatHappened || nestedBody.whatHappened, sections.find((section) => section.heading === "What happened")?.paragraphs.join("\n\n") || summary),
+      asText(
+        draft.whatChanged || nestedBody.whatChanged,
+        sections.find((section) => section.heading === "What changed")?.paragraphs.join("\n\n") ||
+          latestTimelineSummary(timeline) ||
+          "No material change has been recorded yet. CWI will update this page when new source-backed context is reviewed."
+      ),
       asText(draft.whatWeKnow || nestedBody.whatWeKnow, sections.find((section) => section.heading === "What we know")?.paragraphs.join("\n\n") || summary),
       asText(
         draft.whatRemainsUnclear || nestedBody.whatRemainsUnclear,
@@ -214,7 +225,7 @@ export async function getPublishedLiveNewsroomItems(limit = 80) {
   const result = await getPool().query<LiveNewsroomRow>(
     `
       select id::text, title, slug, category, type, summary, body, verification_status,
-        risk_level, source_count, sources_json, what_happened, what_we_know,
+        risk_level, source_count, sources_json, what_happened, what_changed, what_we_know,
         what_remains_unclear, timeline_json, cwi_context, tags_json, hero_image,
         thumbnail_image, og_image, alt_text, published_at::text, updated_at::text,
         author, related_items_json, seo_title, seo_description, canonical_url, status
@@ -234,7 +245,7 @@ export async function getPublishedLiveNewsroomItem(slug: string) {
   const result = await getPool().query<LiveNewsroomRow>(
     `
       select id::text, title, slug, category, type, summary, body, verification_status,
-        risk_level, source_count, sources_json, what_happened, what_we_know,
+        risk_level, source_count, sources_json, what_happened, what_changed, what_we_know,
         what_remains_unclear, timeline_json, cwi_context, tags_json, hero_image,
         thumbnail_image, og_image, alt_text, published_at::text, updated_at::text,
         author, related_items_json, seo_title, seo_description, canonical_url, status
@@ -255,7 +266,7 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
     title: post.title,
     slug: post.slug,
     category: post.category,
-    type: "watch_desk_update",
+    type: "archived_context",
     summary: post.summary,
     body: post.sections,
     verificationStatus: normalizeStatus(post.verificationStatus),
@@ -263,9 +274,10 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
     sourceCount: post.sources.length,
     sources: post.sources,
     whatHappened: sectionText(post.sections, "What happened") || post.summary,
+    whatChanged: "Archived context from older CWI coverage. Current updates now belong in the CWI Live Newsroom.",
     whatWeKnow: sectionText(post.sections, "What we know") || post.content[0] || post.summary,
     whatRemainsUnclear: sectionText(post.sections, "What remains unclear") || "This item is source-backed but remains open for corrections and new context.",
-    timeline: [{ date: post.date, title: "Watch Desk publication", summary: post.summary }],
+    timeline: [{ date: post.date, title: "Archive publication", summary: post.summary }],
     cwiContext,
     tags: post.tags,
     heroImage: post.ogImage,
@@ -306,6 +318,7 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
         note: source.note
       })) as ArticleSource[],
       whatHappened: file.sections[0]?.body || file.summary,
+      whatChanged: "CWI is preserving this file as public memory inside the Live Newsroom ecosystem.",
       whatWeKnow: file.groundReality,
       whatRemainsUnclear: file.unansweredQuestion,
       timeline: file.timeline.slice(0, 8).map((item) => ({ date: item.date, title: item.title, summary: item.summary })),
@@ -349,6 +362,7 @@ function rowToLiveNewsroomItem(row: LiveNewsroomRow): LiveNewsroomItem {
     sourceCount: Number(row.source_count ?? 0),
     sources: extractSources(row.sources_json),
     whatHappened: asText(row.what_happened, summary),
+    whatChanged: asText(row.what_changed, "No material change has been recorded yet. CWI will update this page when new source-backed context is reviewed."),
     whatWeKnow: asText(row.what_we_know, summary),
     whatRemainsUnclear: asText(row.what_remains_unclear, "CWI is tracking corrections, official clarifications, and new source-backed updates."),
     timeline: normalizeTimeline(row.timeline_json),
@@ -499,9 +513,16 @@ function normalizeStatus(value: unknown): LiveNewsroomStatus {
     "Opinion/Analysis": "Opinion/Analysis",
     "Satire/Context": "Satire/Context",
     Unverified: "Unverified",
-    "Public Advisory": "Public Advisory"
+    "Public Advisory": "Public Advisory",
+    Correction: "Correction",
+    Archived: "Archived"
   };
   return map[status] ?? "Developing";
+}
+
+function latestTimelineSummary(timeline: LiveNewsroomTimelineItem[]) {
+  const latest = timeline[0];
+  return latest ? `${latest.title}: ${latest.summary}` : "";
 }
 
 function sectionText(sections: Array<{ heading: string; paragraphs: string[] }>, heading: string) {

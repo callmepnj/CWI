@@ -100,7 +100,7 @@ const sourceLibrary = {
     outlet: "Cockroach Watch India",
     url: "https://www.cockroachwatchindia.online",
     type: "Official source",
-    note: "Used for CWI's own identity, editorial disclaimer, Watch Desk positioning, correction path, and independent civic-watch role."
+    note: "Used for CWI's own identity, editorial disclaimer, Archive positioning, correction path, and independent civic-watch role."
   },
   economicTimesOverview: {
     name: "Cockroach Janta Party explodes on social media",
@@ -896,7 +896,7 @@ function limitText(text: string, maxLength: number) {
 }
 
 function metaTitle(title: string) {
-  const suffix = " - CWI Watch Desk | Cockroach Watch India";
+  const suffix = " - CWI Archive | Cockroach Watch India";
   const maxTitleLength = 74 - suffix.length;
   return `${limitText(title, maxTitleLength)}${suffix}`;
 }
@@ -908,14 +908,14 @@ function pick<T>(items: T[], index: number) {
 function socialPack(seed: ArticleSeed, summary: string): SocialPack {
   return {
     xThread: [
-      `${seed.title}: a CWI Watch Desk brief from Cockroach Watch India.`,
+      `${seed.title}: a CWI Archive brief from Cockroach Watch India.`,
       "Cockroach Watch India is tracking the public conversation around Cockroach Janta Party, the Cockroach wave, creator commentary, and civic satire with context.",
       "Read the article at https://www.cockroachwatchindia.online, check the labels, and send corrections or creator-credit notes when context is missing."
     ],
-    instagramCaption: `${seed.title}. Cockroach Watch India explains the public context on the CWI Watch Desk. Document. Verify. Amplify. The youth are not silent. India is watching.`,
-    redditPost: `${summary} This CWI Watch Desk post from Cockroach Watch India is meant for source-checking, public-interest discussion, and responsible context around the Cockroach wave.`,
-    youtubeShortsDescription: `${seed.title} - Cockroach Watch India explains the Cockroach wave, CJP discussion, Gen Z politics, civic satire, and creator culture in India on the CWI Watch Desk.`,
-    seoSummary: `Cockroach Watch India CWI Watch Desk summary: ${summary}`
+    instagramCaption: `${seed.title}. Cockroach Watch India explains the public context on the CWI Archive. Document. Verify. Amplify. The youth are not silent. India is watching.`,
+    redditPost: `${summary} This CWI Archive post from Cockroach Watch India is meant for source-checking, public-interest discussion, and responsible context around the Cockroach wave.`,
+    youtubeShortsDescription: `${seed.title} - Cockroach Watch India explains the Cockroach wave, CJP discussion, Gen Z politics, civic satire, and creator culture in India on the CWI Archive.`,
+    seoSummary: `Cockroach Watch India CWI Archive summary: ${summary}`
   };
 }
 
@@ -1016,9 +1016,9 @@ function datesFor(seed: ArticleSeed, index: number) {
 }
 
 function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "relatedSlugs"> {
-  const summary = limitText(`CWI Watch Desk: ${seed.angle}`, 190);
+  const summary = limitText(`CWI Archive: ${seed.angle}`, 190);
   const metaDescription = limitText(
-    `Cockroach Watch India explains ${seed.focus}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this public-interest update.`,
+    `Cockroach Watch India explains ${seed.focus}, what is known, what remains unclear, and why the CWI Archive is tracking this public-interest update.`,
     155
   );
   const readingMinutes = 4 + (index % 4);
@@ -1036,9 +1036,9 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     index
   );
   const articleOpeners = [
-    `${seed.title} is about ${seed.focus}. Cockroach Watch India is tracking it through the CWI Watch Desk because the subject connects public reporting, online reaction, civic satire, and the Cockroach wave.`,
+    `${seed.title} is about ${seed.focus}. Cockroach Watch India is tracking it through the CWI Archive because the subject connects public reporting, online reaction, civic satire, and the Cockroach wave.`,
     `The short answer: this article explains ${seed.focus} using public sources, cautious labels, and CWI's independent editorial distance from Cockroach Janta Party.`,
-    `At issue is ${seed.focus}. The CWI Watch Desk treats this as a source-backed public-interest explainer, not as an official statement from CJP or any political organization.`
+    `At issue is ${seed.focus}. The CWI Archive treats this as a source-backed public-interest explainer, not as an official statement from CJP or any political organization.`
   ];
   const contextParagraphs = [
     "The discussion is moving through posts, edits, short videos, comment sections, and creator-led explainers. That visibility matters, but visibility alone does not verify a claim.",
@@ -1047,8 +1047,8 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   ];
   const cwiMethodParagraphs = [
     "Cockroach Watch India uses careful labels for developing material: reportedly, publicly circulating, online discussion, internet reaction, viral trend, and public commentary. The aim is clarity, not exaggeration.",
-    "CWI's editorial standard is simple: Document. Verify. Amplify. The Watch Desk documents the moment, checks the source trail where possible, credits creators, and explains public-interest context without impersonating Cockroach Janta Party.",
-    "The Cockroach Watch India Watch Desk avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
+    "CWI's editorial standard is simple: Document. Verify. Amplify. The Archive documents the moment, checks the source trail where possible, credits creators, and explains public-interest context without impersonating Cockroach Janta Party.",
+    "The Cockroach Watch India Archive avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
   ];
   const closingParagraphs = [
     "What happens next depends on how creators, students, first-time voters, civic observers, and local communities continue to use the language. The youth are not silent. India is watching.",
@@ -1060,7 +1060,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
       heading: "Short answer",
       paragraphs: [
         `${pick(articleOpeners, index)} Read more source-backed updates at https://www.cockroachwatchindia.online.`,
-        "This is a Cockroach Watch India Watch Desk article. CWI is not the official website of Cockroach Janta Party; it is an independent civic watch, satire, and commentary platform."
+        "This is a Cockroach Watch India Archive article. CWI is not the official website of Cockroach Janta Party; it is an independent civic watch, satire, and commentary platform."
       ]
     },
     {
@@ -1095,15 +1095,15 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     {
       heading: "CWI context",
       paragraphs: [
-        "Cockroach Watch India - CWI is tracking this topic through the CWI Watch Desk as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. CWI's method is Document. Verify. Amplify. That means public-interest conversations need context and source attribution.",
+        "Cockroach Watch India - CWI is tracking this topic through the CWI Archive as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. CWI's method is Document. Verify. Amplify. That means public-interest conversations need context and source attribution.",
         pick(cwiMethodParagraphs, index),
-        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Follow more source-backed updates on the CWI Watch Desk at https://www.cockroachwatchindia.online/watch-desk."
+        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Follow more source-backed updates on the CWI Archive at https://www.cockroachwatchindia.online/archive."
       ]
     },
     {
       heading: "CWI Note",
       paragraphs: [
-        "The CWI Watch Desk documents public-interest updates with context, source attribution, and editorial caution. The youth are not silent. India is watching. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
+        "The CWI Archive documents public-interest updates with context, source attribution, and editorial caution. The youth are not silent. India is watching. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
         pick(closingParagraphs, index),
         `Primary reference for this version: ${primarySource.outlet} - ${primarySource.name}. Additional sources are listed below for readers who want to check the reporting trail.`,
         coreDisclaimer
@@ -1124,7 +1124,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     summary,
     content,
     sections,
-    sourceLabel: "CWI Watch Desk",
+    sourceLabel: "CWI Archive",
     sourceUrl: primarySource.url,
     sources,
     verificationStatus: seed.verificationStatus ?? "Reported",
@@ -1137,7 +1137,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     seoTitle: metaTitle(seed.title),
     seoDescription: metaDescription,
     ogImage: "https://www.cockroachwatchindia.online/opengraph-image",
-    imageAlt: `${seed.title} - Cockroach Watch India Watch Desk article graphic`,
+    imageAlt: `${seed.title} - Cockroach Watch India Archive article graphic`,
     pullQuote,
     relatedArticles: [],
     social: socialPack(seed, summary)
@@ -1184,4 +1184,3 @@ export const trendingTopics = [
   "Creator-led commentary",
   "Digital civic culture"
 ];
-

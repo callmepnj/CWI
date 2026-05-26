@@ -5,19 +5,19 @@ import { site } from "@/lib/site";
 
 const footerLinks = [
   { label: "Home", href: "/" },
-  { label: "Watch", href: "/watch" },
-  { label: "CWI Live Newsroom", href: "/live-newsroom" },
-  { label: "Cockroach Watch India", href: "/" },
-  { label: "CWI Watch Desk", href: "/watch-desk" },
+  { label: "Live Newsroom", href: "/live-newsroom" },
+  { label: "Archive", href: "/archive" },
   { label: "India Unanswered Files", href: "/india-unanswered-files" },
-  { label: "Manipur Investigation", href: "/watch/manipur-crisis" },
+  { label: "Corrections", href: "/corrections" },
+  { label: "Submit Report", href: "/submit" },
   { label: "About CWI", href: "/about" },
+  { label: "Editorial Policy", href: "/editorial-policy" },
+  { label: "Contact CWI", href: "/contact" },
+  { label: "Watch", href: "/watch" },
+  { label: "Manipur Investigation", href: "/watch/manipur-crisis" },
   { label: "Charter", href: "/charter" },
-  { label: "Watch Desk", href: "/watch-desk" },
   { label: "Issues", href: "/issues" },
   { label: "Join", href: "/join" },
-  { label: "Submit Report", href: "/submit" },
-  { label: "Contact CWI", href: "/contact" },
   { label: "Five-Point Agenda", href: "/five-point-agenda" },
   { label: "Youth Voice", href: "/youth-voice" },
   { label: "Media Bank", href: "/media-bank" },
@@ -63,10 +63,10 @@ export function Footer() {
           </p>
         </div>
         <div>
-          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Latest updates</p>
+          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Archive preview</p>
           <div className="space-y-3">
             {latestPosts.map((post) => (
-              <Link key={post.slug} href={`/watch-desk/${post.slug}`} className="block rounded-2xl border border-white/10 bg-white/5 p-3 text-xs font-black uppercase leading-5 tracking-[0.1em] text-white/78 transition hover:border-saffron/60 hover:text-saffron">
+              <Link key={post.slug} href={`/archive/${post.slug}`} className="block rounded-2xl border border-white/10 bg-white/5 p-3 text-xs font-black uppercase leading-5 tracking-[0.1em] text-white/78 transition hover:border-saffron/60 hover:text-saffron">
                 {post.title}
               </Link>
             ))}

@@ -156,6 +156,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
           type="button"
           onClick={toggleLike}
           disabled={pendingAction === "like"}
+          aria-label={liked ? `Remove like for ${title}` : `Like ${title}`}
           className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.12em] ring-1 transition ${
             liked ? "bg-urgent/10 text-urgent ring-urgent/25" : "bg-white text-ink/58 ring-line hover:bg-skywash hover:text-royal"
           }`}
@@ -167,6 +168,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
           type="button"
           onClick={toggleBookmark}
           disabled={pendingAction === "bookmark"}
+          aria-label={bookmarked ? `Remove saved item ${title}` : `Save ${title}`}
           className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.12em] ring-1 transition ${
             bookmarked ? "bg-saffron/25 text-[#8A5B00] ring-saffron/35" : "bg-white text-ink/58 ring-line hover:bg-skywash hover:text-royal"
           }`}
@@ -192,6 +194,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
           type="button"
           onClick={toggleLike}
           disabled={pendingAction === "like"}
+          aria-label={liked ? `Remove like for ${title}` : `Like ${title}`}
           className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.12em] ring-1 transition ${
             liked ? "bg-urgent/10 text-urgent ring-urgent/25" : "bg-white text-ink ring-line hover:bg-skywash hover:text-royal"
           }`}
@@ -203,6 +206,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
           type="button"
           onClick={toggleBookmark}
           disabled={pendingAction === "bookmark"}
+          aria-label={bookmarked ? `Remove saved item ${title}` : `Save ${title}`}
           className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.12em] ring-1 transition ${
             bookmarked ? "bg-saffron/25 text-[#8A5B00] ring-saffron/35" : "bg-white text-ink ring-line hover:bg-skywash hover:text-royal"
           }`}
@@ -221,6 +225,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
               key={item.platform}
               type="button"
               onClick={() => share(item.platform, item.href)}
+              aria-label={`Share ${title} on ${item.label}`}
               className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-ink transition hover:border-royal hover:bg-skywash hover:text-royal"
             >
               <Icon className="h-4 w-4" />
@@ -231,6 +236,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
         <button
           type="button"
           onClick={copyLink}
+          aria-label={`Copy link to ${title}`}
           className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-ink transition hover:border-royal hover:bg-skywash hover:text-royal"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}

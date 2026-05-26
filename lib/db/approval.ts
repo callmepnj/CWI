@@ -24,14 +24,16 @@ const approvalStatusMap: Record<string, string> = {
   changes_requested: "changes_requested",
   rejected: "rejected",
   reject: "rejected",
-  "save for later": "waiting_for_approval",
+  "save for later": "saved_for_later",
   saved_for_later: "saved_for_later",
   "saved for later": "saved_for_later",
   waiting_for_approval: "waiting_for_approval",
   "waiting for approval": "waiting_for_approval",
   published: "published",
   archived: "archived",
-  archive: "archived"
+  archive: "archived",
+  blocked: "blocked",
+  block: "blocked"
 };
 
 export function normalizeApprovalStatus(status: unknown) {

@@ -71,7 +71,7 @@ const websiteJsonLd = {
   description: site.description,
   potentialAction: {
     "@type": "SearchAction",
-    target: `${site.url}/watch-desk?search={search_term_string}`,
+    target: `${site.url}/live-newsroom?search={search_term_string}`,
     "query-input": "required name=search_term_string"
   }
 };

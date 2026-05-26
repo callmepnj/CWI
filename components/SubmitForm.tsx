@@ -26,12 +26,14 @@ export function SubmitForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [trackingId, setTrackingId] = useState("");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     setStatus("submitting");
     setError("");
+    setTrackingId("");
 
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
@@ -56,7 +58,7 @@ export function SubmitForm() {
         body: formData
       });
 
-      const data = (await response.json()) as { ok?: boolean; error?: string };
+      const data = (await response.json()) as { ok?: boolean; error?: string; trackingId?: string };
       if (!response.ok || !data.ok) {
         throw new Error(
           data.error || "Something went wrong while submitting your report. Please try again or contact cockroachwatchindia@gmail.com."
@@ -65,6 +67,7 @@ export function SubmitForm() {
 
       form.reset();
       setSelectedFiles([]);
+      setTrackingId(data.trackingId || "");
       setStatus("success");
     } catch (submitError) {
       setStatus("error");
@@ -187,7 +190,7 @@ export function SubmitForm() {
         </div>
       </FormGroup>
 
-      <FormGroup title="Consent and Safety" description="These confirmations are required before the Watch Desk reviews a report.">
+      <FormGroup title="Consent and Safety" description="These confirmations are required before CWI reviews a report.">
         <div className="grid gap-3">
           <label className="flex gap-3 rounded-2xl border border-line bg-paper p-4 text-sm font-bold leading-6">
             <input name="consent" type="checkbox" required className="mt-1 h-4 w-4 accent-royal" />
@@ -220,7 +223,7 @@ export function SubmitForm() {
 
       {status === "success" ? (
         <p className="rounded-2xl border border-leaf/25 bg-leaf/10 p-4 font-bold leading-6 text-[#047766]">
-          Report submitted successfully. The Watch Desk will review it before taking further action.
+          Your report has been received. Tracking ID: {trackingId || "CWI-RECEIVED"}. CWI will review it before taking further action.
         </p>
       ) : null}
       {status === "error" ? (

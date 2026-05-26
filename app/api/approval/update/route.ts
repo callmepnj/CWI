@@ -17,6 +17,8 @@ const statusMap: Record<string, string> = {
   "Save for Later": "saved_for_later",
   Archived: "archived",
   Archive: "archived",
+  Block: "blocked",
+  Blocked: "blocked",
   approved: "approved",
   rejected: "rejected",
   changes_requested: "changes_requested",
@@ -26,7 +28,8 @@ const statusMap: Record<string, string> = {
   saved_for_later: "saved_for_later",
   approved_publish: "approved",
   approved_article_only: "approved_article_only",
-  approved_social_only: "approved_social_only"
+  approved_social_only: "approved_social_only",
+  blocked: "blocked"
 };
 
 export async function PATCH(request: Request) {

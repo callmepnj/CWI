@@ -19,23 +19,26 @@ export function HeroSection() {
         <div className="flex flex-col justify-center">
           <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-royal px-4 py-2 font-mono text-[0.7rem] font-black uppercase tracking-[0.18em] text-white shadow-[0_14px_30px_rgba(11,92,255,0.22)]">
             <ShieldCheck className="h-4 w-4" />
-            Founder-led civic watch platform
+            CWI Live Newsroom is the main desk
           </p>
           <h1 className="max-w-5xl font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.06em] text-ink sm:text-7xl lg:text-8xl">
-            Cockroach Watch India - CWI Civic Watch Platform
+            Cockroach Watch India - CWI
           </h1>
+          <p className="mt-6 font-display text-3xl font-black uppercase leading-none tracking-[-0.03em] text-royal sm:text-4xl">
+            Document. Verify. Amplify.
+          </p>
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-ink/82">
-            Cockroach Watch India, also known as CWI, documents youth voice, public issues, civic satire, creator credit, viral claims, and public memory with source-backed context.
+            Independent civic watch, satire, and commentary platform tracking youth voice, public issues, creator credit, and source-backed public memory.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/submit">Submit a civic report to CWI <ArrowRight className="h-4 w-4" /></Link>
-            </Button>
-            <Button asChild variant="green">
               <Link href="/live-newsroom">Enter Live Newsroom</Link>
             </Button>
+            <Button asChild variant="green">
+              <Link href="/submit">Submit Report <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
             <Button asChild variant="outline">
-              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
+              <Link href="/archive">Browse Archive</Link>
             </Button>
           </div>
           <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-black uppercase tracking-[0.14em] text-ink/58">
@@ -60,7 +63,7 @@ export function HeroSection() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.22em] text-saffron">
-                    CWI Watch Desk
+                    CWI Live Newsroom
                   </p>
                   <p className="mt-3 font-display text-4xl font-black uppercase leading-none">Public Memory Command</p>
                 </div>

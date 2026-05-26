@@ -10,21 +10,23 @@ import { cn } from "@/lib/utils";
 
 const primaryItems = [
   { label: "Home", href: "/" },
-  { label: "Watch", href: "/watch" },
-  { label: "Watch Desk", href: "/watch-desk" },
-  { label: "Issues", href: "/issues" },
+  { label: "Live Newsroom", href: "/live-newsroom" },
+  { label: "Archive", href: "/archive" },
+  { label: "Unanswered Files", href: "/india-unanswered-files" },
   { label: "Submit", href: "/submit" }
 ];
 
 const moreItems = [
-  { label: "Live Newsroom", href: "/live-newsroom" },
-  { label: "Unanswered Files", href: "/india-unanswered-files" },
   { label: "About", href: "/about" },
+  { label: "Corrections", href: "/corrections" },
+  { label: "Editorial Policy", href: "/editorial-policy" },
+  { label: "Contact", href: "/contact" },
+  { label: "Watch", href: "/watch" },
+  { label: "Issues", href: "/issues" },
   { label: "Charter", href: "/charter" },
   { label: "Youth Voice", href: "/youth-voice" },
   { label: "Media Bank", href: "/media-bank" },
-  { label: "Credit Policy", href: "/credit-policy" },
-  { label: "Contact", href: "/contact" }
+  { label: "Credit Policy", href: "/credit-policy" }
 ];
 
 export function Navbar() {

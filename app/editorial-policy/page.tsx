@@ -9,13 +9,13 @@ export const metadata = createMetadata({
   description:
     "Read the Cockroach Watch India editorial policy for source attribution, correction requests, verification labels, creator credit, and responsible handling of public claims.",
   path: "/editorial-policy",
-  keywords: ["Cockroach Watch India editorial policy", "CWI verification", "CWI corrections", "CWI Watch Desk"]
+  keywords: ["Cockroach Watch India editorial policy", "CWI verification", "CWI corrections", "CWI Live Newsroom"]
 });
 
 const policies = [
   {
     title: "Source attribution",
-    body: "CWI identifies sources wherever possible and separates official statements, public reporting, creator commentary, public reaction, and opinion. Source links are shown on Watch Desk and India Unanswered Files pages."
+    body: "CWI identifies sources wherever possible and separates official statements, public reporting, creator commentary, public reaction, and opinion. Source links are shown on Live Newsroom, Archive, and India Unanswered Files pages."
   },
   {
     title: "Verification labels",
@@ -48,9 +48,9 @@ export default function EditorialPolicyPage() {
       subtitle="Cockroach Watch India — CWI documents, verifies, and amplifies public-interest updates with source attribution, correction paths, and cautious labels."
     >
       <Card>
-        <CardLabel>CWI Watch Desk standard</CardLabel>
+        <CardLabel>CWI Live Newsroom standard</CardLabel>
         <p className="text-lg leading-8 text-ink/72">
-          The CWI Watch Desk and CWI India Unanswered Files exist to preserve public memory, not to manufacture certainty. Document. Verify. Amplify. The youth are not silent. India is watching.
+          The CWI Live Newsroom, CWI Archive, and CWI India Unanswered Files exist to preserve public memory, not to manufacture certainty. Document. Verify. Amplify. The youth are not silent. India is watching.
         </p>
         <p className="mt-4 text-lg leading-8 text-ink/72">
           For corrections, creator credit, takedown review, or additional sources, contact{" "}

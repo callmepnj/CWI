@@ -303,7 +303,7 @@ export default async function UnansweredFilePage({ params }: Props) {
                 CWI is not against a community or party. CWI is against silence, delayed transparency, and public suffering without sustained accountability. This file uses source labels and cautious language because public-interest journalism should question power without inventing facts.
               </p>
               <p className="mt-4 leading-8 text-ink/72">
-                Cockroach Watch India — CWI connects this case file to the wider CWI Watch Desk and the official website at{" "}
+                Cockroach Watch India - CWI connects this case file to the wider CWI Live Newsroom and the official website at{" "}
                 <Link href="/" className="font-bold text-royal underline-offset-4 hover:underline">
                   https://www.cockroachwatchindia.online
                 </Link>
@@ -389,7 +389,7 @@ export default async function UnansweredFilePage({ params }: Props) {
                 {[
                   ["CWI India Unanswered Files", unansweredFilesPath],
                   ["The Watch", "/watch"],
-                  ["Watch Desk", "/watch-desk"],
+                  ["Live Newsroom", "/live-newsroom"],
                   ["Submit Report", "/submit"],
                   ["Issue Watch", "/issues"],
                   ["Contact CWI", "/contact"]

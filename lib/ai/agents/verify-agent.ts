@@ -23,7 +23,8 @@ export async function runVerifyAgent(input: { researchPackId?: string; researchP
     payload: researchPack,
     instruction: `
 Review the research pack for accuracy, safety, legal risk, attribution, wording, and source gaps.
-Label claims as Verified, Source-backed, Reported, Developing, Opinion, Satire/Context, Unverified, or Risky.
+Block defamation risk, hate or harassment, doxxing, private personal data, unverified allegations, old screenshots without date/context, platform restriction claims without attribution, and "confirmed" wording without confirmation.
+Label claims as Verified, Source-backed, Reported, Developing, Opinion/Analysis, Satire/Context, Unverified, Risky, or Blocked.
 Return exactly:
 verificationStatus, riskLevel, unsafeClaims, saferWording, sourceGaps, publishRecommendation.
 Never recommend public publishing without human review.

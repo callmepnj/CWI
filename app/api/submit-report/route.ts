@@ -66,6 +66,7 @@ export async function POST(request: Request) {
 
   try {
     await ensureReportsTable();
+    const trackingId = createTrackingId();
 
     const result = await getPool().query<{ id: number }>(
       `
@@ -81,9 +82,10 @@ export async function POST(request: Request) {
           credit_preference,
           consent,
           safety,
+          tracking_id,
           raw_payload
         )
-        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, true, $10::jsonb)
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, true, $10, $11::jsonb)
         returning id;
       `,
       [
@@ -96,8 +98,10 @@ export async function POST(request: Request) {
         evidenceFiles.length > 0 ? evidenceFiles.map((file) => file.name).join(", ") : optionalString(body.proofNote),
         body.message.trim(),
         optionalString(body.creditPreference),
+        trackingId,
         JSON.stringify({
           ...body,
+          trackingId,
           evidenceFiles: evidenceFiles.map((file) => ({
             name: file.name,
             type: file.type,
@@ -115,7 +119,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       id: reportId,
-      message: "Report submitted successfully. The Watch Desk will review it before taking further action."
+      trackingId,
+      message: "Your report has been received. CWI will review it before taking further action."
     });
   } catch (error) {
     console.error("CWI report submission failed", error);
@@ -212,6 +217,10 @@ function optionalString(value: unknown) {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function createTrackingId() {
+  return `CWI-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 }
 
 function isValidUrl(value: string) {

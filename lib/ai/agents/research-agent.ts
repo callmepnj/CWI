@@ -39,7 +39,8 @@ If metadata is limited, say manual context is required.
 Default content destination is live_newsroom unless the admin selected another destination.
 Return exactly these fields:
 topic, summary, sources, sourceCount, whatHappened, whatWeKnow, whatRemainsUnclear, timeline, keyFacts, riskNotes, suggestedAngle, category.
-Sources must contain title, publisher/source, url, date if known, and reliability note.
+Sources must contain title, publisher/source, url, date if known, reliability level, what the source supports, and what the source does not support.
+No reliable source means no article draft.
     `.trim()
   });
 
@@ -51,7 +52,7 @@ Sources must contain title, publisher/source, url, date if known, and reliabilit
     timeline: Array.isArray(data.timeline) ? data.timeline : [],
     keyFacts: Array.isArray(data.keyFacts) ? data.keyFacts : [],
     riskNotes: Array.isArray(data.riskNotes) ? data.riskNotes : [],
-    category: data.category || input.category || "Watch Desk",
+    category: data.category || input.category || "Live Newsroom",
     _meta: { estimatedCost, provider, model }
   };
 }

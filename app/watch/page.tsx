@@ -16,7 +16,7 @@ import { watchAdvisories, watchCategories } from "@/data/watch";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 
 const watchDescription =
-  "The Watch by Cockroach Watch India tracks public issues, viral claims, creator credit requests, civic advisories, youth voice, and source-backed Watch Desk updates.";
+  "The Watch by Cockroach Watch India tracks public issues, viral claims, creator credit requests, civic advisories, youth voice, and source-backed Live Newsroom updates.";
 
 export const metadata = createMetadata({
   title: "The Watch - Cockroach Watch India",
@@ -26,7 +26,7 @@ export const metadata = createMetadata({
     "Cockroach Watch India",
     "CWI",
     "The Watch",
-    "Watch Desk",
+    "Live Newsroom",
     "public issues",
     "viral claims",
     "creator credit",
@@ -48,7 +48,7 @@ const watchJsonLd = {
     "Creator credit",
     "Youth voice",
     "Civic advisories",
-    "Source-backed Watch Desk updates"
+    "Source-backed Live Newsroom updates"
   ]
 };
 
@@ -171,9 +171,9 @@ export default function WatchPage() {
       </Section>
 
       <Section
-        eyebrow="Watch Desk Articles"
-        title="Source-backed Watch Desk Articles"
-        subtitle="Latest researched explainers and updates from CWI, with visible sources, verification labels, dates, and correction paths."
+        eyebrow="Archive Preview"
+        title="Archived CWI Context"
+        subtitle="Older researched explainers and updates from CWI, with visible sources, verification labels, dates, and correction paths."
       >
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {latestArticles.map((post) => (
@@ -181,7 +181,7 @@ export default function WatchPage() {
           ))}
         </div>
         <Button asChild className="mt-8" variant="green">
-          <Link href="/watch-desk">Read all Watch Desk articles <ArrowRight className="h-4 w-4" /></Link>
+          <Link href="/archive">Browse Archive <ArrowRight className="h-4 w-4" /></Link>
         </Button>
       </Section>
 
@@ -225,7 +225,7 @@ export default function WatchPage() {
               <Link href="#follow-cwi">Follow CWI</Link>
             </Button>
             <Button asChild variant="green">
-              <Link href="/watch-desk">Read Latest Articles</Link>
+              <Link href="/live-newsroom">Enter Live Newsroom</Link>
             </Button>
           </div>
         </Card>

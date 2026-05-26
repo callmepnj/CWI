@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       await completeAgentTask(taskId, research, research._meta?.estimatedCost ?? 0);
       const researchPackId = await saveResearchPack({
         topic: research.topic,
-        category: research.category || body?.category || "Watch Desk",
+        category: research.category || body?.category || "Live Newsroom",
         summary: research.summary,
         sources: research.sources,
         whatHappened: research.whatHappened,

@@ -111,7 +111,7 @@ export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
       </div>
 
       <p className="mb-5 font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/50">
-        Showing {visiblePosts.length} Watch Desk article{visiblePosts.length === 1 ? "" : "s"} / sorted by {sortOptions.find((option) => option.value === sortBy)?.label}
+        Showing {visiblePosts.length} archive item{visiblePosts.length === 1 ? "" : "s"} / sorted by {sortOptions.find((option) => option.value === sortBy)?.label}
       </p>
 
       <div className="grid gap-9">
@@ -137,7 +137,7 @@ export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
 
       {visiblePosts.length === 0 ? (
         <div className="rounded-3xl border border-line bg-white p-8 text-center shadow-card">
-          <p className="font-display text-3xl font-black uppercase text-ink">No Watch Desk notes found</p>
+          <p className="font-display text-3xl font-black uppercase text-ink">No archive notes found</p>
           <p className="mt-3 text-ink/65">Try a broader search term or switch the category filter back to All.</p>
         </div>
       ) : null}

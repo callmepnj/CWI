@@ -7,7 +7,7 @@ export const watchAdvisories = [
     date: "May 23, 2026",
     summary:
       "Claims about account access and suspicious activity are circulating online. CWI treats this as unverified until a clear official clarification or reliable source trail is available.",
-    href: "/watch-desk/how-to-verify-viral-cjp-claims-before-sharing"
+    href: "/archive/how-to-verify-viral-cjp-claims-before-sharing"
   },
   {
     title: "Verify before sharing suspicious posts",
@@ -15,7 +15,7 @@ export const watchAdvisories = [
     date: "May 23, 2026",
     summary:
       "Check the original post, timestamp, account handle, archived links, and multiple reliable sources before forwarding screenshots or claims.",
-    href: "/watch-desk/how-to-read-viral-cjp-claims-responsibly"
+    href: "/archive/how-to-read-viral-cjp-claims-responsibly"
   },
   {
     title: "Await official clarification",
@@ -23,14 +23,14 @@ export const watchAdvisories = [
     date: "May 23, 2026",
     summary:
       "Fast-moving platform claims should be read as developing. CWI separates public reaction, satire, verified reporting, and unanswered questions.",
-    href: "/watch-desk/what-happened-after-cjp-x-account-withheld"
+    href: "/archive/what-happened-after-cjp-x-account-withheld"
   },
   {
     title: "Source-backed updates coming soon",
     status: "Advisory" as const,
     date: "May 23, 2026",
     summary:
-      "The Watch Desk prioritizes source trails, creator credit, and correction paths before amplification. Readers can submit context through the report form.",
+      "The Live Newsroom prioritizes source trails, creator credit, and correction paths before amplification. Readers can submit context through the report form.",
     href: "/submit"
   }
 ];
@@ -58,7 +58,7 @@ export const watchCategories = [
   },
   {
     title: "Source-backed Articles",
-    summary: "Watch Desk explainers with visible sources, dates, verification labels, and correction paths."
+    summary: "Live Newsroom updates and archived explainers with visible sources, dates, verification labels, and correction paths."
   },
   {
     title: "Digital Safety Alerts",

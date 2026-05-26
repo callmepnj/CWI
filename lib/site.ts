@@ -20,7 +20,7 @@ export const site = {
     "Cockroach Watch India",
     "CWI",
     "CWI Live Newsroom",
-    "CWI Watch Desk",
+    "CWI Archive",
     "CWI articles",
     "CWI civic watch",
     "CWI public issues",

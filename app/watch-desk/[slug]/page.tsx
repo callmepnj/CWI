@@ -34,16 +34,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) {
     return createMetadata({
-      title: "Watch Desk Post - Cockroach Watch India",
+      title: "CWI Archive Item - Cockroach Watch India",
       description: site.description,
-      path: "/watch-desk"
+      path: "/archive"
     });
   }
 
   const baseMetadata = createMetadata({
-    title: post.seoTitle,
+    title: post.seoTitle.replace(/CWI\s+Watch\s+Desk/g, "CWI Archive").replace(/Watch\s+Desk/g, "Archive"),
     description: post.seoDescription,
-    path: `/watch-desk/${post.slug}`,
+    path: `/archive/${post.slug}`,
     type: "article",
     publishedTime: post.publishedAt,
     keywords: post.tags
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...baseMetadata.openGraph,
       title: post.seoTitle,
       description: post.seoDescription,
-      url: absoluteUrl(`/watch-desk/${post.slug}`),
+      url: absoluteUrl(`/archive/${post.slug}`),
       siteName: site.name,
       images: [
         {
@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 function jsonLdForPost(post: (typeof posts)[number]) {
-  const url = absoluteUrl(`/watch-desk/${post.slug}`);
+  const url = absoluteUrl(`/archive/${post.slug}`);
   const image = post.ogImage;
   const articleBase = {
     headline: post.seoTitle,
@@ -134,8 +134,8 @@ function jsonLdForPost(post: (typeof posts)[number]) {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Watch Desk",
-          item: absoluteUrl("/watch-desk")
+          name: "CWI Archive",
+          item: absoluteUrl("/archive")
         },
         {
           "@type": "ListItem",
@@ -178,7 +178,7 @@ export default async function WatchPostPage({ params }: Props) {
         <div className="mb-6 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-ink/55">
           <Link href="/" className="hover:text-royal">Home</Link>
           <span>/</span>
-          <Link href="/watch-desk" className="hover:text-royal">Watch Desk</Link>
+          <Link href="/archive" className="hover:text-royal">Archive</Link>
           <span>/</span>
           <span>{post.category}</span>
         </div>
@@ -199,7 +199,7 @@ export default async function WatchPostPage({ params }: Props) {
               </h1>
               <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
               <p className="mt-5 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
-                By {post.author} / Published on CWI Watch Desk / Cockroach Watch India
+                By {post.author} / Archived by Cockroach Watch India
               </p>
 
               <div className="mt-7 grid gap-3 border-y border-line py-5 text-sm font-bold uppercase tracking-[0.08em] text-ink/55 sm:grid-cols-3">
@@ -218,7 +218,7 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
 
               <div className="mt-8 rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
-                <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-saffron">Watch Desk Pull Quote</p>
+                <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-saffron">Archive Pull Quote</p>
                 <p className="mt-4 font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em]">{post.pullQuote}</p>
               </div>
 
@@ -260,7 +260,7 @@ export default async function WatchPostPage({ params }: Props) {
                 {post.tags.map((tag) => (
                   <Link
                     key={tag}
-                    href={`/watch-desk/tag/${slugifyTopic(tag)}`}
+                    href={`/archive?tag=${slugifyTopic(tag)}`}
                     className="inline-flex items-center gap-1 rounded-full bg-paper px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-ink/62 ring-1 ring-line hover:bg-skywash hover:text-royal"
                   >
                     <Tag className="h-3.5 w-3.5" />
@@ -272,7 +272,7 @@ export default async function WatchPostPage({ params }: Props) {
               <div className="mt-8 rounded-[2rem] border border-royal/15 bg-skywash p-6">
                 <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">CWI Note</p>
                 <p className="mt-3 leading-8 text-ink/74">
-                  The CWI Watch Desk documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through{" "}
+                  The CWI Archive preserves older public-interest context with source attribution and editorial caution. Current source-backed updates now live in the CWI Live Newsroom. If you have corrections, sources, or creator credit requests, submit them through{" "}
                   <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">
                     Cockroach Watch India
                   </Link>
@@ -312,8 +312,8 @@ export default async function WatchPostPage({ params }: Props) {
             {relatedPosts.length > 0 ? (
               <section className="mt-10">
                 <div className="mb-5 flex items-center justify-between gap-4">
-                  <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Watch Desk articles</h2>
-                  <Link href="/watch-desk" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
+                  <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related archive articles</h2>
+                  <Link href="/archive" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
                     View all <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -329,10 +329,10 @@ export default async function WatchPostPage({ params }: Props) {
           <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
             <Card>
               <CardLabel>Share this article</CardLabel>
-              <ShareButtons title={post.title} path={`/watch-desk/${post.slug}`} summary={post.summary} />
+              <ShareButtons title={post.title} path={`/archive/${post.slug}`} summary={post.summary} />
             </Card>
 
-            <ArticleRating articleType="watch-desk" articleSlug={post.slug} />
+            <ArticleRating articleType="archive" articleSlug={post.slug} />
 
             <Card>
               <CardLabel>Author</CardLabel>
@@ -351,7 +351,7 @@ export default async function WatchPostPage({ params }: Props) {
                 {[
                   ["Cockroach Watch India", "/"],
                   ["The Watch", "/watch"],
-                  ["CWI Watch Desk", "/watch-desk"],
+                  ["CWI Archive", "/archive"],
                   ["CWI India Unanswered Files", "/india-unanswered-files"],
                   ["Submit Report", "/submit"],
                   ["Issue Watch", "/issues"],
@@ -369,7 +369,7 @@ export default async function WatchPostPage({ params }: Props) {
               <CardLabel>Latest updates</CardLabel>
               <div className="space-y-4">
                 {latestPosts.map((latestPost) => (
-                  <Link key={latestPost.slug} href={`/watch-desk/${latestPost.slug}`} className="block border-b border-line pb-4 last:border-b-0 last:pb-0">
+                  <Link key={latestPost.slug} href={`/archive/${latestPost.slug}`} className="block border-b border-line pb-4 last:border-b-0 last:pb-0">
                     <p className="font-display text-lg font-black uppercase leading-tight tracking-[-0.03em]">{latestPost.title}</p>
                     <p className="mt-1 text-xs font-black uppercase tracking-[0.12em] text-ink/45">{latestPost.category}</p>
                   </Link>
@@ -393,7 +393,7 @@ function buildWatchDiscussionPrompts(post: (typeof posts)[number]) {
 
 function buildWatchReaderQuestions(post: (typeof posts)[number]) {
   return [
-    `What does the CWI Watch Desk clearly know about ${post.title}?`,
+    `What does the CWI Archive clearly preserve about ${post.title}?`,
     "Which claim in this article needs the strongest source before it is amplified further?",
     "What should Cockroach Watch India follow next: public reaction, creator credit, official response, or correction?",
     "Does this update affect youth voice, public issues, civic satire, or digital rights in a way CWI should archive?"

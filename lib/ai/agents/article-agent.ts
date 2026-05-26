@@ -30,10 +30,24 @@ export async function runArticleAgent(input: {
       (researchPack as { content_destination?: string } | null)?.content_destination ||
       (verificationReport as { content_destination?: string } | null)?.content_destination
   );
-  const articleType = contentDestination === "live_newsroom" ? "live_newsroom_update" : "watch_desk_update";
+  const articleType = contentDestination === "live_newsroom" ? "live_newsroom_update" : "archived_context";
 
   if (!researchPack) {
     throw new Error("Article AI needs a research pack.");
+  }
+
+  if (!verificationReport) {
+    throw new Error("Verification Report required before article generation.");
+  }
+
+  const sourceCount = Number(
+    (researchPack as { source_count?: unknown; sourceCount?: unknown } | null)?.source_count ??
+      (researchPack as { source_count?: unknown; sourceCount?: unknown } | null)?.sourceCount ??
+      0
+  );
+
+  if (sourceCount < 1) {
+    throw new Error("Article AI blocked. Reliable source required before article generation.");
   }
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<ArticleAgentOutput>({
@@ -42,29 +56,30 @@ export async function runArticleAgent(input: {
     maxTokens: 2600,
     payload: { researchPack, verificationReport, contentDestination, articleType },
     instruction: `
-Write an approval-ready CWI ${contentDestination === "live_newsroom" ? "Live Newsroom update" : "Watch Desk article draft"} from the research and verification pack.
+Write an approval-ready CWI Live Newsroom update from the research and verification pack.
 Do not invent facts, sources, quotes, or current numbers.
 Use newsroom style and include:
-Short answer, What happened, What we know, What remains unclear, Why it matters, CWI context, Sources and further reading, Related CWI articles, Submit correction/report CTA, Disclaimer.
+Short answer, What happened, What changed, What we know, What remains unclear, Why it matters, CWI context, Timeline, Sources and further reading, Related CWI articles, Submit correction/report CTA, Disclaimer.
 For live_newsroom use the public route /live-newsroom/[slug] and the article type live_newsroom_update.
-Every draft must naturally mention Cockroach Watch India, CWI, ${contentDestination === "live_newsroom" ? "CWI Live Newsroom" : "CWI Watch Desk"}, Document. Verify. Amplify., The youth are not silent. India is watching., and ${site.url}.
+Archive is passive. Do not create fresh archive-first content.
+Every draft must naturally mention Cockroach Watch India, CWI, CWI Live Newsroom, Document. Verify. Amplify., The youth are not silent. India is watching., and ${site.url}.
 Return exactly: title, slug, category, summary, body, sources, disclaimer, relatedArticles.
     `.trim()
   });
 
-  const title = asText(data.title, asText((researchPack as { topic?: string }).topic, "CWI Watch Desk draft"));
+  const title = asText(data.title, asText((researchPack as { topic?: string }).topic, "CWI Live Newsroom draft"));
 
   return {
     title,
     slug: asText(data.slug, slugify(title)),
-    category: asText(data.category, contentDestination === "live_newsroom" ? "Live Newsroom" : "Watch Desk"),
-    summary: asText(data.summary, `CWI ${contentDestination === "live_newsroom" ? "Live Newsroom" : "Watch Desk"} draft prepared for human review.`),
+    category: asText(data.category, contentDestination === "public_advisory" ? "Public Advisory" : "Live Newsroom"),
+    summary: asText(data.summary, "CWI Live Newsroom draft prepared for human review."),
     body: Array.isArray(data.body) ? data.body : [],
     sources: Array.isArray(data.sources) ? data.sources : [],
     disclaimer:
       data.disclaimer ||
       "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Claims require attribution and human review.",
-    relatedArticles: Array.isArray(data.relatedArticles) ? data.relatedArticles : ["/watch-desk", "/india-unanswered-files", "/submit"],
+    relatedArticles: Array.isArray(data.relatedArticles) ? data.relatedArticles : ["/live-newsroom", "/india-unanswered-files", "/archive", "/submit"],
     _meta: { estimatedCost, provider, model }
   };
 }

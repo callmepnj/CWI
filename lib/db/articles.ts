@@ -247,7 +247,7 @@ function publishedRowToWatchPost(row: PublishedArticleRow): WatchPost {
     asText(draft.summary) ||
     asText(nestedDraft.summary) ||
     sections[0]?.paragraphs[0] ||
-    "CWI Watch Desk article published from the approved CWI AI OS workflow.";
+    "CWI Archive article published from the approved CWI workflow.";
   const date = dateOnly(row.published_at);
   const updatedDate = dateOnly(row.updated_at || row.published_at);
   const category = normalizeCategory(row.category);
@@ -263,28 +263,28 @@ function publishedRowToWatchPost(row: PublishedArticleRow): WatchPost {
     summary,
     content: sections.flatMap((section) => section.paragraphs),
     sections,
-    sourceLabel: "CWI AI OS approved draft",
+    sourceLabel: "CWI approved archive item",
     sourceUrl: row.url,
     sources,
     verificationStatus: normalizeVerification(row.verification_status),
     credit: "Cockroach Watch India Editorial Desk",
-    tags: Array.from(new Set(["Cockroach Watch India", "CWI", "CWI Watch Desk", category, "Approved AI draft"])),
+    tags: Array.from(new Set(["Cockroach Watch India", "CWI", "CWI Archive", category, "Approved editorial item"])),
     author: "Cockroach Watch India Editorial Desk",
     readingMinutes: Math.max(3, Math.ceil(sections.flatMap((section) => section.paragraphs).join(" ").split(/\s+/).length / 180)),
-    metaTitle: row.seo_title || `${row.title} - CWI Watch Desk`,
+    metaTitle: row.seo_title || `${row.title} - CWI Archive`,
     metaDescription: row.meta_description || summary.slice(0, 155),
-    seoTitle: row.seo_title || `${row.title} - CWI Watch Desk`,
+    seoTitle: row.seo_title || `${row.title} - CWI Archive`,
     seoDescription: row.meta_description || summary.slice(0, 155),
     ogImage: row.open_graph_image || `${site.url}/opengraph-image`,
-    imageAlt: `${row.title} - Cockroach Watch India Watch Desk article`,
+    imageAlt: `${row.title} - Cockroach Watch India Archive article`,
     pullQuote: "Approved CWI drafts become public only after human approval and Publish AI.",
     relatedSlugs: [],
     relatedArticles: [],
     social: {
-      xThread: [`${row.title}`, `Read on CWI Watch Desk: ${row.url}`],
+      xThread: [`${row.title}`, `Read in CWI Archive: ${row.url}`],
       instagramCaption: `${row.title}\n\nRead the source-backed update at ${site.url}.`,
       redditPost: `${row.title} - what verified context should CWI add?`,
-      youtubeShortsDescription: `${row.title} | CWI Watch Desk`,
+      youtubeShortsDescription: `${row.title} | CWI Archive`,
       seoSummary: summary
     }
   };
@@ -315,7 +315,7 @@ function extractSections(draft: Record<string, unknown>) {
     ? sections
     : [
         {
-          heading: "CWI Watch Desk",
+          heading: "CWI Archive",
           paragraphs: ["This approved article draft is available from the CWI admin publishing database."]
         }
       ];
@@ -339,7 +339,7 @@ function normalizeSectionArray(value: unknown) {
   return value
     .map((item) => {
       const record = asRecord(item);
-      const heading = asText(record.heading || record.title, "CWI Watch Desk");
+      const heading = asText(record.heading || record.title, "CWI Archive");
       const paragraphs = Array.isArray(record.paragraphs)
         ? record.paragraphs.map((paragraph) => asText(paragraph)).filter(Boolean)
         : splitParagraphs(asText(record.body || record.text || record.content));

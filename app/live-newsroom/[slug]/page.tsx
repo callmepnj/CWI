@@ -120,6 +120,7 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
         <div className="mx-auto grid max-w-5xl gap-8 px-4 pb-12 sm:px-6 lg:px-8">
           <InfoPanel title="Short answer" body={item.summary} />
           <InfoPanel title="What happened" body={item.whatHappened} />
+          <InfoPanel title="What changed" body={item.whatChanged} />
           <InfoPanel title="What we know" body={item.whatWeKnow} />
           <InfoPanel title="What remains unclear" body={item.whatRemainsUnclear} tone="warning" />
 

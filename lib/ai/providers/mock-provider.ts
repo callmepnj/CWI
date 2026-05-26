@@ -17,9 +17,9 @@ export const mockProvider: AITextProvider = {
 function buildMockText(taskName: string, userPrompt: string) {
   const topic = extractTopic(userPrompt);
   const destination = extractDestination(userPrompt);
-  const isLiveNewsroom = destination === "live_newsroom";
-  const sectionLabel = isLiveNewsroom ? "CWI Live Newsroom" : "CWI Watch Desk";
-  const sectionPath = isLiveNewsroom ? "/live-newsroom" : "/watch-desk";
+  const isArchive = destination === "archive" || destination === "watch_desk";
+  const sectionLabel = isArchive ? "CWI Archive" : "CWI Live Newsroom";
+  const sectionPath = isArchive ? "/archive" : "/live-newsroom";
   const slug = slugify(topic);
   const sourceUrl = extractUrl(userPrompt);
   const notice = "Mock mode active - no real AI call.";
@@ -32,7 +32,7 @@ function buildMockText(taskName: string, userPrompt: string) {
     return JSON.stringify({
       notice,
       topic,
-      summary: `${notice} Research shell for ${topic}. Replace with verified source extraction before production use.`,
+      summary: `${notice} Research review package for ${topic}. Replace with verified source extraction before production use.`,
       sources,
       sourceCount: sources.length,
       whatHappened: "Admin supplied a topic or link for CWI review.",
@@ -46,7 +46,7 @@ function buildMockText(taskName: string, userPrompt: string) {
       suggestedAngle: `Source-backed ${sectionLabel} review of ${topic}.`,
       suggestedSocialAngle: `Short CWI update after verification: ${topic}.`,
       sourceConfidenceScore: sources.length ? 45 : 20,
-      category: isLiveNewsroom ? "Live Newsroom" : "Watch Desk"
+      category: isArchive ? "Archive" : "Live Newsroom"
     });
   }
 
@@ -68,11 +68,12 @@ function buildMockText(taskName: string, userPrompt: string) {
       notice,
       title: topic,
       slug,
-      category: isLiveNewsroom ? "Live Newsroom" : "Watch Desk",
-      summary: `${notice} Article draft shell for ${topic}.`,
+      category: isArchive ? "Archive" : "Live Newsroom",
+      summary: `${notice} Article review package for ${topic}.`,
       body: [
-        { heading: "Short answer", body: "This is a mock-mode draft shell. Verified reporting is required before publication." },
+        { heading: "Short answer", body: "This is a mock-mode review package. Verified reporting is required before publication." },
         { heading: "What happened", body: "Use source-backed details from the research pack here." },
+        { heading: "What changed", body: "Record only material changes supported by sources." },
         { heading: "What we know", body: "List verified or attributed facts only." },
         { heading: "What remains unclear", body: "Separate claims, rumours, and developing details." },
         { heading: "Why it matters", body: `${sectionLabel} tracks public-interest topics with context, source labels, and editorial caution.` },
@@ -108,7 +109,7 @@ function buildMockText(taskName: string, userPrompt: string) {
   if (taskName.includes("Social")) {
     return JSON.stringify({
       notice,
-      instagramCaption: `${topic}\n\nMock mode active - no real AI call.\n\nDocument. Verify. Amplify.`,
+      instagramCaption: `${topic}\n\nMock mode active - no real AI call.\n\nDocument. Verify. Amplify.\n${site.url}${sectionPath}/${slug}`,
       facebookCaption: `${topic}\n\nCWI is reviewing this topic with source attribution.`,
       xCaption: `${topic}\n${sectionLabel} review queued. ${site.url}${sectionPath}/${slug}`,
       redditTitle: `${topic} - what verified context should CWI add?`,
