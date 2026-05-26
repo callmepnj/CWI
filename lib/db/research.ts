@@ -1,6 +1,7 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { optionalUuid } from "@/lib/db/ids";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 
 export async function saveManualLink(input: {
   url: string;
@@ -10,6 +11,7 @@ export async function saveManualLink(input: {
   notes?: string;
   priority?: string;
   contentType?: string;
+  contentDestination?: ContentDestination;
   metadata?: { title?: string; description?: string; image?: string; sourceDomain?: string; status?: string };
 }) {
   await ensureAdminDatabase();
@@ -17,9 +19,9 @@ export async function saveManualLink(input: {
     `
       insert into manual_links (
         url, topic, platform, creator_source, notes, priority, content_type,
-        extracted_title, extracted_description, extraction_status
+        content_destination, extracted_title, extracted_description, extraction_status
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       returning id;
     `,
     [
@@ -30,6 +32,7 @@ export async function saveManualLink(input: {
       input.notes ?? "",
       input.priority ?? "normal",
       input.contentType ?? "manual link",
+      normalizeContentDestination(input.contentDestination),
       input.metadata?.title ?? "",
       input.metadata?.description ?? "",
       input.metadata?.status ?? "pending"
@@ -50,21 +53,23 @@ export async function saveResearchPack(pack: {
   keyFacts: unknown[];
   riskNotes: unknown[];
   suggestedAngle: string;
+  contentDestination?: ContentDestination;
 }) {
   await ensureAdminDatabase();
   const result = await getPool().query<{ id: string }>(
     `
       insert into research_packs (
-        topic, category, source_list, source_count, summary, what_happened,
+        topic, category, content_destination, source_list, source_count, summary, what_happened,
         what_we_know, what_remains_unclear, timeline, key_facts, risks,
         suggested_article_angle, source_confidence, status
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'AI-generated from supplied sources - human verification required', 'Research Ready')
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'AI-generated from supplied sources - human verification required', 'Research Ready')
       returning id;
     `,
     [
       pack.topic,
       pack.category,
+      normalizeContentDestination(pack.contentDestination),
       JSON.stringify(pack.sources),
       pack.sources.length,
       pack.summary,

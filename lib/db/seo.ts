@@ -1,6 +1,7 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { optionalUuid } from "@/lib/db/ids";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 
 export async function saveSeoPack(pack: {
   articleDraftId?: string;
@@ -16,20 +17,22 @@ export async function saveSeoPack(pack: {
   schemaJson: unknown;
   internalLinks: unknown[];
   altText: unknown[];
+  contentDestination?: ContentDestination;
 }) {
   await ensureAdminDatabase();
   const result = await getPool().query<{ id: string }>(
     `
       insert into seo_packs (
-        article_draft_id, seo_title, meta_description, slug, canonical_url,
+        article_draft_id, content_destination, seo_title, meta_description, slug, canonical_url,
         open_graph_title, open_graph_description, open_graph_image,
         twitter_card, schema_json, internal_links, image_alt_text, sitemap_status
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Pending approval')
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'Pending approval')
       returning id;
     `,
     [
       optionalUuid(pack.articleDraftId),
+      normalizeContentDestination(pack.contentDestination),
       pack.seoTitle,
       pack.metaDescription,
       pack.slug,

@@ -15,7 +15,12 @@ export async function POST(request: Request) {
 
   try {
     const result = await runPublishApprovedItem(body.approvalQueueId);
-    return ok(result, "Approved article is published and available on the public CWI Watch Desk route.");
+    return ok(
+      result,
+      result.contentDestination === "live_newsroom"
+        ? "Approved article is published and available on the public CWI Live Newsroom route."
+        : "Approved article is published and available on the public CWI Watch Desk route."
+    );
   } catch (error) {
     console.error("CWI Publish Gate failed", error);
     return fail(error, error instanceof Error && error.message.includes("Human approval") ? 403 : 500);

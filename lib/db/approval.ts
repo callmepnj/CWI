@@ -1,6 +1,7 @@
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 
 const approvalStatusMap: Record<string, string> = {
   approve: "approved",
@@ -24,6 +25,8 @@ const approvalStatusMap: Record<string, string> = {
   rejected: "rejected",
   reject: "rejected",
   "save for later": "waiting_for_approval",
+  saved_for_later: "saved_for_later",
+  "saved for later": "saved_for_later",
   waiting_for_approval: "waiting_for_approval",
   "waiting for approval": "waiting_for_approval",
   published: "published",
@@ -61,21 +64,23 @@ export async function saveApprovalItem(input: {
   sourceCount?: number;
   status?: string;
   adminNotes?: string;
+  contentDestination?: ContentDestination;
 }) {
   await ensureAdminDatabase();
   const result = await getPool().query<{ id: string }>(
     `
       insert into approval_queue (
-        topic, type, item_type, summary, research_pack_id, verification_report_id,
+        topic, type, item_type, content_destination, summary, research_pack_id, verification_report_id,
         article_draft_id, seo_pack_id, social_pack_id, image_pack_id, uiux_audit_id,
         verification_status, risk_level, source_count, status, notes, admin_notes
       )
-      values ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $15)
+      values ($1, $2, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $16)
       returning id;
     `,
     [
       input.topic,
       input.itemType,
+      normalizeContentDestination(input.contentDestination),
       input.summary,
       optionalUuid(input.researchPackId),
       optionalUuid(input.verificationReportId),

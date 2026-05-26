@@ -1,6 +1,7 @@
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { getPool } from "@/lib/db";
 import { requireUuid } from "@/lib/db/ids";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 
 type AgentTaskInput = {
   agentName: string;
@@ -8,6 +9,7 @@ type AgentTaskInput = {
   input: unknown;
   status?: "queued" | "running" | "completed" | "failed";
   costEstimate?: number;
+  contentDestination?: ContentDestination;
 };
 
 export async function createAgentTask(input: AgentTaskInput) {
@@ -15,10 +17,10 @@ export async function createAgentTask(input: AgentTaskInput) {
   const result = await getPool().query<{ id: string }>(
     `
       insert into agent_tasks (
-        agent_id, agent_name, title, task_type, status, input, input_json,
+        agent_id, agent_name, title, task_type, content_destination, status, input, input_json,
         cost_estimate_inr, cost_estimate
       )
-      values ($1, $2, $3, $4, $5, $6, $6, $7, $7)
+      values ($1, $2, $3, $4, $5, $6, $7, $7, $8, $8)
       returning id;
     `,
     [
@@ -26,6 +28,7 @@ export async function createAgentTask(input: AgentTaskInput) {
       input.agentName,
       `${input.agentName}: ${input.taskType}`,
       input.taskType,
+      normalizeContentDestination(input.contentDestination),
       input.status ?? "running",
       JSON.stringify(input.input ?? {}),
       input.costEstimate ?? 0

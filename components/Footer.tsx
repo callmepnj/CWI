@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 const footerLinks = [
   { label: "Home", href: "/" },
   { label: "Watch", href: "/watch" },
+  { label: "CWI Live Newsroom", href: "/live-newsroom" },
   { label: "Cockroach Watch India", href: "/" },
   { label: "CWI Watch Desk", href: "/watch-desk" },
   { label: "India Unanswered Files", href: "/india-unanswered-files" },

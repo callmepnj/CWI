@@ -3,6 +3,7 @@ import { ensureAdminDatabase } from "@/lib/db/admin";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
 import type { ArticleSource, VerificationStatus, WatchCategory, WatchPost } from "@/data/posts";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 
 export async function saveVerificationReport(report: {
   researchPackId: string;
@@ -12,20 +13,22 @@ export async function saveVerificationReport(report: {
   saferWording: unknown[];
   sourceGaps: unknown[];
   publishRecommendation: string;
+  contentDestination?: ContentDestination;
 }) {
   await ensureAdminDatabase();
   const researchPackId = requireUuid(report.researchPackId, "researchPackId");
   const result = await getPool().query<{ id: string }>(
     `
       insert into verification_reports (
-        research_pack_id, verification_status, risk_level, unsafe_claims,
+        research_pack_id, content_destination, verification_status, risk_level, unsafe_claims,
         safer_wording, source_gaps, publish_recommendation, human_review_required
       )
-      values ($1, $2, $3, $4, $5, $6, $7, true)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, true)
       returning id;
     `,
     [
       researchPackId,
+      normalizeContentDestination(report.contentDestination),
       report.verificationStatus,
       report.riskLevel,
       JSON.stringify(report.unsafeClaims),
@@ -57,19 +60,21 @@ export async function saveArticleDraft(article: {
   body: unknown;
   verificationStatus: string;
   sourceCount: number;
+  contentDestination?: ContentDestination;
 }) {
   await ensureAdminDatabase();
   const result = await getPool().query<{ id: string }>(
     `
       insert into article_drafts (
-        research_pack_id, title, slug, category, draft, verification_status,
+        research_pack_id, content_destination, title, slug, category, draft, verification_status,
         source_count, approval_status, publish_status
       )
-      values ($1, $2, $3, $4, $5, $6, $7, 'Draft Ready', 'Not published')
+      values ($1, $2, $3, $4, $5, $6, $7, $8, 'Draft Ready', 'Not published')
       returning id;
     `,
     [
       optionalUuid(article.researchPackId),
+      normalizeContentDestination(article.contentDestination),
       article.title,
       article.slug,
       article.category,

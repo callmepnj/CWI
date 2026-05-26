@@ -21,6 +21,7 @@ import { rememberApprovalItem, rememberArticleDraft, rememberResearchPack } from
 import { assertArticleDraftAllowed, runVerificationGate } from "@/lib/ai/verification-engine";
 import { completeWorkflow, createWorkflow, failWorkflow, markWorkflowAwaitingApproval, setWorkflowStep } from "@/lib/ai/workflow-state";
 import { site } from "@/lib/site";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 
 type ManualLinkInput = {
   url: string;
@@ -30,6 +31,7 @@ type ManualLinkInput = {
   notes?: string;
   priority?: string;
   contentType?: string;
+  contentDestination?: ContentDestination | string;
 };
 
 type TopicToArticleInput = {
@@ -37,15 +39,21 @@ type TopicToArticleInput = {
   category?: string;
   sourceNotes?: string;
   url?: string;
+  contentDestination?: ContentDestination | string;
 };
 
 export async function runManualLinkToApproval(input: ManualLinkInput) {
   await ensureAdminDatabase();
   const url = normalizeUrl(input.url);
+  const contentDestination = normalizeContentDestination(input.contentDestination);
   const metadata = await extractUrlMetadata(url);
   const topic = clean(input.topic) || metadata.title || new URL(url).hostname;
   const platform = clean(input.platform) || detectPlatform(url);
-  const workflowId = await createWorkflow({ workflowType: "manual_link_to_approval", topic, payload: { ...input, url, platform, metadata } });
+  const workflowId = await createWorkflow({
+    workflowType: contentDestination === "live_newsroom" ? "manual_link_to_live_newsroom" : "manual_link_to_approval",
+    topic,
+    payload: { ...input, url, platform, metadata, contentDestination }
+  });
 
   try {
     const manualLinkId = await saveManualLink({
@@ -56,16 +64,19 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       notes: input.notes,
       priority: input.priority,
       contentType: input.contentType,
+      contentDestination,
       metadata
     });
 
     await setWorkflowStep(workflowId, "researching", "running");
-    const research = await runTask("CWI Source Lens", "manual_link_research", { url, topic, platform, metadata }, () =>
-      runResearchAgent({ topic, url, platform, notes: input.notes, metadata, category: categoryFromContentType(input.contentType) })
+    const research = await runTask("CWI Source Lens", "manual_link_research", { url, topic, platform, metadata, contentDestination }, () =>
+      runResearchAgent({ topic, url, platform, notes: input.notes, metadata, category: categoryFromContentType(input.contentType, contentDestination), contentDestination }),
+      true,
+      contentDestination
     );
     const researchPackId = await saveResearchPack({
       topic: research.topic,
-      category: research.category || categoryFromContentType(input.contentType),
+      category: research.category || categoryFromContentType(input.contentType, contentDestination),
       summary: research.summary,
       sources: research.sources,
       whatHappened: research.whatHappened,
@@ -74,14 +85,18 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       timeline: research.timeline,
       keyFacts: research.keyFacts,
       riskNotes: research.riskNotes,
-      suggestedAngle: research.suggestedAngle
+      suggestedAngle: research.suggestedAngle,
+      contentDestination
     });
     await rememberResearchPack({ ...research, id: researchPackId, source_count: research.sourceCount });
     await setWorkflowStep(workflowId, "researching", "completed", { researchPackId, sourceCount: research.sourceCount });
 
     await setWorkflowStep(workflowId, "verifying", "running");
-    const verification = await runTask("CWI Verify Shield", "manual_link_verify", { researchPackId }, () =>
+    const verification = await runTask("CWI Verify Shield", "manual_link_verify", { researchPackId, contentDestination }, () =>
       runVerifyAgent({ researchPack: { ...research, id: researchPackId } })
+      ,
+      true,
+      contentDestination
     );
     const verificationReportId = await saveVerificationReport({
       researchPackId,
@@ -90,15 +105,18 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       unsafeClaims: verification.unsafeClaims,
       saferWording: verification.saferWording,
       sourceGaps: verification.sourceGaps,
-      publishRecommendation: verification.publishRecommendation
+      publishRecommendation: verification.publishRecommendation,
+      contentDestination
     });
     const verificationGate = await runVerificationGate({ researchPackId, verificationReportId });
     await setWorkflowStep(workflowId, "verifying", "completed", { verificationReportId, verificationGate });
 
     await assertArticleDraftAllowed({ researchPackId, verificationReportId });
     await setWorkflowStep(workflowId, "drafting", "running");
-    const rawArticle = await runTask("CWI Desk Writer", "manual_link_article", { researchPackId, verificationReportId }, () =>
-      runArticleAgent({ researchPack: { ...research, id: researchPackId }, verificationReport: { ...verification, id: verificationReportId } })
+    const rawArticle = await runTask("CWI Desk Writer", "manual_link_article", { researchPackId, verificationReportId, contentDestination }, () =>
+      runArticleAgent({ researchPack: { ...research, id: researchPackId, content_destination: contentDestination }, verificationReport: { ...verification, id: verificationReportId, content_destination: contentDestination }, contentDestination }),
+      true,
+      contentDestination
     );
     const firstQuality = scoreArticleQuality(rawArticle);
     const article = improveArticleDraft(rawArticle, firstQuality);
@@ -114,27 +132,41 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       summary: article.summary,
       body: article,
       verificationStatus: verification.verificationStatus,
-      sourceCount: research.sourceCount
+      sourceCount: research.sourceCount,
+      contentDestination
     });
     await saveQualityScore(quality, { topic: article.title, articleDraftId });
     await rememberArticleDraft(article, { articleDraftId });
     await setWorkflowStep(workflowId, "drafting", "completed", { articleDraftId, quality });
 
     await setWorkflowStep(workflowId, "seo", "running");
-    const seo = await runTask("CWI Rank Engine", "manual_link_seo", { articleDraftId, title: article.title }, () =>
-      runSEOAgent({ articleDraft: { id: articleDraftId, title: article.title, slug: article.slug, draft: article } })
+    const seo = await runTask("CWI Rank Engine", "manual_link_seo", { articleDraftId, title: article.title, contentDestination }, () =>
+      runSEOAgent({ articleDraft: { id: articleDraftId, title: article.title, slug: article.slug, draft: article, content_destination: contentDestination }, contentDestination })
+      ,
+      true,
+      contentDestination
     );
-    const seoPackId = await saveSeoPack({ articleDraftId, ...seo });
+    const seoPackId = await saveSeoPack({ articleDraftId, contentDestination, ...seo });
     await setWorkflowStep(workflowId, "seo", "completed", { seoPackId });
 
     await setWorkflowStep(workflowId, "social", "running");
-    const social = await runTask("CWI Signal Studio", "manual_link_social", { articleDraftId, title: article.title }, () =>
-      runSocialAgent({ articleDraft: { id: articleDraftId, title: article.title, draft: article } })
+    const social = await runTask("CWI Signal Studio", "manual_link_social", { articleDraftId, title: article.title, contentDestination }, () =>
+      runSocialAgent({ articleDraft: { id: articleDraftId, title: article.title, draft: article, content_destination: contentDestination }, contentDestination })
+      ,
+      true,
+      contentDestination
     );
-    const socialPackId = await saveSocialPack({ articleDraftId, ...social });
+    const socialPackId = await saveSocialPack({ articleDraftId, contentDestination, ...social });
     await setWorkflowStep(workflowId, "social", "completed", { socialPackId });
 
-    const image = await runTask("CWI Visual Desk", "manual_link_image", { topic: article.title }, () => runImageAgent({ topic: article.title, articleDraftId }));
+    const image = await runTask(
+      "CWI Visual Desk",
+      "manual_link_image",
+      { topic: article.title, contentDestination },
+      () => runImageAgent({ topic: article.title, articleDraftId, contentDestination }),
+      true,
+      contentDestination
+    );
 
     const approvalQueueId = await saveApprovalItem({
       topic: article.title,
@@ -150,6 +182,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       riskLevel: verification.riskLevel,
       sourceCount: research.sourceCount,
       status: "waiting_for_approval",
+      contentDestination,
       adminNotes: `Human approval required. Verification gate: ${verificationGate.status}, quality readiness: ${quality.publishReadinessScore}/100.`
     });
     await rememberApprovalItem({ id: approvalQueueId, topic: article.title, summary: article.summary, status: "waiting_for_approval", verification_status: verification.verificationStatus, risk_level: verification.riskLevel, source_count: research.sourceCount });
@@ -176,19 +209,39 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 }
 
 export async function runTopicToArticle(input: TopicToArticleInput) {
+  const contentDestination = normalizeContentDestination(input.contentDestination);
   return runManualLinkToApproval({
-    url: input.url || `${site.url}/watch-desk`,
+    url: input.url || `${site.url}/${contentDestination === "live_newsroom" ? "live-newsroom" : "watch-desk"}`,
     topic: input.topic,
     platform: "Manual Topic",
     notes: input.sourceNotes,
-    contentType: input.category || "Watch Desk"
+    contentType: input.category || (contentDestination === "live_newsroom" ? "Live Newsroom" : "Watch Desk"),
+    contentDestination
   });
 }
 
-export async function runArticleToSocial(articleDraftId: string) {
+export function runManualLinkToLiveNewsroom(input: ManualLinkInput) {
+  return runManualLinkToApproval({ ...input, contentDestination: "live_newsroom" });
+}
+
+export function runTopicToLiveNewsroomArticle(input: TopicToArticleInput) {
+  return runTopicToArticle({ ...input, contentDestination: "live_newsroom" });
+}
+
+export function runIndiaUnansweredFileToLiveNewsroom(input: TopicToArticleInput & { existingFileData?: unknown }) {
+  return runTopicToArticle({
+    ...input,
+    category: input.category || "India Unanswered Files",
+    sourceNotes: [input.sourceNotes, input.existingFileData ? JSON.stringify(input.existingFileData) : ""].filter(Boolean).join("\n\n"),
+    contentDestination: "live_newsroom"
+  });
+}
+
+export async function runArticleToSocial(articleDraftId: string, contentDestination: ContentDestination = "live_newsroom") {
   await ensureAdminDatabase();
-  const social = await runTask("CWI Signal Studio", "article_to_social", { articleDraftId }, () => runSocialAgent({ articleDraftId }));
-  const socialPackId = await saveSocialPack({ articleDraftId, ...social });
+  const destination = normalizeContentDestination(contentDestination);
+  const social = await runTask("CWI Signal Studio", "article_to_social", { articleDraftId, contentDestination: destination }, () => runSocialAgent({ articleDraftId, contentDestination: destination }), true, destination);
+  const socialPackId = await saveSocialPack({ articleDraftId, contentDestination: destination, ...social });
   const approvalQueueId = await saveApprovalItem({
     topic: "Social pack",
     itemType: "Social Pack",
@@ -199,14 +252,16 @@ export async function runArticleToSocial(articleDraftId: string) {
     riskLevel: "Low",
     sourceCount: 0,
     status: "waiting_for_approval",
+    contentDestination: destination,
     adminNotes: "Approve social captions before posting manually."
   });
   return { socialPackId, approvalQueueId };
 }
 
-export async function runUIUXAuditWorkflow(input: { page: string; notes?: string }) {
+export async function runUIUXAuditWorkflow(input: { page: string; notes?: string; contentDestination?: ContentDestination }) {
   await ensureAdminDatabase();
-  const audit = await runTask("CWI UX Guardian", "uiux_audit", input, () => runUIUXAgent(input));
+  const contentDestination = normalizeContentDestination(input.contentDestination);
+  const audit = await runTask("CWI UX Guardian", "uiux_audit", { ...input, contentDestination }, () => runUIUXAgent(input), true, contentDestination);
   const result = await getPool().query<{ id: string }>(
     `
       insert into uiux_audits (page, issue, severity, suggested_text, fix_status)
@@ -229,9 +284,18 @@ export async function runUIUXAuditWorkflow(input: { page: string; notes?: string
     riskLevel: audit.severity,
     sourceCount: 0,
     status: "waiting_for_approval",
+    contentDestination,
     adminNotes: "No UI changes should be applied until approved."
   });
   return { uiuxAuditId: result.rows[0].id, approvalQueueId };
+}
+
+export function runUIUXAuditLiveNewsroom(input: { page?: string; pageName?: string; pageUrl?: string; notes?: string }) {
+  return runUIUXAuditWorkflow({
+    page: input.page || input.pageName || input.pageUrl || "/live-newsroom",
+    notes: input.notes,
+    contentDestination: "live_newsroom"
+  });
 }
 
 export async function runPublishApprovedItem(approvalQueueId: string) {
@@ -256,6 +320,10 @@ export async function runPublishApprovedItem(approvalQueueId: string) {
   }
 }
 
+export function runPublishApprovedLiveNewsroomItem(approvalQueueId: string) {
+  return runPublishApprovedItem(approvalQueueId);
+}
+
 export async function runSystemHealthWorkflow() {
   return runSystemHealthAgent();
 }
@@ -269,13 +337,14 @@ async function runTask<T>(
   taskType: string,
   input: unknown,
   runner: () => Promise<T>,
-  enforceBudget = true
+  enforceBudget = true,
+  contentDestination: ContentDestination = "live_newsroom"
 ) {
   if (enforceBudget) {
     await assertBudgetAllowsWork();
   }
 
-  const taskId = await createAgentTask({ agentName, taskType, input, status: "running" });
+  const taskId = await createAgentTask({ agentName, taskType, input, status: "running", contentDestination });
 
   try {
     const output = await runner();
@@ -364,11 +433,12 @@ function detectPlatform(url: string) {
   return "Website";
 }
 
-function categoryFromContentType(value?: string) {
+function categoryFromContentType(value?: string, destination: ContentDestination = "live_newsroom") {
   const lower = clean(value).toLowerCase();
   if (lower.includes("unanswered")) return "India Unanswered Files";
   if (lower.includes("advisory")) return "Public Advisory";
   if (lower.includes("social")) return "Social Pack";
+  if (destination === "live_newsroom") return "Live Newsroom";
   return "Watch Desk";
 }
 

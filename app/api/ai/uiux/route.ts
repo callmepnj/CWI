@@ -1,4 +1,5 @@
 import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
+import { normalizeContentDestination } from "@/lib/ai/content-destination";
 import { runUIUXAuditWorkflow } from "@/lib/ai/orchestrator";
 
 export const runtime = "nodejs";
@@ -7,10 +8,14 @@ export async function POST(request: Request) {
   const blocked = requireAdminApi(request);
   if (blocked) return blocked;
 
-  const body = (await request.json().catch(() => null)) as { page?: string; notes?: string } | null;
+  const body = (await request.json().catch(() => null)) as { page?: string; notes?: string; contentDestination?: string } | null;
 
   try {
-    const result = await runUIUXAuditWorkflow({ page: body?.page || "Homepage", notes: body?.notes });
+    const result = await runUIUXAuditWorkflow({
+      page: body?.page || "/live-newsroom",
+      notes: body?.notes,
+      contentDestination: normalizeContentDestination(body?.contentDestination)
+    });
     return ok(result, "UI/UX audit saved and sent to approval queue.");
   } catch (error) {
     console.error("CWI UX Guardian failed", error);

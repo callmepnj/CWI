@@ -14,7 +14,7 @@ const statusMap: Record<string, string> = {
   "Request Changes": "changes_requested",
   Rejected: "rejected",
   Reject: "rejected",
-  "Save for Later": "waiting_for_approval",
+  "Save for Later": "saved_for_later",
   Archived: "archived",
   Archive: "archived",
   approved: "approved",
@@ -23,6 +23,7 @@ const statusMap: Record<string, string> = {
   published: "published",
   archived: "archived",
   waiting_for_approval: "waiting_for_approval",
+  saved_for_later: "saved_for_later",
   approved_publish: "approved",
   approved_article_only: "approved_article_only",
   approved_social_only: "approved_social_only"

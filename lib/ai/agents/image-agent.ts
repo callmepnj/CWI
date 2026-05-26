@@ -1,4 +1,5 @@
 import { getFileVisual, unansweredFiles } from "@/data/unanswered-files";
+import { normalizeContentDestination, type ContentDestination } from "@/lib/ai/content-destination";
 import { getPool } from "@/lib/db";
 
 export type ImageAgentOutput = {
@@ -11,8 +12,9 @@ export type ImageAgentOutput = {
   imagePackId?: string;
 };
 
-export async function runImageAgent(input: { topic?: string; articleDraftId?: string }) {
+export async function runImageAgent(input: { topic?: string; articleDraftId?: string; contentDestination?: ContentDestination }) {
   const topic = input.topic || "CWI Watch Desk update";
+  const contentDestination = normalizeContentDestination(input.contentDestination);
   const file =
     unansweredFiles.find((item) => topic.toLowerCase().includes(item.title.toLowerCase().split(" ")[0])) ||
     unansweredFiles.find((item) => item.heroImage) ||
@@ -30,12 +32,13 @@ export async function runImageAgent(input: { topic?: string; articleDraftId?: st
 
   const result = await getPool().query<{ id: string }>(
     `
-      insert into image_library (topic, section, image_type, path, alt_text, credit, source_url, quality_status, approval_status, metadata)
-      values ($1, 'CWI AI OS', 'hero/thumbnail/og/social candidate', $2, $3, $4, $5, 'Needs human review', 'Image Ready', $6)
+      insert into image_library (topic, section, content_destination, image_type, path, alt_text, credit, source_url, quality_status, approval_status, metadata)
+      values ($1, 'CWI AI OS', $2, 'hero/thumbnail/og/social candidate', $3, $4, $5, $6, 'Needs human review', 'Image Ready', $7)
       returning id;
     `,
     [
       topic,
+      contentDestination,
       output.heroImage,
       output.altText,
       visual.credit,

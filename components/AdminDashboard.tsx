@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type React from "react";
 import {
   Activity,
@@ -79,11 +79,14 @@ type AdminData = {
   costUsageLogs: AdminRecord[];
   latestPublicArticles: AdminRecord[];
   latestUnansweredFiles: AdminRecord[];
+  liveNewsroomItems: AdminRecord[];
+  liveNewsroomFallbackItems: AdminRecord[];
 };
 
 const sections = [
   ["overview", "Overview", Activity],
   ["command-center", "Command Center", Gauge],
+  ["live-newsroom", "Live Newsroom", Newspaper],
   ["agents", "Agent Control", Bot],
   ["approval", "Approval Queue", ClipboardCheck],
   ["manual-link", "Manual Link Processor", LinkIcon],
@@ -130,6 +133,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
   const [pending, setPending] = useState("");
   const [progress, setProgress] = useState<{ label: string; detail: string; percent: number } | null>(null);
   const [currentSection, setCurrentSection] = useState(activeSection);
+  const commentCountRef = useRef<number | null>(null);
 
   const safeSection = normalizeSection(currentSection);
 
@@ -169,6 +173,18 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     return () => window.clearInterval(timer);
   }, [pending]);
 
+  useEffect(() => {
+    if (safeSection !== "comments") {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      loadDashboard(true);
+    }, 15000);
+
+    return () => window.clearInterval(timer);
+  }, [safeSection]);
+
   async function loadDashboard(force = false) {
     setError("");
     const controller = new AbortController();
@@ -194,6 +210,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }
 
     setDegradedMessage(json.degraded ? json.error ?? "Admin dashboard is in setup mode." : "");
+    const nextCommentCount = Array.isArray(json.data?.comments) ? json.data.comments.length : 0;
+    if (safeSection === "comments" && commentCountRef.current !== null && nextCommentCount > commentCountRef.current) {
+      setMessage("New comment received");
+    }
+    commentCountRef.current = nextCommentCount;
     setData(json.data);
   }
 
@@ -261,7 +282,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
   async function publishApproval(id: string) {
     setPending(`${id}:publish`);
-    startProgress("Publishing approved article", "Publish AI is saving the article and opening the public Watch Desk route.");
+    startProgress("Publishing approved article", "Publish AI is saving the article and opening the correct public route.");
     setMessage("");
     setError("");
 
@@ -283,7 +304,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
   async function approveAndPublish(item: AdminRecord) {
     const id = text(item.id);
     setPending(`${id}:approved`);
-    startProgress("Approving and publishing", "Saving approval, preparing any missing article draft, and opening the public Watch Desk route.");
+    startProgress("Approving and publishing", "Saving approval, preparing any missing article draft, and opening the correct public route.");
     setMessage("");
     setError("");
 
@@ -387,9 +408,9 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
       return;
     }
 
-    setMessage(`Comment marked ${status}.`);
+    setMessage(status === "approved" ? "Comment approved" : status === "rejected" ? "Comment rejected" : `Comment marked ${status}.`);
+    updateCommentInState(source, id, status);
     finishProgress("Comment moderation saved.");
-    await loadDashboard(true);
   }
 
   function startProgress(label: string, detail: string) {
@@ -434,6 +455,19 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
         ...current,
         approvals: current.approvals.map((item) =>
           text(item.id) === id ? { ...item, status: "published" } : item
+        )
+      };
+    });
+  }
+
+  function updateCommentInState(source: string, id: string, status: string) {
+    setData((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        comments: current.comments.map((comment) =>
+          text(comment.id) === id && text(comment.source) === source ? { ...comment, status } : comment
         )
       };
     });
@@ -548,6 +582,20 @@ function AdminSection({
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
   if (section === "command-center") return <CommandCenterSection data={data} pending={pending} runAction={runAction} />;
+  if (section === "live-newsroom") {
+    return (
+      <LiveNewsroomSection
+        data={data}
+        pending={pending}
+        runAction={runAction}
+        refresh={refresh}
+        updateApproval={updateApproval}
+        publishApproval={publishApproval}
+        approveAndPublish={approveAndPublish}
+        generateArticleForApproval={generateArticleForApproval}
+      />
+    );
+  }
   if (section === "agents") return <AgentsSection data={data} pending={pending} runAction={runAction} />;
   if (section === "workflows") {
     return (
@@ -570,7 +618,7 @@ function AdminSection({
       />
     );
   }
-  if (section === "manual-link") return <ManualLinkSection onComplete={refresh} />;
+  if (section === "manual-link") return <ManualLinkSection onComplete={refresh} defaultDestination="live_newsroom" />;
   if (section === "source-memory") return <MemoryGraphSection data={data} pending={pending} runAction={runAction} />;
   if (section === "trend-radar") return <TrendRadarSection data={data} pending={pending} runAction={runAction} />;
   if (section === "quality-scores") return <QualityScoresSection data={data} />;
@@ -681,6 +729,90 @@ function CommandCenterSection({ data, pending, runAction }: { data: AdminData; p
         <PreviewList title="Workflow state" records={data.workflows} fields={["workflow_type", "topic", "status", "current_step", "progress_percent"]} />
         <PreviewList title="Pending approvals" records={data.approvals} fields={["topic", "type", "verification_status", "risk_level", "status"]} />
       </div>
+      <CostDashboard data={data} />
+    </div>
+  );
+}
+
+function LiveNewsroomSection({
+  data,
+  pending,
+  runAction,
+  refresh,
+  updateApproval,
+  publishApproval,
+  approveAndPublish,
+  generateArticleForApproval
+}: {
+  data: AdminData;
+  pending: string;
+  runAction: (action: string) => Promise<void>;
+  refresh: () => Promise<void>;
+  updateApproval: (id: string, status: string) => Promise<void>;
+  publishApproval: (id: string) => Promise<void>;
+  approveAndPublish: (item: AdminRecord) => Promise<void>;
+  generateArticleForApproval: (item: AdminRecord) => Promise<void>;
+}) {
+  const liveFilter = (record: AdminRecord) => text(record.content_destination) === "live_newsroom";
+  const liveApprovals = data.approvals.filter(liveFilter);
+  const liveResearch = data.researchPacks.filter(liveFilter);
+  const liveVerification = data.verificationReports.filter(liveFilter);
+  const liveDrafts = data.articleDrafts.filter(liveFilter);
+  const liveSeo = data.seoPacks.filter(liveFilter);
+  const liveSocial = data.socialPacks.filter(liveFilter);
+  const liveImages = data.imageLibrary.filter(liveFilter);
+  const published = [...data.liveNewsroomItems, ...data.liveNewsroomFallbackItems];
+
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <CardLabel>Default destination: Live Newsroom</CardLabel>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">CWI Live Newsroom Control</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/70">
+              This page reuses the existing CWI agents. Manual links, topics, drafts, SEO, social, visuals, approvals, and publishing are filtered to content_destination = live_newsroom.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" onClick={() => runAction("system-health")} disabled={pending === "system-health"}>Check Health</Button>
+            <Button type="button" variant="outline" onClick={() => runAction("uiux-audit")} disabled={pending === "uiux-audit"}>Audit Live UI</Button>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MiniMetric label="Published items" value={String(published.length)} />
+        <MiniMetric label="Waiting approvals" value={String(liveApprovals.filter((item) => normalizeApprovalStatus(text(item.status)) === "waiting_for_approval").length)} />
+        <MiniMetric label="Drafts waiting" value={String(liveDrafts.filter((item) => text(item.publish_status) !== "Published").length)} />
+        <MiniMetric label="Failed tasks" value={text(data.health.failed_tasks)} />
+      </div>
+
+      <ManualLinkSection onComplete={refresh} defaultDestination="live_newsroom" compactTitle="Manual Link Processor" />
+
+      <div className="grid gap-5 xl:grid-cols-2">
+        <PreviewList title="Research Packs" records={liveResearch} fields={["topic", "category", "source_count", "status"]} />
+        <PreviewList title="Verification Reports" records={liveVerification} fields={["verification_status", "risk_level", "publish_recommendation"]} />
+        <PreviewList title="Drafts" records={liveDrafts} fields={["title", "slug", "category", "verification_status", "publish_status"]} />
+        <PreviewList title="SEO Packs" records={liveSeo} fields={["seo_title", "canonical_url", "sitemap_status"]} />
+        <PreviewList title="Social Packs" records={liveSocial} fields={["instagram_caption", "x_caption", "website_line"]} />
+        <PreviewList title="Images" records={liveImages} fields={["topic", "path", "alt_text", "quality_status"]} />
+      </div>
+
+      <Card>
+        <CardLabel>Approval Queue</CardLabel>
+        <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Live Newsroom approvals</h2>
+      </Card>
+      <ApprovalSection
+        data={{ ...data, approvals: liveApprovals }}
+        pending={pending}
+        updateApproval={updateApproval}
+        publishApproval={publishApproval}
+        approveAndPublish={approveAndPublish}
+        generateArticleForApproval={generateArticleForApproval}
+      />
+
+      <RecordList title="Published Live Newsroom Updates" records={published} fields={["title", "slug", "category", "verificationStatus", "sourceCount", "canonicalUrl"]} />
       <CostDashboard data={data} />
     </div>
   );
@@ -1017,11 +1149,19 @@ const approvalActions = [
   { label: "Approve Article Only", status: "approved_article_only" },
   { label: "Request Changes", status: "changes_requested" },
   { label: "Reject", status: "rejected" },
-  { label: "Save for Later", status: "waiting_for_approval" },
+  { label: "Save for Later", status: "saved_for_later" },
   { label: "Archive", status: "archived" }
 ] as const;
 
-function ManualLinkSection({ onComplete }: { onComplete: () => Promise<void> }) {
+function ManualLinkSection({
+  onComplete,
+  defaultDestination = "live_newsroom",
+  compactTitle = "Manual Link Processor"
+}: {
+  onComplete: () => Promise<void>;
+  defaultDestination?: string;
+  compactTitle?: string;
+}) {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -1044,7 +1184,8 @@ function ManualLinkSection({ onComplete }: { onComplete: () => Promise<void> }) 
         creatorSource: formData.get("creatorSource"),
         notes: formData.get("notes"),
         priority: formData.get("priority"),
-        contentType: formData.get("contentType")
+        contentType: formData.get("contentType"),
+        contentDestination: formData.get("contentDestination") || defaultDestination
       })
     }).catch(() => null);
     const json = await response?.json().catch(() => null);
@@ -1062,7 +1203,7 @@ function ManualLinkSection({ onComplete }: { onComplete: () => Promise<void> }) 
 
   return (
     <Card>
-      <CardLabel>Manual Link Processor</CardLabel>
+      <CardLabel>{compactTitle}</CardLabel>
       <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Process a source without paid APIs</h2>
       <p className="mt-3 leading-7 text-ink/70">
         Paste a URL from Instagram, X, YouTube, Reddit, Bluesky, a news article, official statement, or public website. The system extracts low-cost metadata, creates packs, and sends everything to approval.
@@ -1075,6 +1216,18 @@ function ManualLinkSection({ onComplete }: { onComplete: () => Promise<void> }) 
           <AdminInput name="creatorSource" label="Creator / source" placeholder="Source name or public handle" />
           <AdminSelect name="priority" label="Priority" options={["normal", "high", "urgent", "low"]} />
           <AdminSelect name="contentType" label="Content type" options={["manual link", "Watch Desk", "Public Advisory", "Social Pack", "India Unanswered Files", "Civic Issue"]} />
+          <AdminSelect
+            name="contentDestination"
+            label="Destination"
+            defaultValue={defaultDestination}
+            options={[
+              ["live_newsroom", "Live Newsroom"],
+              ["watch_desk", "Watch Desk"],
+              ["india_unanswered_files", "India Unanswered Files"],
+              ["public_advisory", "Public Advisory"],
+              ["social_only", "Social Only"]
+            ]}
+          />
         </div>
         <label className="grid gap-2 text-sm font-black uppercase tracking-[0.08em] text-ink/65">
           Notes
@@ -1121,6 +1274,8 @@ function SystemHealthSection({ data, pending, runAction }: { data: AdminData; pe
           <MiniMetric label="Sitemap" value={text(health.sitemap_status)} />
           <MiniMetric label="Robots" value={text(health.robots_status)} />
           <MiniMetric label="Old URL check" value={text(health.old_url_check)} />
+          <MiniMetric label="Live Newsroom route" value={text(health.liveNewsroomStatus)} />
+          <MiniMetric label="Live Newsroom DB" value={text(health.liveNewsroomDbStatus)} />
           <MiniMetric label="Pending approvals" value={text(health.pending_approvals)} />
           <MiniMetric label="Daily AI usage" value={`₹${number(Number(health.daily_ai_usage_inr ?? 0))}`} />
           <MiniMetric label="Monthly usage" value={`₹${number(Number(health.monthly_budget_usage_inr ?? data.budget.estimatedMonthlyCost))}`} />
@@ -1228,24 +1383,41 @@ function CommentsSection({
         <Card key={`${text(comment.source)}-${text(comment.id)}`}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <CardLabel>{text(comment.source)} / {text(comment.status)}</CardLabel>
+              <CardLabel>{text(comment.source)}</CardLabel>
               <h3 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">{text(comment.article)}</h3>
               <p className="mt-3 text-sm font-black uppercase tracking-[0.1em] text-ink/50">{text(comment.name)}</p>
               <p className="mt-3 leading-7 text-ink/72">{text(comment.comment)}</p>
             </div>
+            <StatusPill status={text(comment.status)} />
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
-            {["approved", "rejected", "spam", "pending"].map((status) => (
-              <Button key={status} type="button" size="sm" variant={status === "approved" ? "default" : "outline"} disabled={pending === `${text(comment.id)}:${status}`} onClick={() => updateComment(text(comment.source), text(comment.id), status)}>
+            {["approved", "rejected", "spam", "pending"].map((status) => {
+              const currentStatus = normalizeCommentStatus(text(comment.status));
+              return (
+              <Button key={status} type="button" size="sm" variant={status === "approved" ? "default" : "outline"} disabled={pending === `${text(comment.id)}:${status}` || currentStatus === status} onClick={() => updateComment(text(comment.source), text(comment.id), status)}>
                 {status}
               </Button>
-            ))}
+              );
+            })}
           </div>
         </Card>
       ))}
       {records.length === 0 ? <Card><p className="font-bold text-ink/64">No comments yet.</p></Card> : null}
     </div>
   );
+}
+
+function StatusPill({ status }: { status: string }) {
+  const normalized = normalizeCommentStatus(status);
+  const label = normalized === "approved" ? "Approved" : normalized === "rejected" ? "Rejected" : normalized === "spam" ? "Spam" : "Pending";
+  const className =
+    normalized === "approved"
+      ? "bg-leaf/10 text-[#047766] ring-leaf/20"
+      : normalized === "rejected" || normalized === "spam"
+        ? "bg-urgent/10 text-urgent ring-urgent/20"
+        : "bg-saffron/15 text-[#8A5B00] ring-saffron/20";
+
+  return <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ring-1 ${className}`}>{label}</span>;
 }
 
 function RecordList({ title, records, fields, empty }: { title: string; records: AdminRecord[]; fields: string[]; empty?: string }) {
@@ -1302,13 +1474,25 @@ function AdminInput({ name, label, placeholder, required }: { name: string; labe
   );
 }
 
-function AdminSelect({ name, label, options }: { name: string; label: string; options: string[] }) {
+function AdminSelect({
+  name,
+  label,
+  options,
+  defaultValue
+}: {
+  name: string;
+  label: string;
+  options: Array<string | readonly [string, string]>;
+  defaultValue?: string;
+}) {
   return (
     <label className="grid gap-2 text-sm font-black uppercase tracking-[0.08em] text-ink/65">
       {label}
-      <select name={name} className="rounded-2xl border border-line bg-paper px-4 py-3 normal-case tracking-normal outline-none focus:border-royal">
+      <select name={name} defaultValue={defaultValue} className="rounded-2xl border border-line bg-paper px-4 py-3 normal-case tracking-normal outline-none focus:border-royal">
         {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
+          <option key={Array.isArray(option) ? option[0] : option} value={Array.isArray(option) ? option[0] : option}>
+            {Array.isArray(option) ? option[1] : option}
+          </option>
         ))}
       </select>
     </label>
@@ -1421,7 +1605,8 @@ function normalizeApprovalStatus(value: string) {
     changes_requested: "changes_requested",
     reject: "rejected",
     rejected: "rejected",
-    save_for_later: "waiting_for_approval",
+    save_for_later: "saved_for_later",
+    saved_for_later: "saved_for_later",
     waiting_for_approval: "waiting_for_approval",
     published: "published",
     archive: "archived",
@@ -1429,6 +1614,12 @@ function normalizeApprovalStatus(value: string) {
   };
 
   return statusMap[normalized] ?? normalized;
+}
+
+function normalizeCommentStatus(value: string) {
+  const normalized = value.trim().toLowerCase();
+  if (["approved", "rejected", "spam", "pending"].includes(normalized)) return normalized;
+  return "pending";
 }
 
 function normalizeSection(value: string): SectionId {

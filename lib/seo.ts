@@ -25,6 +25,7 @@ export const importantRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
+  "/live-newsroom",
   "/india-unanswered-files",
   "/watch-desk",
   "/issues",

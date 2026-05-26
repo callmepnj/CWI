@@ -4,6 +4,7 @@ import { getAIProviderConfig } from "@/lib/ai/model-provider";
 import { ensureAdminOsTables, ensureCommentsTable, ensureReportsTable, ensureUnansweredFilesTables, getPool } from "@/lib/db";
 import { normalizeApprovalStatus } from "@/lib/db/approval";
 import { getPublishedWatchPosts } from "@/lib/db/articles";
+import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/lib/db/live-newsroom";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
 import { cwiOsAgents, syncBigBrainRules } from "@/lib/ai/big-brain";
@@ -231,6 +232,8 @@ async function buildAdminDashboardData() {
 
   const approvalRows = approvals.rows;
   const dbPublishedPosts = await getPublishedWatchPosts(8).catch(() => []);
+  const liveNewsroomItems = await getPublishedLiveNewsroomItems(24).catch(() => []);
+  const liveNewsroomFallbackItems = getLiveNewsroomFallbackItems(24);
   const estimatedMonthlyCost = Number(costs.rows[0]?.month_cost ?? 0);
   const estimatedDailyCost = Number(dailyCosts.rows[0]?.day_cost ?? 0);
   const pendingApprovals = approvalRows.filter((row) => normalizeApprovalStatus(row.status) === "waiting_for_approval").length;
@@ -247,6 +250,8 @@ async function buildAdminDashboardData() {
     ai: publicAiConfig(),
     counts: {
       totalArticles: posts.length + dbPublishedPosts.length + unansweredFiles.length,
+      liveNewsroomItems: liveNewsroomItems.length + liveNewsroomFallbackItems.length,
+      liveNewsroomApprovals: approvalRows.filter((row) => row.content_destination === "live_newsroom").length,
       pendingApprovals,
       reportsReceived: reports.rows.length,
       researchPacksReady: researchPacks.rows.length,
@@ -286,6 +291,8 @@ async function buildAdminDashboardData() {
     memoryGraphNodes: memoryGraphNodes.rows,
     memoryGraphEdges: memoryGraphEdges.rows,
     costUsageLogs: costUsageLogs.rows,
+    liveNewsroomItems,
+    liveNewsroomFallbackItems,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
     latestPublicArticles: mergeAdminArticles([
       ...dbPublishedPosts.map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),

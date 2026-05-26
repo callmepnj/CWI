@@ -5,6 +5,7 @@ import { getPool } from "@/lib/db";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { saveApprovalItem } from "@/lib/db/approval";
 import { saveVerificationReport } from "@/lib/db/articles";
+import { normalizeContentDestination } from "@/lib/ai/content-destination";
 
 export const runtime = "nodejs";
 
@@ -12,13 +13,14 @@ export async function POST(request: Request) {
   const blocked = requireAdminApi(request);
   if (blocked) return blocked;
 
-  const body = (await request.json().catch(() => null)) as { researchPackId?: string } | null;
+  const body = (await request.json().catch(() => null)) as { researchPackId?: string; contentDestination?: string } | null;
 
   try {
     const researchPackId = body?.researchPackId || (await latestId("research_packs"));
     if (!researchPackId) return fail(new Error("No research pack found. Run Research AI first."), 400);
+    const contentDestination = normalizeContentDestination(body?.contentDestination);
 
-    const taskId = await createAgentTask({ agentName: "CWI Verify Shield", taskType: "verify_pack", input: { researchPackId } });
+    const taskId = await createAgentTask({ agentName: "CWI Verify Shield", taskType: "verify_pack", input: { researchPackId, contentDestination }, contentDestination });
     try {
       const verification = await runVerifyAgent({ researchPackId });
       await completeAgentTask(taskId, verification, verification._meta?.estimatedCost ?? 0);
@@ -29,7 +31,8 @@ export async function POST(request: Request) {
         unsafeClaims: verification.unsafeClaims,
         saferWording: verification.saferWording,
         sourceGaps: verification.sourceGaps,
-        publishRecommendation: verification.publishRecommendation
+        publishRecommendation: verification.publishRecommendation,
+        contentDestination
       });
       const verificationGate = await runVerificationGate({ researchPackId, verificationReportId });
       const approvalQueueId = await saveApprovalItem({
@@ -42,6 +45,7 @@ export async function POST(request: Request) {
         riskLevel: verification.riskLevel,
         sourceCount: 0,
         status: "waiting_for_approval",
+        contentDestination,
         adminNotes: "Review verification before drafting or publishing."
       });
       return ok({ verificationReportId, approvalQueueId, verification, verificationGate }, "Verification report saved.");

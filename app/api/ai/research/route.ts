@@ -4,6 +4,7 @@ import { rememberApprovalItem, rememberResearchPack } from "@/lib/ai/source-memo
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { saveApprovalItem } from "@/lib/db/approval";
 import { saveResearchPack } from "@/lib/db/research";
+import { normalizeContentDestination } from "@/lib/ai/content-destination";
 
 export const runtime = "nodejs";
 
@@ -11,13 +12,14 @@ export async function POST(request: Request) {
   const blocked = requireAdminApi(request);
   if (blocked) return blocked;
 
-  const body = (await request.json().catch(() => null)) as { topic?: string; url?: string; notes?: string; category?: string } | null;
+  const body = (await request.json().catch(() => null)) as { topic?: string; url?: string; notes?: string; category?: string; contentDestination?: string } | null;
   const topic = body?.topic?.trim() || "CWI priority research";
+  const contentDestination = normalizeContentDestination(body?.contentDestination);
 
   try {
-    const taskId = await createAgentTask({ agentName: "CWI Source Lens", taskType: "research_only", input: body ?? {} });
+    const taskId = await createAgentTask({ agentName: "CWI Source Lens", taskType: "research_only", input: body ?? {}, contentDestination });
     try {
-      const research = await runResearchAgent({ topic, url: body?.url, notes: body?.notes, category: body?.category });
+      const research = await runResearchAgent({ topic, url: body?.url, notes: body?.notes, category: body?.category, contentDestination });
       await completeAgentTask(taskId, research, research._meta?.estimatedCost ?? 0);
       const researchPackId = await saveResearchPack({
         topic: research.topic,
@@ -30,7 +32,8 @@ export async function POST(request: Request) {
         timeline: research.timeline,
         keyFacts: research.keyFacts,
         riskNotes: research.riskNotes,
-        suggestedAngle: research.suggestedAngle
+        suggestedAngle: research.suggestedAngle,
+        contentDestination
       });
       const approvalQueueId = await saveApprovalItem({
         topic: research.topic,
@@ -41,6 +44,7 @@ export async function POST(request: Request) {
         riskLevel: "Medium",
         sourceCount: research.sourceCount,
         status: "waiting_for_approval",
+        contentDestination,
         adminNotes: "Review research before sending to Article AI."
       });
       await rememberResearchPack({ ...research, id: researchPackId, source_count: research.sourceCount });

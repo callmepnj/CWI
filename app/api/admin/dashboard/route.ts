@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/admin-auth";
 import { getAdminDashboardData } from "@/lib/cwi-admin-os";
+import { getLiveNewsroomFallbackItems } from "@/lib/db/live-newsroom";
 
 export const runtime = "nodejs";
 
@@ -28,6 +29,7 @@ export async function GET(request: Request) {
 }
 
 function buildSetupModeDashboard() {
+  const liveNewsroomFallbackItems = getLiveNewsroomFallbackItems(24);
   return {
     budget: {
       monthlyCapInr: 8000,
@@ -46,6 +48,8 @@ function buildSetupModeDashboard() {
     },
     counts: {
       totalArticles: 0,
+      liveNewsroomItems: liveNewsroomFallbackItems.length,
+      liveNewsroomApprovals: 0,
       pendingApprovals: 0,
       reportsReceived: 0,
       researchPacksReady: 0,
@@ -106,6 +110,8 @@ function buildSetupModeDashboard() {
     memoryGraphEdges: [],
     costUsageLogs: [],
     latestPublicArticles: [],
-    latestUnansweredFiles: []
+    latestUnansweredFiles: [],
+    liveNewsroomItems: [],
+    liveNewsroomFallbackItems
   };
 }

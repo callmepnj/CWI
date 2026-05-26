@@ -5,6 +5,8 @@ import { rememberArticleDraft } from "@/lib/ai/source-memory";
 import { assertArticleDraftAllowed } from "@/lib/ai/verification-engine";
 import { attachDraftToApprovalItem, getApprovalItem, isPublishApproved, updateApprovalItem } from "@/lib/db/approval";
 import { getArticleDraft, saveArticleDraft, savePublishedArticle } from "@/lib/db/articles";
+import { normalizeContentDestination } from "@/lib/ai/content-destination";
+import { saveLiveNewsroomItemFromDraft } from "@/lib/db/live-newsroom";
 import { site } from "@/lib/site";
 
 export async function runPublishAgent(approvalQueueId: string) {
@@ -22,6 +24,42 @@ export async function runPublishAgent(approvalQueueId: string) {
 
   if (!articleDraft) {
     throw new Error("Publishing blocked. Article draft not found.");
+  }
+
+  const contentDestination = normalizeContentDestination(approval.content_destination || articleDraft.content_destination);
+
+  if (contentDestination === "live_newsroom") {
+    const liveItem = await saveLiveNewsroomItemFromDraft({
+      approval,
+      articleDraft
+    });
+
+    await updateApprovalItem(
+      approvalQueueId,
+      "published",
+      generatedArticleDraft
+        ? "Publish AI generated the missing article draft, saved it to live_newsroom_items, and opened the public Live Newsroom route."
+        : "Publish AI saved the approved item to live_newsroom_items and opened the public Live Newsroom route."
+    );
+
+    return {
+      publishedArticleId: liveItem.id,
+      publishedLiveNewsroomId: liveItem.id,
+      articleDraftId: articleDraft.id,
+      articleUrl: liveItem.url,
+      contentDestination,
+      generatedArticleDraft,
+      sitemapStatus: "Live Newsroom route is dynamic. Static sitemap includes the Live Newsroom index and fallback source-backed items.",
+      metadataStatus: "SEO pack remains attached to approval item.",
+      buildStatus: "Not required for dynamic public visibility.",
+      deploymentChecklist: [
+        "Open the public Live Newsroom URL and review formatting.",
+        "Confirm sources are visible on the detail page.",
+        "Check the approval item is marked published.",
+        "Run npm run build before deploy.",
+        "Inspect the final URL in Google Search Console."
+      ]
+    };
   }
 
   const slug = publicSlugForDraft(articleDraft.slug, articleDraft.id);
@@ -51,6 +89,7 @@ export async function runPublishAgent(approvalQueueId: string) {
     publishedArticleId,
     articleDraftId: articleDraft.id,
     articleUrl: url,
+    contentDestination,
     generatedArticleDraft,
     sitemapStatus: "Dynamic public route is live immediately. Static sitemap regeneration is still recommended before major deploys.",
     metadataStatus: "SEO pack remains attached to approval item.",
@@ -99,7 +138,8 @@ async function getOrCreatePublishableDraft(approval: Record<string, unknown>) {
     summary: article.summary,
     body: article,
     verificationStatus: asText(approval.verification_status) || "Developing",
-    sourceCount: article.sources.length || Number(approval.source_count ?? 0)
+    sourceCount: article.sources.length || Number(approval.source_count ?? 0),
+    contentDestination: normalizeContentDestination(approval.content_destination)
   });
   await saveQualityScore(quality, { topic: article.title, articleDraftId, approvalQueueId: asText(approval.id) });
   await rememberArticleDraft(article, { articleDraftId, approvalQueueId: asText(approval.id) });

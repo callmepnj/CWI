@@ -2,6 +2,7 @@ import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
 import { runImageAgent } from "@/lib/ai/agents/image-agent";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { saveApprovalItem } from "@/lib/db/approval";
+import { normalizeContentDestination } from "@/lib/ai/content-destination";
 
 export const runtime = "nodejs";
 
@@ -9,13 +10,14 @@ export async function POST(request: Request) {
   const blocked = requireAdminApi(request);
   if (blocked) return blocked;
 
-  const body = (await request.json().catch(() => null)) as { topic?: string; articleDraftId?: string } | null;
+  const body = (await request.json().catch(() => null)) as { topic?: string; articleDraftId?: string; contentDestination?: string } | null;
   const topic = body?.topic || "CWI image pack";
+  const contentDestination = normalizeContentDestination(body?.contentDestination);
 
   try {
-    const taskId = await createAgentTask({ agentName: "CWI Visual Desk", taskType: "image_pack", input: body ?? {} });
+    const taskId = await createAgentTask({ agentName: "CWI Visual Desk", taskType: "image_pack", input: body ?? {}, contentDestination });
     try {
-      const image = await runImageAgent({ topic, articleDraftId: body?.articleDraftId });
+      const image = await runImageAgent({ topic, articleDraftId: body?.articleDraftId, contentDestination });
       await completeAgentTask(taskId, image, 0);
       const approvalQueueId = await saveApprovalItem({
         topic,
@@ -27,6 +29,7 @@ export async function POST(request: Request) {
         riskLevel: "Low",
         sourceCount: 0,
         status: "waiting_for_approval",
+        contentDestination,
         adminNotes: "Check image relevance, credit, and topic match before use."
       });
       return ok({ imagePackId: image.imagePackId, approvalQueueId, image }, "Image pack saved.");

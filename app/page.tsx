@@ -23,6 +23,7 @@ import { roles } from "@/data/roles";
 import { unansweredFiles } from "@/data/unanswered-files";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/lib/db/live-newsroom";
 
 const homepageFaqs = [
   {
@@ -112,11 +113,13 @@ export const metadata = createMetadata({
   ]
 });
 
-export default function HomePage() {
+export default async function HomePage() {
   const dateSortedPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date));
   const featuredPost = dateSortedPosts[0];
   const latestIssuePost = dateSortedPosts.find((post) => post.category === "Civic Issue") ?? dateSortedPosts[0];
   const latestYouthPost = dateSortedPosts.find((post) => post.category === "Youth Voice") ?? dateSortedPosts[1];
+  const dbLiveItems = await getPublishedLiveNewsroomItems(6).catch(() => []);
+  const liveNewsroomItems = mergeLiveItems(dbLiveItems, getLiveNewsroomFallbackItems(6)).slice(0, 6);
 
   return (
     <>
@@ -131,6 +134,43 @@ export default function HomePage() {
       <HeroSection />
       <WatchHighlightSection />
       <WatchTicker />
+      <Section
+        eyebrow="CWI Live Newsroom"
+        title="Live from CWI Newsroom"
+        subtitle="Latest source-backed updates, public advisories, and India Unanswered Files coverage."
+      >
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <Card className="bg-gradient-to-br from-white via-skywash to-[#F7FFF9]">
+            <CardLabel>Source-backed operating desk</CardLabel>
+            <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">
+              One central newsroom for updates, verification, sources, and public memory.
+            </h2>
+            <p className="mt-4 leading-8 text-ink/70">
+              CWI Live Newsroom brings Watch Desk updates, public advisories, India Unanswered Files, and source trails into one approval-first public desk.
+            </p>
+            <Button asChild className="mt-7">
+              <Link href="/live-newsroom">Enter Live Newsroom</Link>
+            </Button>
+          </Card>
+          <div className="grid gap-4 md:grid-cols-2">
+            {liveNewsroomItems.slice(0, 4).map((item) => (
+              <Link
+                key={item.id}
+                href={`/live-newsroom/${item.slug}`}
+                className="rounded-[1.5rem] border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-royal/35 hover:shadow-soft"
+              >
+                <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-royal">
+                  {item.verificationStatus} / {item.sourceCount} sources
+                </p>
+                <h3 className="mt-2 font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm font-semibold leading-7 text-ink/66">{item.summary}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </Section>
       <Section title="A Statement From The Founders">
         <FounderStatement />
       </Section>
@@ -364,4 +404,13 @@ export default function HomePage() {
 
 function dateValue(value: string) {
   return new Date(`${value}T00:00:00+05:30`).getTime();
+}
+
+function mergeLiveItems<T extends { slug: string }>(primary: T[], fallback: T[]) {
+  const seen = new Set<string>();
+  return [...primary, ...fallback].filter((item) => {
+    if (seen.has(item.slug)) return false;
+    seen.add(item.slug);
+    return true;
+  });
 }

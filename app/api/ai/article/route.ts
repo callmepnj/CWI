@@ -7,6 +7,7 @@ import { getPool } from "@/lib/db";
 import { createAgentTask, completeAgentTask, failAgentTask } from "@/lib/db/agents";
 import { attachDraftToApprovalItem, getApprovalItem, saveApprovalItem } from "@/lib/db/approval";
 import { saveArticleDraft } from "@/lib/db/articles";
+import { normalizeContentDestination } from "@/lib/ai/content-destination";
 
 export const runtime = "nodejs";
 
@@ -18,18 +19,20 @@ export async function POST(request: Request) {
     approvalQueueId?: string;
     researchPackId?: string;
     verificationReportId?: string;
+    contentDestination?: string;
   } | null;
 
   try {
     const approvalItem = body?.approvalQueueId ? await getApprovalItem(body.approvalQueueId) : null;
+    const contentDestination = normalizeContentDestination(body?.contentDestination || approvalItem?.content_destination);
     const researchPackId = body?.researchPackId || approvalItem?.research_pack_id || (await latestId("research_packs"));
-    if (!researchPackId) return fail(new Error("No research pack found. Run Research AI first."), 400);
+    if (!researchPackId) return fail(new Error("Research Pack required before article generation."), 400);
     const verificationReportId = body?.verificationReportId || approvalItem?.verification_report_id || (await latestId("verification_reports"));
 
-    const taskId = await createAgentTask({ agentName: "CWI Desk Writer", taskType: "article_draft", input: { researchPackId, verificationReportId } });
+    const taskId = await createAgentTask({ agentName: "CWI Desk Writer", taskType: "article_draft", input: { researchPackId, verificationReportId, contentDestination }, contentDestination });
     try {
       const verificationGate = await assertArticleDraftAllowed({ researchPackId, verificationReportId });
-      const rawArticle = await runArticleAgent({ researchPackId, verificationReportId });
+      const rawArticle = await runArticleAgent({ researchPackId, verificationReportId, contentDestination });
       const firstQuality = scoreArticleQuality(rawArticle);
       const article = improveArticleDraft(rawArticle, firstQuality);
       const quality = scoreArticleQuality(article);
@@ -45,7 +48,8 @@ export async function POST(request: Request) {
         summary: article.summary,
         body: article,
         verificationStatus: "Developing",
-        sourceCount: article.sources.length
+        sourceCount: article.sources.length,
+        contentDestination
       });
       await saveQualityScore(quality, { topic: article.title, articleDraftId, approvalQueueId: approvalItem?.id });
       await rememberArticleDraft(article, { articleDraftId, approvalQueueId: approvalItem?.id });
@@ -72,6 +76,7 @@ export async function POST(request: Request) {
         riskLevel: "Medium",
         sourceCount: article.sources.length,
         status: "waiting_for_approval",
+        contentDestination,
         adminNotes: "Review article before SEO/social/publish."
       });
       return ok({ articleDraftId, approvalQueueId, article, verificationGate, quality }, "Article draft saved.");

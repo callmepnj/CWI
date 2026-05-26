@@ -13,27 +13,32 @@ export async function runSystemHealthAgent() {
   let failedTasks = 0;
   let dailyUsage = 0;
   let monthlyUsage = 0;
+  let liveNewsroomDbStatus = "unchecked";
 
   try {
     await ensureAdminDatabase();
-    const [approvals, tasks, day, month] = await Promise.all([
+    const [approvals, tasks, day, month, liveTable] = await Promise.all([
       getPool().query(`select count(*)::int as count from approval_queue where status = 'waiting_for_approval';`),
       getPool().query(`select count(*)::int as count from agent_tasks where status = 'failed';`),
       getDayCostInr(),
-      getMonthCostInr()
+      getMonthCostInr(),
+      getPool().query(`select to_regclass('public.live_newsroom_items') is not null as exists;`)
     ]);
     pendingApprovals = approvals.rows[0]?.count ?? 0;
     failedTasks = tasks.rows[0]?.count ?? 0;
     dailyUsage = day;
     monthlyUsage = month;
+    liveNewsroomDbStatus = liveTable.rows[0]?.exists ? "ok" : "missing table";
   } catch {
     databaseStatus = "connection failed";
+    liveNewsroomDbStatus = "connection failed";
   }
 
   const oldUrlHits = await scanForOldUrls(process.cwd()).catch(() => []);
   const sitemapStatus = await checkEndpoint(`${site.url}/sitemap.xml`);
   const robotsStatus = await checkEndpoint(`${site.url}/robots.txt`);
   const websiteStatus = await checkEndpoint(site.url);
+  const liveNewsroomStatus = await checkEndpoint(`${site.url}/live-newsroom`);
 
   if (databaseStatus === "connected") {
     await saveSystemHealthLog({
@@ -52,6 +57,8 @@ export async function runSystemHealthAgent() {
     databaseStatus,
     sitemapStatus,
     robotsStatus,
+    liveNewsroomStatus,
+    liveNewsroomDbStatus,
     aiProvider: {
       provider: aiProvider.provider,
       model: aiProvider.model,

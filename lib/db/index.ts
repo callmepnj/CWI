@@ -365,6 +365,7 @@ async function adminOsSchemaLooksReady() {
         to_regclass('public.research_packs') is not null as research_packs,
         to_regclass('public.verification_reports') is not null as verification_reports,
         to_regclass('public.article_drafts') is not null as article_drafts,
+        to_regclass('public.live_newsroom_items') is not null as live_newsroom_items,
         to_regclass('public.seo_packs') is not null as seo_packs,
         to_regclass('public.social_packs') is not null as social_packs,
         to_regclass('public.image_library') is not null as image_library,
@@ -396,6 +397,30 @@ async function adminOsSchemaLooksReady() {
           select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'output_json'
         ) as agent_tasks_output_json,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'content_destination'
+        ) as agent_tasks_content_destination,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'research_packs' and column_name = 'content_destination'
+        ) as research_packs_content_destination,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'article_drafts' and column_name = 'content_destination'
+        ) as article_drafts_content_destination,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'seo_packs' and column_name = 'content_destination'
+        ) as seo_packs_content_destination,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'social_packs' and column_name = 'content_destination'
+        ) as social_packs_content_destination,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'content_destination'
+        ) as approval_queue_content_destination,
         exists (
           select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'approval_queue' and column_name = 'item_type'
@@ -451,6 +476,7 @@ export async function ensureAdminOsTables() {
         agent_id text references agents(id) on delete set null,
         title text not null,
         task_type text not null,
+        content_destination text not null default 'live_newsroom',
         status text not null default 'queued',
         priority text not null default 'normal',
         input jsonb not null default '{}'::jsonb,
@@ -496,6 +522,7 @@ export async function ensureAdminOsTables() {
         notes text,
         priority text not null default 'normal',
         content_type text not null default 'manual link',
+        content_destination text not null default 'live_newsroom',
         extracted_title text,
         extracted_description text,
         extraction_status text not null default 'pending',
@@ -507,6 +534,7 @@ export async function ensureAdminOsTables() {
         id uuid primary key default gen_random_uuid(),
         topic text not null,
         category text not null default 'Watch Desk',
+        content_destination text not null default 'live_newsroom',
         date_range text,
         source_list jsonb not null default '[]'::jsonb,
         source_count integer not null default 0,
@@ -529,6 +557,7 @@ export async function ensureAdminOsTables() {
       create table if not exists verification_reports (
         id uuid primary key default gen_random_uuid(),
         research_pack_id uuid references research_packs(id) on delete cascade,
+        content_destination text not null default 'live_newsroom',
         verification_status text not null default 'Developing',
         risk_level text not null default 'Medium',
         unsafe_claims jsonb not null default '[]'::jsonb,
@@ -543,6 +572,7 @@ export async function ensureAdminOsTables() {
       create table if not exists article_drafts (
         id uuid primary key default gen_random_uuid(),
         research_pack_id uuid references research_packs(id) on delete set null,
+        content_destination text not null default 'live_newsroom',
         title text not null,
         slug text,
         category text not null default 'Watch Desk',
@@ -566,15 +596,58 @@ export async function ensureAdminOsTables() {
         metadata jsonb not null default '{}'::jsonb
       );
 
+      create table if not exists live_newsroom_items (
+        id uuid primary key default gen_random_uuid(),
+        approval_queue_id uuid,
+        article_draft_id uuid references article_drafts(id) on delete set null,
+        title text not null,
+        slug text not null,
+        category text not null default 'Live Newsroom',
+        type text not null default 'live_newsroom_update',
+        summary text,
+        body jsonb not null default '{}'::jsonb,
+        verification_status text not null default 'Developing',
+        risk_level text not null default 'Medium',
+        source_count integer not null default 0,
+        sources_json jsonb not null default '[]'::jsonb,
+        what_happened text,
+        what_we_know text,
+        what_remains_unclear text,
+        timeline_json jsonb not null default '[]'::jsonb,
+        cwi_context text,
+        tags_json jsonb not null default '[]'::jsonb,
+        hero_image text,
+        thumbnail_image text,
+        og_image text,
+        alt_text text,
+        published_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        author text not null default 'Cockroach Watch India Editorial Desk',
+        related_items_json jsonb not null default '[]'::jsonb,
+        seo_title text,
+        seo_description text,
+        canonical_url text,
+        status text not null default 'published',
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now()
+      );
+
       create index if not exists published_articles_slug_published_idx
       on published_articles (slug, published_at desc);
 
       create index if not exists published_articles_published_at_idx
       on published_articles (published_at desc);
 
+      create index if not exists live_newsroom_items_slug_status_idx
+      on live_newsroom_items (slug, status, published_at desc);
+
+      create index if not exists live_newsroom_items_published_idx
+      on live_newsroom_items (status, published_at desc);
+
       create table if not exists seo_packs (
         id uuid primary key default gen_random_uuid(),
         article_draft_id uuid references article_drafts(id) on delete cascade,
+        content_destination text not null default 'live_newsroom',
         seo_title text not null,
         meta_description text not null,
         slug text,
@@ -597,6 +670,7 @@ export async function ensureAdminOsTables() {
       create table if not exists social_packs (
         id uuid primary key default gen_random_uuid(),
         article_draft_id uuid references article_drafts(id) on delete cascade,
+        content_destination text not null default 'live_newsroom',
         instagram_caption text,
         facebook_caption text,
         x_caption text,
@@ -620,6 +694,7 @@ export async function ensureAdminOsTables() {
         id uuid primary key default gen_random_uuid(),
         topic text,
         section text,
+        content_destination text not null default 'live_newsroom',
         image_type text,
         path text,
         alt_text text,
@@ -902,6 +977,7 @@ export async function ensureAdminOsTables() {
         id uuid primary key default gen_random_uuid(),
         topic text not null,
         type text not null,
+        content_destination text not null default 'live_newsroom',
         summary text,
         verification_status text not null default 'Developing',
         risk_level text not null default 'Medium',
@@ -948,13 +1024,23 @@ export async function ensureAdminOsTables() {
       on memory_graph_edges (relation_type, updated_at desc);
 
       alter table agent_tasks add column if not exists agent_name text;
+      alter table agent_tasks add column if not exists content_destination text not null default 'live_newsroom';
       alter table agent_tasks add column if not exists input_json jsonb not null default '{}'::jsonb;
       alter table agent_tasks add column if not exists output_json jsonb not null default '{}'::jsonb;
       alter table agent_tasks add column if not exists error_message text;
       alter table agent_tasks add column if not exists cost_estimate numeric(10,2) not null default 0;
       alter table agent_tasks add column if not exists completed_at timestamptz;
 
+      alter table manual_links add column if not exists content_destination text not null default 'live_newsroom';
+      alter table research_packs add column if not exists content_destination text not null default 'live_newsroom';
+      alter table verification_reports add column if not exists content_destination text not null default 'live_newsroom';
+      alter table article_drafts add column if not exists content_destination text not null default 'live_newsroom';
+      alter table seo_packs add column if not exists content_destination text not null default 'live_newsroom';
+      alter table social_packs add column if not exists content_destination text not null default 'live_newsroom';
+      alter table image_library add column if not exists content_destination text not null default 'live_newsroom';
+
       alter table approval_queue add column if not exists item_type text;
+      alter table approval_queue add column if not exists content_destination text not null default 'live_newsroom';
       alter table approval_queue add column if not exists research_pack_id uuid references research_packs(id) on delete set null;
       alter table approval_queue add column if not exists verification_report_id uuid references verification_reports(id) on delete set null;
       alter table approval_queue add column if not exists admin_notes text;

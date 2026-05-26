@@ -17,6 +17,7 @@ const primaryItems = [
 ];
 
 const moreItems = [
+  { label: "Live Newsroom", href: "/live-newsroom" },
   { label: "Unanswered Files", href: "/india-unanswered-files" },
   { label: "About", href: "/about" },
   { label: "Charter", href: "/charter" },

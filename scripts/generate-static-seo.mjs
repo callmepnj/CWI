@@ -12,6 +12,7 @@ const staticRoutes = [
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
+  "/live-newsroom",
   "/india-unanswered-files",
   "/watch-desk",
   "/issues",
@@ -64,6 +65,8 @@ const routes = [
   ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
   ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
   ...postSlugs.map((slug) => `/watch-desk/${slug}`),
+  ...postSlugs.slice(0, 12).map((slug) => `/live-newsroom/${slug}`),
+  ...unansweredFileSlugs.map((slug) => `/live-newsroom/${slug}`),
   ...unansweredFileSlugs.map((slug) => `/india-unanswered-files/${slug}`)
 ];
 
@@ -74,13 +77,14 @@ ${routes
     const isHome = route === "/";
     const isWatchDeskArticle = route.startsWith("/watch-desk/") && !route.startsWith("/watch-desk/category/") && !route.startsWith("/watch-desk/tag/");
     const isUnansweredArticle = route.startsWith("/india-unanswered-files/");
+    const isLiveNewsroomArticle = route.startsWith("/live-newsroom/");
     const isTaxonomy = route.startsWith("/watch-desk/category/") || route.startsWith("/watch-desk/tag/");
-    const changefreq = isHome ? "daily" : isWatchDeskArticle || isUnansweredArticle ? "monthly" : isTaxonomy ? "weekly" : "weekly";
+    const changefreq = isHome ? "daily" : isWatchDeskArticle || isUnansweredArticle || isLiveNewsroomArticle ? "monthly" : isTaxonomy ? "weekly" : "weekly";
     const priority = isHome
       ? "1.0"
-      : ["/watch", "/watch-desk", "/india-unanswered-files"].includes(route)
+      : ["/watch", "/watch-desk", "/live-newsroom", "/india-unanswered-files"].includes(route)
         ? "0.9"
-        : isWatchDeskArticle || isUnansweredArticle
+        : isWatchDeskArticle || isUnansweredArticle || isLiveNewsroomArticle
           ? "0.8"
           : isTaxonomy
             ? "0.6"
