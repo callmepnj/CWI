@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const researchPackId = body?.researchPackId || (await latestId("research_packs"));
     if (!researchPackId) return fail(new Error("No research pack found. Run Research AI first."), 400);
 
-    const taskId = await createAgentTask({ agentName: "CWI Verify AI", taskType: "verify_pack", input: { researchPackId } });
+    const taskId = await createAgentTask({ agentName: "CWI Verify Shield", taskType: "verify_pack", input: { researchPackId } });
     try {
       const verification = await runVerifyAgent({ researchPackId });
       await completeAgentTask(taskId, verification, verification._meta?.estimatedCost ?? 0);
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       throw error;
     }
   } catch (error) {
-    console.error("CWI Verify AI failed", error);
+    console.error("CWI Verify Shield failed", error);
     return fail(error);
   }
 }

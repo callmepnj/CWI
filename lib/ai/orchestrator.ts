@@ -20,6 +20,7 @@ import { improveArticleDraft, saveQualityScore, scoreArticleQuality } from "@/li
 import { rememberApprovalItem, rememberArticleDraft, rememberResearchPack } from "@/lib/ai/source-memory";
 import { assertArticleDraftAllowed, runVerificationGate } from "@/lib/ai/verification-engine";
 import { completeWorkflow, createWorkflow, failWorkflow, markWorkflowAwaitingApproval, setWorkflowStep } from "@/lib/ai/workflow-state";
+import { site } from "@/lib/site";
 
 type ManualLinkInput = {
   url: string;
@@ -59,7 +60,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
     });
 
     await setWorkflowStep(workflowId, "researching", "running");
-    const research = await runTask("CWI Research AI", "manual_link_research", { url, topic, platform, metadata }, () =>
+    const research = await runTask("CWI Source Lens", "manual_link_research", { url, topic, platform, metadata }, () =>
       runResearchAgent({ topic, url, platform, notes: input.notes, metadata, category: categoryFromContentType(input.contentType) })
     );
     const researchPackId = await saveResearchPack({
@@ -79,7 +80,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
     await setWorkflowStep(workflowId, "researching", "completed", { researchPackId, sourceCount: research.sourceCount });
 
     await setWorkflowStep(workflowId, "verifying", "running");
-    const verification = await runTask("CWI Verify AI", "manual_link_verify", { researchPackId }, () =>
+    const verification = await runTask("CWI Verify Shield", "manual_link_verify", { researchPackId }, () =>
       runVerifyAgent({ researchPack: { ...research, id: researchPackId } })
     );
     const verificationReportId = await saveVerificationReport({
@@ -96,7 +97,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 
     await assertArticleDraftAllowed({ researchPackId, verificationReportId });
     await setWorkflowStep(workflowId, "drafting", "running");
-    const rawArticle = await runTask("CWI Article AI", "manual_link_article", { researchPackId, verificationReportId }, () =>
+    const rawArticle = await runTask("CWI Desk Writer", "manual_link_article", { researchPackId, verificationReportId }, () =>
       runArticleAgent({ researchPack: { ...research, id: researchPackId }, verificationReport: { ...verification, id: verificationReportId } })
     );
     const firstQuality = scoreArticleQuality(rawArticle);
@@ -120,20 +121,20 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
     await setWorkflowStep(workflowId, "drafting", "completed", { articleDraftId, quality });
 
     await setWorkflowStep(workflowId, "seo", "running");
-    const seo = await runTask("CWI SEO AI", "manual_link_seo", { articleDraftId, title: article.title }, () =>
+    const seo = await runTask("CWI Rank Engine", "manual_link_seo", { articleDraftId, title: article.title }, () =>
       runSEOAgent({ articleDraft: { id: articleDraftId, title: article.title, slug: article.slug, draft: article } })
     );
     const seoPackId = await saveSeoPack({ articleDraftId, ...seo });
     await setWorkflowStep(workflowId, "seo", "completed", { seoPackId });
 
     await setWorkflowStep(workflowId, "social", "running");
-    const social = await runTask("CWI Social AI", "manual_link_social", { articleDraftId, title: article.title }, () =>
+    const social = await runTask("CWI Signal Studio", "manual_link_social", { articleDraftId, title: article.title }, () =>
       runSocialAgent({ articleDraft: { id: articleDraftId, title: article.title, draft: article } })
     );
     const socialPackId = await saveSocialPack({ articleDraftId, ...social });
     await setWorkflowStep(workflowId, "social", "completed", { socialPackId });
 
-    const image = await runTask("CWI Image AI", "manual_link_image", { topic: article.title }, () => runImageAgent({ topic: article.title, articleDraftId }));
+    const image = await runTask("CWI Visual Desk", "manual_link_image", { topic: article.title }, () => runImageAgent({ topic: article.title, articleDraftId }));
 
     const approvalQueueId = await saveApprovalItem({
       topic: article.title,
@@ -176,7 +177,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 
 export async function runTopicToArticle(input: TopicToArticleInput) {
   return runManualLinkToApproval({
-    url: input.url || "https://www.cockroachwatchindia.online/watch-desk",
+    url: input.url || `${site.url}/watch-desk`,
     topic: input.topic,
     platform: "Manual Topic",
     notes: input.sourceNotes,
@@ -186,12 +187,12 @@ export async function runTopicToArticle(input: TopicToArticleInput) {
 
 export async function runArticleToSocial(articleDraftId: string) {
   await ensureAdminDatabase();
-  const social = await runTask("CWI Social AI", "article_to_social", { articleDraftId }, () => runSocialAgent({ articleDraftId }));
+  const social = await runTask("CWI Signal Studio", "article_to_social", { articleDraftId }, () => runSocialAgent({ articleDraftId }));
   const socialPackId = await saveSocialPack({ articleDraftId, ...social });
   const approvalQueueId = await saveApprovalItem({
     topic: "Social pack",
     itemType: "Social Pack",
-    summary: "CWI Social AI generated captions for an article draft. Human review required.",
+    summary: "CWI Signal Studio generated captions for an article draft. Human review required.",
     articleDraftId,
     socialPackId,
     verificationStatus: "Opinion",
@@ -205,7 +206,7 @@ export async function runArticleToSocial(articleDraftId: string) {
 
 export async function runUIUXAuditWorkflow(input: { page: string; notes?: string }) {
   await ensureAdminDatabase();
-  const audit = await runTask("CWI UI/UX AI", "uiux_audit", input, () => runUIUXAgent(input));
+  const audit = await runTask("CWI UX Guardian", "uiux_audit", input, () => runUIUXAgent(input));
   const result = await getPool().query<{ id: string }>(
     `
       insert into uiux_audits (page, issue, severity, suggested_text, fix_status)
@@ -238,7 +239,7 @@ export async function runPublishApprovedItem(approvalQueueId: string) {
   const workflowId = await createWorkflow({ workflowType: "publish_approved_item", topic: approvalQueueId, payload: { approvalQueueId } });
   await setWorkflowStep(workflowId, "publishing", "running");
   try {
-    const result = await runTask("CWI Publish AI", "publish_approved_item", { approvalQueueId }, () => runPublishAgent(approvalQueueId), false);
+    const result = await runTask("CWI Publish Gate", "publish_approved_item", { approvalQueueId }, () => runPublishAgent(approvalQueueId), false);
     await setWorkflowStep(workflowId, "publishing", "completed", result);
     await setWorkflowStep(workflowId, "published", "completed", result);
     await completeWorkflow({
@@ -260,7 +261,7 @@ export async function runSystemHealthWorkflow() {
 }
 
 export async function runCommandWorkflow() {
-  return runTask("CWI Command AI", "daily_command_briefing", {}, () => runCommandAgent(), false);
+  return runTask("CWI Command Core", "daily_command_briefing", {}, () => runCommandAgent(), false);
 }
 
 async function runTask<T>(

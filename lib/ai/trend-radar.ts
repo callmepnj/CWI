@@ -161,7 +161,7 @@ function suggestedAction(trendType: string, score: number) {
   if (score >= 80) return "Assign Research AI today and prepare a verification-first Watch Desk draft.";
   if (trendType.includes("unanswered")) return "Check source freshness and consider an India Unanswered Files update.";
   if (trendType.includes("reader")) return "Review comments for corrections, missing context, or follow-up questions.";
-  return "Queue for CWI Research AI and source-memory enrichment.";
+  return "Queue for CWI Source Lens and memory-graph enrichment.";
 }
 
 function whyItMatters(trendType: string, topic: string) {

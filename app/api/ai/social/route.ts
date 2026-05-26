@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const taskId = await createAgentTask({ agentName: "CWI Social AI", taskType: "social_pack", input: body });
+    const taskId = await createAgentTask({ agentName: "CWI Signal Studio", taskType: "social_pack", input: body });
     try {
       const social = await runSocialAgent({ articleDraftId: body.articleDraftId, topic: body.topic });
       await completeAgentTask(taskId, social, social._meta?.estimatedCost ?? 0);
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       throw error;
     }
   } catch (error) {
-    console.error("CWI Social AI failed", error);
+    console.error("CWI Signal Studio failed", error);
     return fail(error);
   }
 }

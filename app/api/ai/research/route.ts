@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   const topic = body?.topic?.trim() || "CWI priority research";
 
   try {
-    const taskId = await createAgentTask({ agentName: "CWI Research AI", taskType: "research_only", input: body ?? {} });
+    const taskId = await createAgentTask({ agentName: "CWI Source Lens", taskType: "research_only", input: body ?? {} });
     try {
       const research = await runResearchAgent({ topic, url: body?.url, notes: body?.notes, category: body?.category });
       await completeAgentTask(taskId, research, research._meta?.estimatedCost ?? 0);
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       throw error;
     }
   } catch (error) {
-    console.error("CWI Research AI failed", error);
+    console.error("CWI Source Lens failed", error);
     return fail(error);
   }
 }

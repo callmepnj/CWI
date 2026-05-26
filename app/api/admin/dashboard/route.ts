@@ -32,6 +32,7 @@ function buildSetupModeDashboard() {
     budget: {
       monthlyCapInr: 8000,
       dailyCapInr: 250,
+      estimatedDailyCost: 0,
       estimatedMonthlyCost: 0,
       safeMode: false
     },
@@ -40,6 +41,7 @@ function buildSetupModeDashboard() {
       model: process.env.AI_MODEL || "not_configured",
       configured: false,
       productionReady: false,
+      routing: {},
       message: "AI configuration was not checked because the database connection failed first."
     },
     counts: {
@@ -52,6 +54,8 @@ function buildSetupModeDashboard() {
       socialPacksReady: 0,
       uiuxIssuesFound: 0,
       memoryNodes: 0,
+      memoryGraphNodes: 0,
+      bigBrainRules: 0,
       activeWorkflows: 0,
       trendRadarItems: 0,
       qualityReviews: 0
@@ -59,9 +63,11 @@ function buildSetupModeDashboard() {
     agents: [],
     approvals: [],
     researchPacks: [],
+    verificationReports: [],
     articleDrafts: [],
     seoPacks: [],
     socialPacks: [],
+    imageLibrary: [],
     uiuxAudits: [
       {
         id: "database-setup",
@@ -95,6 +101,10 @@ function buildSetupModeDashboard() {
     verificationGates: [],
     qualityScores: [],
     trendRadarItems: [],
+    bigBrainRules: [],
+    memoryGraphNodes: [],
+    memoryGraphEdges: [],
+    costUsageLogs: [],
     latestPublicArticles: [],
     latestUnansweredFiles: []
   };

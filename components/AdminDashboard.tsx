@@ -5,16 +5,19 @@ import type React from "react";
 import {
   Activity,
   Bot,
+  Brain,
   ClipboardCheck,
   Database,
   FileSearch,
   FileText,
+  Gauge,
   HeartHandshake,
   ImageIcon,
   KeyRound,
   LinkIcon,
   LogOut,
   MessageSquare,
+  Network,
   Newspaper,
   PauseCircle,
   RefreshCcw,
@@ -25,6 +28,7 @@ import {
   TrendingUp,
   WalletCards
 } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
 
@@ -34,6 +38,7 @@ type AdminData = {
   budget: {
     monthlyCapInr: number;
     dailyCapInr: number;
+    estimatedDailyCost: number;
     estimatedMonthlyCost: number;
     safeMode: boolean;
   };
@@ -43,14 +48,17 @@ type AdminData = {
     configured: boolean;
     productionReady: boolean;
     message: string;
+    routing?: Record<string, string>;
   };
   counts: Record<string, number>;
   agents: AdminRecord[];
   approvals: AdminRecord[];
   researchPacks: AdminRecord[];
+  verificationReports: AdminRecord[];
   articleDrafts: AdminRecord[];
   seoPacks: AdminRecord[];
   socialPacks: AdminRecord[];
+  imageLibrary: AdminRecord[];
   uiuxAudits: AdminRecord[];
   manualLinks: AdminRecord[];
   sources: AdminRecord[];
@@ -65,46 +73,50 @@ type AdminData = {
   verificationGates: AdminRecord[];
   qualityScores: AdminRecord[];
   trendRadarItems: AdminRecord[];
+  bigBrainRules: AdminRecord[];
+  memoryGraphNodes: AdminRecord[];
+  memoryGraphEdges: AdminRecord[];
+  costUsageLogs: AdminRecord[];
   latestPublicArticles: AdminRecord[];
   latestUnansweredFiles: AdminRecord[];
 };
 
 const sections = [
   ["overview", "Overview", Activity],
-  ["agents", "Agent Control Center", Bot],
-  ["workflows", "Workflows", Activity],
+  ["command-center", "Command Center", Gauge],
+  ["agents", "Agent Control", Bot],
   ["approval", "Approval Queue", ClipboardCheck],
-  ["manual-link", "Manual Link", LinkIcon],
-  ["source-memory", "Source Memory", Database],
-  ["trend-radar", "Trend Radar", Search],
-  ["quality-scores", "Quality Scores", ShieldCheck],
+  ["manual-link", "Manual Link Processor", LinkIcon],
   ["research-packs", "Research Packs", FileSearch],
+  ["verification-reports", "Verification Reports", ShieldCheck],
   ["articles", "Articles", Newspaper],
   ["seo-packs", "SEO Packs", TrendingUp],
   ["social-packs", "Social Packs", MessageSquare],
-  ["images", "Images", ImageIcon],
+  ["visual-desk", "Visual Desk", ImageIcon],
   ["uiux-fixes", "UI/UX Fixes", Sparkles],
   ["reports", "Reports", FileText],
   ["comments", "Comments", MessageSquare],
   ["sources", "Sources", Database],
   ["keywords", "Keywords", KeyRound],
-  ["daily-briefing", "Daily Briefing", HeartHandshake],
+  ["big-brain", "Big Brain", Brain],
+  ["memory-graph", "Memory Graph", Network],
   ["system-health", "System Health", ShieldCheck],
   ["settings", "Settings", Settings]
 ] as const;
 
 const agentActions = [
-  ["daily-workflow", "Run Daily Workflow"],
+  ["daily-workflow", "Run Command Briefing"],
+  ["sync-big-brain", "Sync Big Brain"],
   ["sync-memory", "Sync Source Memory"],
   ["trend-radar", "Run Trend Radar"],
-  ["research-only", "Run Research Only"],
-  ["verify", "Run Verify"],
-  ["article-draft", "Generate Article Draft"],
-  ["seo-check", "Generate SEO Pack"],
-  ["social-pack", "Generate Social Pack"],
-  ["image-pack", "Generate Image Pack"],
-  ["uiux-audit", "Run UI/UX Audit"],
-  ["system-health", "Check System Health"],
+  ["research-only", "Run Source Lens"],
+  ["verify", "Run Verify Shield"],
+  ["article-draft", "Generate Desk Draft"],
+  ["seo-check", "Generate Rank Pack"],
+  ["social-pack", "Generate Signal Pack"],
+  ["image-pack", "Generate Visual Pack"],
+  ["uiux-audit", "Run UX Guardian"],
+  ["system-health", "Check Health Monitor"],
   ["stop-non-essential", "Stop Non-Essential Tasks"]
 ] as const;
 
@@ -535,6 +547,7 @@ function AdminSection({
   generateArticleForApproval: (item: AdminRecord) => Promise<void>;
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
+  if (section === "command-center") return <CommandCenterSection data={data} pending={pending} runAction={runAction} />;
   if (section === "agents") return <AgentsSection data={data} pending={pending} runAction={runAction} />;
   if (section === "workflows") {
     return (
@@ -558,19 +571,22 @@ function AdminSection({
     );
   }
   if (section === "manual-link") return <ManualLinkSection onComplete={refresh} />;
-  if (section === "source-memory") return <SourceMemorySection data={data} pending={pending} runAction={runAction} />;
+  if (section === "source-memory") return <MemoryGraphSection data={data} pending={pending} runAction={runAction} />;
   if (section === "trend-radar") return <TrendRadarSection data={data} pending={pending} runAction={runAction} />;
   if (section === "quality-scores") return <QualityScoresSection data={data} />;
   if (section === "research-packs") return <RecordList title="Research Packs" records={data.researchPacks} fields={["topic", "category", "source_confidence", "status", "source_count"]} />;
+  if (section === "verification-reports") return <VerificationReportsSection data={data} />;
   if (section === "articles") return <RecordList title="Articles" records={data.articleDrafts} fields={["title", "slug", "category", "verification_status", "approval_status", "publish_status"]} />;
   if (section === "seo-packs") return <RecordList title="SEO Packs" records={data.seoPacks} fields={["seo_title", "meta_description", "canonical_url", "sitemap_status", "approval_status"]} />;
   if (section === "social-packs") return <SocialPacksSection records={data.socialPacks} />;
-  if (section === "images") return <RecordList title="Images" records={[]} fields={["topic", "path", "alt_text", "quality_status", "approval_status"]} empty="Image packs appear here when CWI Image AI prepares or imports visuals." />;
+  if (section === "visual-desk") return <VisualDeskSection data={data} />;
   if (section === "uiux-fixes") return <RecordList title="UI/UX Fixes" records={data.uiuxAudits} fields={["page", "issue", "severity", "suggested_text", "fix_status"]} />;
   if (section === "reports") return <ReportsSection records={data.reports} />;
   if (section === "comments") return <CommentsSection records={data.comments} pending={pending} updateComment={updateComment} />;
   if (section === "sources") return <RecordList title="Sources" records={data.sources} fields={["name", "source_type", "url", "trust_level", "active", "notes"]} />;
   if (section === "keywords") return <RecordList title="Keywords" records={data.keywords} fields={["keyword", "keyword_group", "priority", "active"]} />;
+  if (section === "big-brain") return <BigBrainSection data={data} pending={pending} runAction={runAction} />;
+  if (section === "memory-graph") return <MemoryGraphSection data={data} pending={pending} runAction={runAction} />;
   if (section === "daily-briefing") return <DailyBriefingSection data={data} pending={pending} runAction={runAction} />;
   if (section === "system-health") return <SystemHealthSection data={data} pending={pending} runAction={runAction} />;
   if (section === "settings") return <SettingsSection data={data} />;
@@ -587,9 +603,12 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
     ["Social packs", data.counts.socialPacksReady, MessageSquare],
     ["UI/UX issues", data.counts.uiuxIssuesFound, Sparkles],
     ["Memory nodes", data.counts.memoryNodes ?? 0, Database],
+    ["Big Brain rules", data.counts.bigBrainRules ?? 0, Brain],
+    ["Memory graph", data.counts.memoryGraphNodes ?? 0, Network],
     ["Active workflows", data.counts.activeWorkflows ?? 0, Activity],
     ["Radar items", data.counts.trendRadarItems ?? 0, Search],
     ["Quality reviews", data.counts.qualityReviews ?? 0, ShieldCheck],
+    ["Daily cost", `INR ${number(data.budget.estimatedDailyCost ?? 0)}`, WalletCards],
     ["Monthly cost", `₹${number(data.budget.estimatedMonthlyCost)}`, WalletCards],
     ["AI provider", data.ai.configured ? data.ai.provider : "Not configured", Bot]
   ] as const;
@@ -618,6 +637,8 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
         </div>
       </Card>
 
+      <CostDashboard data={data} />
+
       <div className="grid gap-6 xl:grid-cols-2">
         <PreviewList title="Ready for approval" records={data.approvals} fields={["topic", "type", "verification_status", "risk_level", "status"]} />
         <PreviewList title="Trend radar" records={data.trendRadarItems} fields={["topic", "trend_type", "priority_score", "suggested_action"]} />
@@ -627,6 +648,72 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
         <PreviewList title="Latest Unanswered Files" records={data.latestUnansweredFiles} fields={["title", "category", "href"]} />
       </div>
     </>
+  );
+}
+
+function CommandCenterSection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <CardLabel>CWI Command Core</CardLabel>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Newsroom operating picture</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/70">
+              Command Core coordinates priorities across Watch Desk, India Unanswered Files, reports, comments, SEO, visuals, UX, and publishing. It prepares briefing packages only for human approval.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" disabled={pending === "daily-workflow"} onClick={() => runAction("daily-workflow")}>
+              <HeartHandshake className="h-4 w-4" />
+              {pending === "daily-workflow" ? "Briefing..." : "Run Briefing"}
+            </Button>
+            <Button type="button" variant="outline" disabled={pending === "trend-radar"} onClick={() => runAction("trend-radar")}>
+              <Search className="h-4 w-4" />
+              {pending === "trend-radar" ? "Scanning..." : "Run Radar"}
+            </Button>
+          </div>
+        </div>
+      </Card>
+      <div className="grid gap-5 xl:grid-cols-2">
+        <PreviewList title="Daily briefings" records={data.dailyBriefings} fields={["briefing_date", "top_topics", "risks_to_avoid", "status"]} />
+        <PreviewList title="Trend radar" records={data.trendRadarItems} fields={["topic", "trend_type", "priority_score", "suggested_action"]} />
+        <PreviewList title="Workflow state" records={data.workflows} fields={["workflow_type", "topic", "status", "current_step", "progress_percent"]} />
+        <PreviewList title="Pending approvals" records={data.approvals} fields={["topic", "type", "verification_status", "risk_level", "status"]} />
+      </div>
+      <CostDashboard data={data} />
+    </div>
+  );
+}
+
+function CostDashboard({ data }: { data: AdminData }) {
+  const chartData = costChartData(data.costUsageLogs);
+  return (
+    <Card>
+      <CardLabel>Cost Control</CardLabel>
+      <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <div>
+          <h2 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">Budget guardrails</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <MiniMetric label="Today" value={`INR ${number(data.budget.estimatedDailyCost ?? 0)} / ${number(250)}`} />
+            <MiniMetric label="Month" value={`INR ${number(data.budget.estimatedMonthlyCost ?? 0)} / ${number(8000)}`} />
+            <MiniMetric label="Soft warning" value="INR 200 daily" />
+            <MiniMetric label="Danger level" value="INR 7,500 monthly" />
+          </div>
+        </div>
+        <div className="h-64 min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D9E4F2" />
+              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip formatter={(value) => [`INR ${number(Number(value))}`, "Cost"]} />
+              <Bar dataKey="cost" fill="#2563EB" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -672,25 +759,26 @@ function AgentsSection({ data, pending, runAction }: { data: AdminData; pending:
   );
 }
 
-function SourceMemorySection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
+function MemoryGraphSection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
   return (
     <div className="grid gap-5">
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <CardLabel>CWI Memory</CardLabel>
-            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Source memory and knowledge graph</h2>
+            <CardLabel>CWI Memory Graph</CardLabel>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Public memory engine</h2>
             <p className="mt-3 leading-7 text-ink/70">
-              Public articles, Unanswered Files, research packs, approvals, and corrections are indexed into reusable source memory.
+              Watch Desk, India Unanswered Files, reports, sources, approvals, and draft claims are connected into one central memory graph.
             </p>
           </div>
           <Button type="button" disabled={pending === "sync-memory"} onClick={() => runAction("sync-memory")}>
             <Database className="h-4 w-4" />
-            {pending === "sync-memory" ? "Syncing..." : "Sync Memory"}
+            {pending === "sync-memory" ? "Syncing..." : "Sync Graph"}
           </Button>
         </div>
       </Card>
-      <RecordList title="Knowledge Graph Nodes" records={data.memoryNodes} fields={["node_type", "label", "confidence_score", "source_count", "mention_count", "summary"]} />
+      <RecordList title="Memory Graph Nodes" records={data.memoryGraphNodes.length ? data.memoryGraphNodes : data.memoryNodes} fields={["node_type", "label", "confidence_score", "source_count", "status", "summary"]} />
+      <RecordList title="Memory Graph Edges" records={data.memoryGraphEdges} fields={["relation_type", "weight", "evidence", "updated_at"]} />
       <RecordList title="Memory Claims" records={data.memoryClaims} fields={["topic", "claim_text", "status", "confidence_score", "risk_level", "source_count"]} />
     </div>
   );
@@ -746,6 +834,79 @@ function QualityScoresSection({ data }: { data: AdminData }) {
           "publish_readiness_score"
         ]}
       />
+    </div>
+  );
+}
+
+function VerificationReportsSection({ data }: { data: AdminData }) {
+  return (
+    <div className="grid gap-5">
+      <RecordList
+        title="Verification Reports"
+        records={data.verificationReports}
+        fields={["verification_status", "risk_level", "publish_recommendation", "human_review_required", "source_gaps", "unsafe_claims"]}
+      />
+      <RecordList
+        title="Verification Gates"
+        records={data.verificationGates}
+        fields={["topic", "status", "can_draft", "confidence_score", "source_count", "official_source_available", "legal_risk"]}
+      />
+      <RecordList
+        title="Quality Scores"
+        records={data.qualityScores}
+        fields={["topic", "status", "factual_accuracy_score", "source_strength_score", "legal_risk_score", "publish_readiness_score"]}
+      />
+    </div>
+  );
+}
+
+function VisualDeskSection({ data }: { data: AdminData }) {
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <CardLabel>CWI Visual Desk</CardLabel>
+        <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Images, posters, thumbnails, and visual mapping</h2>
+        <p className="mt-3 leading-7 text-ink/70">
+          Visual Desk maps approved images to topics, keeps image credits visible, and prepares alt text without generating unnecessary images.
+        </p>
+      </Card>
+      <RecordList
+        title="Image Library"
+        records={data.imageLibrary}
+        fields={["topic", "section", "image_type", "path", "alt_text", "credit", "quality_status", "approval_status"]}
+        empty="Visual packs appear here after CWI Visual Desk maps images or poster assets."
+      />
+    </div>
+  );
+}
+
+function BigBrainSection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <CardLabel>CWI Big Brain</CardLabel>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Shared newsroom intelligence</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/70">
+              Every agent loads the same brand, editorial, source, safe wording, SEO, image, approval, and budget rules before working.
+            </p>
+          </div>
+          <Button type="button" disabled={pending === "sync-big-brain"} onClick={() => runAction("sync-big-brain")}>
+            <Brain className="h-4 w-4" />
+            {pending === "sync-big-brain" ? "Syncing..." : "Sync Big Brain"}
+          </Button>
+        </div>
+      </Card>
+      <RecordList title="Big Brain Rules" records={data.bigBrainRules} fields={["category", "title", "body", "priority", "active"]} />
+      <Card>
+        <CardLabel>Model Routing</CardLabel>
+        <div className="grid gap-3 md:grid-cols-2">
+          {Object.entries(data.ai.routing ?? {}).map(([role, model]) => (
+            <MiniMetric key={role} label={role} value={model} />
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }
@@ -966,6 +1127,7 @@ function SystemHealthSection({ data, pending, runAction }: { data: AdminData; pe
           <MiniMetric label="Failed tasks" value={text(health.failed_tasks)} />
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
+          <Button type="button" disabled={pending === "system-health"} onClick={() => runAction("system-health")}>Run Health Monitor</Button>
           <Button type="button" disabled={pending === "seo-check"} onClick={() => runAction("seo-check")}>Run SEO Check</Button>
           <Button type="button" variant="outline" disabled={pending === "stop-non-essential"} onClick={() => runAction("stop-non-essential")}>Stop Non-Essential Tasks</Button>
         </div>
@@ -1182,6 +1344,19 @@ function number(value: number) {
   return Math.round(value).toLocaleString("en-IN");
 }
 
+function costChartData(records: AdminRecord[]) {
+  const byDate = new Map<string, number>();
+
+  for (const record of records) {
+    const date = typeof record.created_at === "string" ? record.created_at.slice(5, 10) : "today";
+    const cost = Number(record.estimated_cost_inr ?? 0);
+    byDate.set(date, (byDate.get(date) ?? 0) + cost);
+  }
+
+  const values = Array.from(byDate, ([label, cost]) => ({ label, cost: Math.round(cost) }));
+  return values.length ? values.slice(-7) : [{ label: "today", cost: 0 }];
+}
+
 function actionRequest(action: string) {
   const defaultTopic = "CWI priority public-interest update";
 
@@ -1257,6 +1432,15 @@ function normalizeApprovalStatus(value: string) {
 }
 
 function normalizeSection(value: string): SectionId {
+  const aliases: Record<string, SectionId> = {
+    workflows: "command-center",
+    "daily-briefing": "command-center",
+    "source-memory": "memory-graph",
+    "trend-radar": "command-center",
+    "quality-scores": "verification-reports",
+    images: "visual-desk"
+  };
+  if (aliases[value]) return aliases[value];
   const match = sections.find(([id]) => id === value)?.[0];
   return match ?? "overview";
 }

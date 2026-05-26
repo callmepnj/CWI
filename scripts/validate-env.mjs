@@ -48,8 +48,8 @@ if (env.ADMIN_PASSWORD && env.ADMIN_PASSWORD.includes("CHANGE_ME")) {
 }
 
 const provider = (env.AI_PROVIDER || "").toLowerCase();
-if (!["openai", "gemini", "mock"].includes(provider)) {
-  issues.push("AI_PROVIDER must be openai, gemini, or mock.");
+if (!["bedrock", "openai", "mock"].includes(provider)) {
+  issues.push("AI_PROVIDER must be bedrock, openai, or mock.");
 }
 
 if (provider === "openai" && !hasRealSecret(env.OPENAI_API_KEY, "OPENAI")) {
@@ -60,11 +60,28 @@ if (provider === "openai" && !hasRealSecret(env.OPENAI_API_KEY, "OPENAI")) {
   }
 }
 
-if (provider === "gemini" && !hasRealSecret(env.GEMINI_API_KEY, "GEMINI")) {
-  if (allowPlaceholders && isPlaceholder(env.GEMINI_API_KEY)) {
-    warnings.push("GEMINI_API_KEY is still a placeholder.");
-  } else {
-    issues.push("AI_PROVIDER=gemini requires GEMINI_API_KEY.");
+if (provider === "bedrock") {
+  const missingBedrock = [
+    ["AWS_ACCESS_KEY_ID", env.AWS_ACCESS_KEY_ID],
+    ["AWS_SECRET_ACCESS_KEY", env.AWS_SECRET_ACCESS_KEY],
+    ["AWS_REGION", env.AWS_REGION]
+  ].filter(([, value]) => !value || String(value).includes("CHANGE_ME"));
+  const hasModel = Boolean(env.BEDROCK_MODEL_CLAUDE || env.BEDROCK_MODEL_LLAMA || env.BEDROCK_MODEL_MISTRAL);
+
+  if (missingBedrock.length) {
+    if (allowPlaceholders && missingBedrock.every(([, value]) => isPlaceholder(value))) {
+      warnings.push(`Bedrock env still has placeholders: ${missingBedrock.map(([key]) => key).join(", ")}.`);
+    } else {
+      issues.push(`AI_PROVIDER=bedrock requires ${missingBedrock.map(([key]) => key).join(", ")}.`);
+    }
+  }
+
+  if (!hasModel) {
+    if (allowPlaceholders) {
+      warnings.push("At least one BEDROCK_MODEL_* value should be set before production.");
+    } else {
+      issues.push("AI_PROVIDER=bedrock requires at least one BEDROCK_MODEL_* value.");
+    }
   }
 }
 

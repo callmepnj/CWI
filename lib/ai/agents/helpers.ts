@@ -14,7 +14,8 @@ export async function runJsonAgent<T>(input: {
     userPrompt: `${input.instruction}\n\nInput JSON:\n${JSON.stringify(input.payload, null, 2)}`,
     temperature: input.temperature ?? 0.2,
     maxTokens: input.maxTokens ?? 1800,
-    taskName: input.taskName
+    taskName: input.taskName,
+    agentName: input.agentName
   });
 
   if (!result.success) {

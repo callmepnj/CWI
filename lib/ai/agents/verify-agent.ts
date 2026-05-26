@@ -18,7 +18,7 @@ export async function runVerifyAgent(input: { researchPackId?: string; researchP
   }
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<VerifyAgentOutput>({
-    agentName: "CWI Verify AI",
+    agentName: "CWI Verify Shield",
     taskName: "Verify Agent",
     payload: researchPack,
     instruction: `

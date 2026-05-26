@@ -31,7 +31,15 @@ CWI_ADMIN_PASSWORD="change-this-long-admin-password"
 AI_PROVIDER="mock"
 AI_MODEL=""
 OPENAI_API_KEY=""
-GEMINI_API_KEY=""
+OPENAI_MODEL=""
+OPENAI_LIGHT_MODEL=""
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_REGION="ap-south-1"
+BEDROCK_MODEL_CLAUDE=""
+BEDROCK_MODEL_LLAMA=""
+BEDROCK_MODEL_MISTRAL=""
+SERP_API_KEY=""
 ```
 
 Do not commit `.env.local`.
@@ -42,7 +50,8 @@ Do not commit `.env.local`.
 - The admin system uses the existing PostgreSQL/Supabase `DATABASE_URL`.
 - Agents prepare research packs, drafts, SEO packs, social packs, image notes, UI/UX audits, and approval cards.
 - Nothing publishes automatically. Approval queue actions are required before any public update.
-- Set `AI_PROVIDER` to `openai` or `gemini` in production and add the matching server-side API key. `mock` is only for labelled local testing and must not be treated as real editorial output.
+- Set `AI_PROVIDER` to `bedrock` or `openai` in production and add the matching server-side keys. `mock` is only for labelled local testing and must not be treated as real editorial output.
+- CWI OS v1 routes heavy work through the model router: Command Core, Source Lens, Verify Shield, and Desk Writer use the strongest configured model; Rank Engine, Signal Studio, Visual Desk, UX Guardian, and Health Monitor use lighter/template-first paths where possible.
 - `npm run env:check:vercel` validates the placeholder template syntax. After replacing placeholders in your deployment environment, use the same rules as `npm run env:check:production` before launch. Keep `vercel.env` as a placeholder template only; never paste real keys into tracked files.
 - If an AI provider key is missing, the dashboard returns a visible configuration error instead of silently generating fake output.
 - The low-cost operating target is INR 8,000/month with a daily target around INR 250. The system uses manual links, RSS/source lists, templates, caching, and approval-first workflows instead of paid social APIs or expensive crawlers.

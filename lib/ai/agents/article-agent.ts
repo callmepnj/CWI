@@ -29,7 +29,7 @@ export async function runArticleAgent(input: {
   }
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<ArticleAgentOutput>({
-    agentName: "CWI Article AI",
+    agentName: "CWI Desk Writer",
     taskName: "Article Agent",
     maxTokens: 2600,
     payload: { researchPack, verificationReport },

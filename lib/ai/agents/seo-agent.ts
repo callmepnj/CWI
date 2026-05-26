@@ -22,7 +22,7 @@ export async function runSEOAgent(input: { articleDraftId?: string; articleDraft
   const title = asText((articleDraft as { title?: string } | null)?.title, input.topic || "CWI Watch Desk update");
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<SeoAgentOutput>({
-    agentName: "CWI SEO AI",
+    agentName: "CWI Rank Engine",
     taskName: "SEO Agent",
     payload: { articleDraft, topic: title },
     instruction: `

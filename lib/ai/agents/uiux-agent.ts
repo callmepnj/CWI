@@ -11,7 +11,7 @@ export type UIUXAgentOutput = {
 
 export async function runUIUXAgent(input: { page: string; notes?: string }) {
   const { data, estimatedCost, provider, model } = await runJsonAgent<UIUXAgentOutput>({
-    agentName: "CWI UI/UX AI",
+    agentName: "CWI UX Guardian",
     taskName: "UI/UX Agent",
     payload: input,
     instruction: `

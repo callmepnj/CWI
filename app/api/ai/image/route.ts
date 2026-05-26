@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const topic = body?.topic || "CWI image pack";
 
   try {
-    const taskId = await createAgentTask({ agentName: "CWI Image AI", taskType: "image_pack", input: body ?? {} });
+    const taskId = await createAgentTask({ agentName: "CWI Visual Desk", taskType: "image_pack", input: body ?? {} });
     try {
       const image = await runImageAgent({ topic, articleDraftId: body?.articleDraftId });
       await completeAgentTask(taskId, image, 0);
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       throw error;
     }
   } catch (error) {
-    console.error("CWI Image AI failed", error);
+    console.error("CWI Visual Desk failed", error);
     return fail(error);
   }
 }

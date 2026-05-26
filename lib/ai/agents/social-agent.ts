@@ -20,7 +20,7 @@ export async function runSocialAgent(input: { articleDraftId?: string; articleDr
   const topic = asText((articleDraft as { title?: string } | null)?.title, input.topic || "CWI Watch Desk update");
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<SocialAgentOutput>({
-    agentName: "CWI Social AI",
+    agentName: "CWI Signal Studio",
     taskName: "Social Agent",
     payload: { articleDraft, topic },
     instruction: `

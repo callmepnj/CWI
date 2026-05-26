@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const result = await runUIUXAuditWorkflow({ page: body?.page || "Homepage", notes: body?.notes });
     return ok(result, "UI/UX audit saved and sent to approval queue.");
   } catch (error) {
-    console.error("CWI UI/UX AI failed", error);
+    console.error("CWI UX Guardian failed", error);
     return fail(error);
   }
 }

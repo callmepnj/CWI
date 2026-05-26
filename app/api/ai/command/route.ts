@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const result = await runCommandWorkflow();
     return ok(result, "Daily Command Briefing generated.");
   } catch (error) {
-    console.error("CWI Command AI failed", error);
+    console.error("CWI Command Core failed", error);
     return fail(error);
   }
 }

@@ -381,6 +381,9 @@ async function adminOsSchemaLooksReady() {
         to_regclass('public.cwi_verification_gates') is not null as cwi_verification_gates,
         to_regclass('public.cwi_quality_scores') is not null as cwi_quality_scores,
         to_regclass('public.cwi_trend_radar_items') is not null as cwi_trend_radar_items,
+        to_regclass('public.big_brain_rules') is not null as big_brain_rules,
+        to_regclass('public.memory_graph_nodes') is not null as memory_graph_nodes,
+        to_regclass('public.memory_graph_edges') is not null as memory_graph_edges,
         exists (
           select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'agent_tasks' and column_name = 'agent_name'
@@ -854,6 +857,47 @@ export async function ensureAdminOsTables() {
         unique (topic, trend_type)
       );
 
+      create table if not exists big_brain_rules (
+        id uuid primary key default gen_random_uuid(),
+        rule_key text not null unique,
+        category text not null,
+        title text not null,
+        body text not null,
+        priority integer not null default 10,
+        active boolean not null default true,
+        metadata jsonb not null default '{}'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists memory_graph_nodes (
+        id uuid primary key default gen_random_uuid(),
+        node_type text not null,
+        label text not null,
+        slug text not null,
+        summary text,
+        confidence_score integer not null default 50,
+        source_count integer not null default 0,
+        status text not null default 'active',
+        source_url text,
+        metadata jsonb not null default '{}'::jsonb,
+        first_seen_at timestamptz not null default now(),
+        last_seen_at timestamptz not null default now(),
+        unique (node_type, slug)
+      );
+
+      create table if not exists memory_graph_edges (
+        id uuid primary key default gen_random_uuid(),
+        from_node_id uuid not null references memory_graph_nodes(id) on delete cascade,
+        to_node_id uuid not null references memory_graph_nodes(id) on delete cascade,
+        relation_type text not null,
+        weight integer not null default 50,
+        evidence jsonb not null default '[]'::jsonb,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        unique (from_node_id, to_node_id, relation_type)
+      );
+
       create table if not exists approval_queue (
         id uuid primary key default gen_random_uuid(),
         topic text not null,
@@ -893,6 +937,15 @@ export async function ensureAdminOsTables() {
 
       create index if not exists cwi_trend_radar_priority_idx
       on cwi_trend_radar_items (priority_score desc, updated_at desc);
+
+      create index if not exists big_brain_rules_category_priority_idx
+      on big_brain_rules (category, priority);
+
+      create index if not exists memory_graph_nodes_type_seen_idx
+      on memory_graph_nodes (node_type, last_seen_at desc);
+
+      create index if not exists memory_graph_edges_relation_idx
+      on memory_graph_edges (relation_type, updated_at desc);
 
       alter table agent_tasks add column if not exists agent_name text;
       alter table agent_tasks add column if not exists input_json jsonb not null default '{}'::jsonb;

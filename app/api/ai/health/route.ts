@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const result = await runSystemHealthWorkflow();
     return ok(result, "System health check completed.");
   } catch (error) {
-    console.error("CWI System Health AI failed", error);
+    console.error("CWI Health Monitor failed", error);
     return fail(error);
   }
 }

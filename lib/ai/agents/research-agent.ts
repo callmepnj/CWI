@@ -26,7 +26,7 @@ export type ResearchAgentOutput = {
 
 export async function runResearchAgent(input: ResearchAgentInput) {
   const { data, estimatedCost, provider, model } = await runJsonAgent<ResearchAgentOutput>({
-    agentName: "CWI Research AI",
+    agentName: "CWI Source Lens",
     taskName: "Research Agent",
     payload: input,
     instruction: `

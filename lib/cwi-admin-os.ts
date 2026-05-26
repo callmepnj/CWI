@@ -6,6 +6,7 @@ import { normalizeApprovalStatus } from "@/lib/db/approval";
 import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { site } from "@/lib/site";
+import { cwiOsAgents, syncBigBrainRules } from "@/lib/ai/big-brain";
 import { syncStaticPublicMemory } from "@/lib/ai/source-memory";
 import { runTrendRadar } from "@/lib/ai/trend-radar";
 
@@ -19,18 +20,7 @@ declare global {
   var cwiAdminDashboardCache: { data: unknown; expiresAt: number } | undefined;
 }
 
-const agentDefinitions = [
-  ["command-ai", "CWI Command AI", "Main controller, editor-in-chief, and daily operations manager."],
-  ["research-ai", "CWI Research AI", "Finds and extracts authentic information from low-cost sources."],
-  ["verify-ai", "CWI Verify AI", "Checks accuracy, legal risk, safety, labels, and source gaps."],
-  ["article-ai", "CWI Article AI", "Writes approval-ready Watch Desk and India Unanswered Files drafts."],
-  ["seo-ai", "CWI SEO AI", "Prepares metadata, schema, links, sitemap notes, and Search Console checklist."],
-  ["social-ai", "CWI Social AI", "Creates platform-specific captions and distribution packs."],
-  ["image-ai", "CWI Image AI", "Maps approved images, alt text, thumbnails, OG assets, and source notes."],
-  ["uiux-ai", "CWI UI/UX AI", "Audits spelling, clarity, layout, accessibility, and mobile issues."],
-  ["publish-ai", "CWI Publish AI", "Publishes only after approval and prepares deploy checklists."],
-  ["system-health-ai", "CWI System Health AI", "Monitors agents, database, sitemap, robots, links, and budget."]
-] as const;
+const agentDefinitions = cwiOsAgents;
 
 const defaultSources = [
   ["Reuters", "news", "https://www.reuters.com/", "", "", "website", "high", "International wire source for verified public-interest reporting."],
@@ -137,6 +127,8 @@ export async function seedAdminDefaults() {
       JSON.stringify({ url: site.url })
     ]
   );
+
+  await syncBigBrainRules();
 }
 
 export async function getAdminDashboardData(options: { force?: boolean } = {}) {
@@ -164,9 +156,11 @@ async function buildAdminDashboardData() {
     agents,
     approvals,
     researchPacks,
+    verificationReports,
     articleDrafts,
     seoPacks,
     socialPacks,
+    imageLibrary,
     uiuxAudits,
     manualLinks,
     sources,
@@ -174,6 +168,8 @@ async function buildAdminDashboardData() {
     briefings,
     healthLogs,
     costs,
+    dailyCosts,
+    costUsageLogs,
     reports,
     watchComments,
     unansweredComments,
@@ -182,14 +178,19 @@ async function buildAdminDashboardData() {
     memoryClaims,
     verificationGates,
     qualityScores,
-    trendRadarItems
+    trendRadarItems,
+    bigBrainRules,
+    memoryGraphNodes,
+    memoryGraphEdges
   ] = await Promise.all([
     pool.query(`select * from agents order by id;`),
     pool.query(`select * from approval_queue order by created_at desc limit 80;`),
     pool.query(`select * from research_packs order by created_at desc limit 50;`),
+    pool.query(`select * from verification_reports order by created_at desc limit 50;`),
     pool.query(`select * from article_drafts order by created_at desc limit 50;`),
     pool.query(`select * from seo_packs order by created_at desc limit 50;`),
     pool.query(`select * from social_packs order by created_at desc limit 50;`),
+    pool.query(`select * from image_library order by created_at desc limit 50;`),
     pool.query(`select * from uiux_audits order by created_at desc limit 50;`),
     pool.query(`select * from manual_links order by created_at desc limit 50;`),
     pool.query(`select * from sources order by active desc, trust_level, name;`),
@@ -197,6 +198,8 @@ async function buildAdminDashboardData() {
     pool.query(`select * from daily_briefings order by created_at desc limit 20;`),
     pool.query(`select * from system_health_logs order by created_at desc limit 10;`),
     pool.query(`select coalesce(sum(estimated_cost_inr), 0)::numeric(10,2)::text as month_cost from cost_usage_logs where created_at >= date_trunc('month', now());`),
+    pool.query(`select coalesce(sum(estimated_cost_inr), 0)::numeric(10,2)::text as day_cost from cost_usage_logs where created_at >= current_date;`),
+    pool.query(`select * from cost_usage_logs order by created_at desc limit 50;`),
     pool.query(`
       select id::text, created_at, name, contact, city, state, type, source_url, message, status
       from cwi_report_submissions
@@ -220,21 +223,26 @@ async function buildAdminDashboardData() {
     pool.query(`select * from cwi_memory_claims order by last_seen_at desc limit 80;`).catch(() => ({ rows: [] })),
     pool.query(`select * from cwi_verification_gates order by created_at desc limit 50;`).catch(() => ({ rows: [] })),
     pool.query(`select * from cwi_quality_scores order by created_at desc limit 50;`).catch(() => ({ rows: [] })),
-    pool.query(`select * from cwi_trend_radar_items order by priority_score desc, updated_at desc limit 50;`).catch(() => ({ rows: [] }))
+    pool.query(`select * from cwi_trend_radar_items order by priority_score desc, updated_at desc limit 50;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from big_brain_rules order by priority asc, category asc, title asc;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from memory_graph_nodes order by last_seen_at desc limit 100;`).catch(() => ({ rows: [] })),
+    pool.query(`select * from memory_graph_edges order by updated_at desc limit 100;`).catch(() => ({ rows: [] }))
   ]);
 
   const approvalRows = approvals.rows;
   const dbPublishedPosts = await getPublishedWatchPosts(8).catch(() => []);
   const estimatedMonthlyCost = Number(costs.rows[0]?.month_cost ?? 0);
+  const estimatedDailyCost = Number(dailyCosts.rows[0]?.day_cost ?? 0);
   const pendingApprovals = approvalRows.filter((row) => normalizeApprovalStatus(row.status) === "waiting_for_approval").length;
-  const latestHealth = healthLogs.rows[0] ?? buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost });
+  const latestHealth = healthLogs.rows[0] ?? buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost, estimatedDailyCost });
 
   return {
     budget: {
       monthlyCapInr: monthlyBudgetInr,
       dailyCapInr: dailyBudgetInr,
+      estimatedDailyCost,
       estimatedMonthlyCost,
-      safeMode: estimatedMonthlyCost > monthlyBudgetInr * 0.8
+      safeMode: estimatedMonthlyCost > monthlyBudgetInr * 0.8 || estimatedDailyCost >= 200
     },
     ai: publicAiConfig(),
     counts: {
@@ -247,6 +255,8 @@ async function buildAdminDashboardData() {
       socialPacksReady: socialPacks.rows.length,
       uiuxIssuesFound: uiuxAudits.rows.length,
       memoryNodes: memoryNodes.rows.length,
+      memoryGraphNodes: memoryGraphNodes.rows.length,
+      bigBrainRules: bigBrainRules.rows.length,
       activeWorkflows: workflows.rows.filter((row) => ["queued", "running", "awaiting_approval"].includes(String(row.status))).length,
       trendRadarItems: trendRadarItems.rows.length,
       qualityReviews: qualityScores.rows.length
@@ -254,9 +264,11 @@ async function buildAdminDashboardData() {
     agents: agents.rows,
     approvals: approvalRows,
     researchPacks: researchPacks.rows,
+    verificationReports: verificationReports.rows,
     articleDrafts: articleDrafts.rows,
     seoPacks: seoPacks.rows,
     socialPacks: socialPacks.rows,
+    imageLibrary: imageLibrary.rows,
     uiuxAudits: uiuxAudits.rows,
     manualLinks: manualLinks.rows,
     sources: sources.rows,
@@ -270,6 +282,10 @@ async function buildAdminDashboardData() {
     verificationGates: verificationGates.rows,
     qualityScores: qualityScores.rows,
     trendRadarItems: trendRadarItems.rows,
+    bigBrainRules: bigBrainRules.rows,
+    memoryGraphNodes: memoryGraphNodes.rows,
+    memoryGraphEdges: memoryGraphEdges.rows,
+    costUsageLogs: costUsageLogs.rows,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
     latestPublicArticles: mergeAdminArticles([
       ...dbPublishedPosts.map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),
@@ -285,7 +301,8 @@ function publicAiConfig() {
     provider: config.provider,
     model: config.model,
     configured: config.configured,
-    productionReady: config.provider === "openai" || config.provider === "gemini",
+    productionReady: config.provider === "openai" || config.provider === "bedrock",
+    routing: config.routing ?? {},
     message: config.configured
       ? config.provider === "mock"
         ? "Mock mode is active. Use only for local testing, not real editorial output."
@@ -360,7 +377,7 @@ export async function createManualLinkWorkflow(input: {
       categoryFromContentType(input.contentType),
       "Manual review",
       JSON.stringify(sourceList),
-      metadata.description || `CWI Research AI received a manual link about ${topic}.`,
+      metadata.description || `CWI Source Lens received a manual link about ${topic}.`,
       `A manual source link was submitted for ${topic}. The source needs review before use.`,
       "The URL, platform, creator/source, notes, and extracted metadata are available for review.",
       "Whether the claim is verified, complete, current, or suitable for publication remains unclear until human review.",
@@ -441,6 +458,13 @@ export async function runAgentAction(action: string) {
     return { ok: true, message: `Source memory synced: ${result.synced} public records indexed.`, data: result };
   }
 
+  if (action === "sync-big-brain") {
+    const result = await syncBigBrainRules();
+    await logTask("memory-graph-ai", "Synced CWI Big Brain rules", "completed", 1, result);
+    invalidateAdminDashboardCache();
+    return { ok: true, message: `Big Brain synced: ${result.synced} newsroom rules active.`, data: result };
+  }
+
   if (action === "trend-radar") {
     const result = await runTrendRadar();
     await logTask("command-ai", "Generated CWI Trend Radar", "completed", 4, result);
@@ -449,7 +473,7 @@ export async function runAgentAction(action: string) {
   }
 
   if (action === "stop-non-essential") {
-    await getPool().query(`update agents set status = 'paused', updated_at = now() where id not in ('command-ai', 'system-health-ai', 'publish-ai');`);
+    await getPool().query(`update agents set status = 'paused', updated_at = now() where id not in ('command-ai', 'system-health-ai', 'publish-ai', 'memory-graph-ai');`);
     await logTask("system-health-ai", "Stopped all non-essential tasks", "completed", 0);
     invalidateAdminDashboardCache();
     return { ok: true, message: "Non-essential agents paused. Command, Publish, and System Health remain available." };
@@ -531,7 +555,7 @@ async function createDailyBriefing() {
   await createApprovalQueueItem({
     topic: "Daily Command Briefing",
     type: "Daily Briefing",
-    summary: "CWI Command AI prepared a daily briefing for human review.",
+    summary: "CWI Command Core prepared a daily briefing for human review.",
     verificationStatus: "Source-backed",
     riskLevel: "Low",
     sourceCount: 0,
@@ -604,7 +628,7 @@ async function createSeoAuditPack() {
   await createApprovalQueueItem({
     topic: "SEO system check",
     type: "SEO Pack",
-    summary: "CWI SEO AI checked sitemap/robots assumptions and queued a Search Console checklist.",
+    summary: "CWI Rank Engine checked sitemap/robots assumptions and queued a Search Console checklist.",
     verificationStatus: "Source-backed",
     riskLevel: "Low",
     sourceCount: 0,
@@ -636,7 +660,7 @@ async function createUiuxAudit() {
   await createApprovalQueueItem({
     topic: "UI/UX audit pack",
     type: "UI/UX Fix Pack",
-    summary: "CWI UI/UX AI prepared a small review list. No redesign will happen without approval.",
+    summary: "CWI UX Guardian prepared a small review list. No redesign will happen without approval.",
     verificationStatus: "Opinion",
     riskLevel: "Low",
     sourceCount: 0,
@@ -654,7 +678,7 @@ async function createStandaloneSocialPack() {
   await createApprovalQueueItem({
     topic: post.title,
     type: "Social Pack",
-    summary: "CWI Social AI generated platform captions for review only.",
+    summary: "CWI Signal Studio generated platform captions for review only.",
     verificationStatus: post.verificationStatus,
     riskLevel: "Low",
     sourceCount: post.sources.length,
@@ -674,7 +698,7 @@ async function createStandaloneArticleDraft() {
   await createApprovalQueueItem({
     topic: post.title,
     type: "Article Draft",
-    summary: "CWI Article AI prepared a template-based draft shell for human review.",
+    summary: "CWI Desk Writer prepared a template-based draft shell for human review.",
     verificationStatus: post.verificationStatus,
     riskLevel: "Medium",
     sourceCount: post.sources.length,
@@ -826,7 +850,7 @@ async function createImagePack(topic: string) {
       `Cockroach Watch India visual for ${topic}.`,
       visual.credit,
       visual.sourceUrl,
-      JSON.stringify({ doNotRepeatAcrossUnrelatedTopics: true, generatedBy: "CWI Image AI template" })
+      JSON.stringify({ doNotRepeatAcrossUnrelatedTopics: true, generatedBy: "CWI Visual Desk template" })
     ]
   );
 
@@ -942,7 +966,15 @@ async function extractUrlMetadata(url: string) {
   }
 }
 
-function buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost }: { pendingApprovals: number; estimatedMonthlyCost: number }) {
+function buildHealthSnapshot({
+  pendingApprovals,
+  estimatedMonthlyCost,
+  estimatedDailyCost
+}: {
+  pendingApprovals: number;
+  estimatedMonthlyCost: number;
+  estimatedDailyCost: number;
+}) {
   return {
     website_status: "online",
     database_status: "connected",
@@ -954,7 +986,7 @@ function buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost }: { pendi
     missing_alt_text: 0,
     failed_tasks: 0,
     monthly_budget_usage_inr: estimatedMonthlyCost,
-    daily_ai_usage_inr: 0,
+    daily_ai_usage_inr: estimatedDailyCost,
     pending_approvals: pendingApprovals,
     created_at: new Date().toISOString()
   };

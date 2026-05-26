@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const taskId = await createAgentTask({ agentName: "CWI SEO AI", taskType: "seo_pack", input: body });
+    const taskId = await createAgentTask({ agentName: "CWI Rank Engine", taskType: "seo_pack", input: body });
     try {
       const seo = await runSEOAgent({ articleDraftId: body.articleDraftId, topic: body.topic });
       await completeAgentTask(taskId, seo, seo._meta?.estimatedCost ?? 0);
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       throw error;
     }
   } catch (error) {
-    console.error("CWI SEO AI failed", error);
+    console.error("CWI Rank Engine failed", error);
     return fail(error);
   }
 }

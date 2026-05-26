@@ -200,7 +200,50 @@ async function upsertMemoryNode(input: {
     ]
   );
 
+  await upsertMemoryGraphNode({
+    ...input,
+    slug
+  });
+
   return result.rows[0].id;
+}
+
+async function upsertMemoryGraphNode(input: {
+  nodeType: string;
+  label: string;
+  slug: string;
+  summary?: string;
+  confidenceScore?: number;
+  sourceCount?: number;
+  sourceUrl?: string;
+  metadata?: unknown;
+}) {
+  await getPool().query(
+    `
+      insert into memory_graph_nodes (
+        node_type, label, slug, summary, confidence_score, source_count, source_url, metadata
+      )
+      values ($1, $2, $3, $4, $5, $6, nullif($7, ''), $8)
+      on conflict (node_type, slug) do update set
+        label = excluded.label,
+        summary = coalesce(nullif(excluded.summary, ''), memory_graph_nodes.summary),
+        confidence_score = greatest(memory_graph_nodes.confidence_score, excluded.confidence_score),
+        source_count = greatest(memory_graph_nodes.source_count, excluded.source_count),
+        source_url = coalesce(excluded.source_url, memory_graph_nodes.source_url),
+        metadata = memory_graph_nodes.metadata || excluded.metadata,
+        last_seen_at = now();
+    `,
+    [
+      input.nodeType,
+      input.label,
+      input.slug,
+      input.summary ?? "",
+      clampScore(input.confidenceScore ?? 50),
+      input.sourceCount ?? 0,
+      input.sourceUrl ?? "",
+      JSON.stringify(input.metadata ?? {})
+    ]
+  );
 }
 
 async function upsertMemoryEdge(fromNodeId: string, toNodeId: string, relationType: string, confidenceScore: number, evidence: unknown[]) {
