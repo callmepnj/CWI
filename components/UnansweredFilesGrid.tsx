@@ -67,6 +67,25 @@ export function UnansweredFilesGrid({ files }: { files: UnansweredFile[] }) {
         Showing {filteredFiles.length} of {files.length} source-backed files
       </p>
 
+      {filteredFiles.length === 0 ? (
+        <div className="mt-6 rounded-[1.5rem] border border-dashed border-royal/25 bg-skywash p-6 text-center">
+          <p className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">No files match this view</p>
+          <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-6 text-ink/68">
+            Try a different search term, category, or status filter. CWI keeps the archive readable even when a filter returns no results.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              setCategory("all");
+              setStatus("all");
+            }}
+            className="mt-5 rounded-full bg-ink px-5 py-3 text-xs font-black uppercase tracking-[0.14em] text-white transition hover:bg-royal"
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : (
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {filteredFiles.map((file) => (
           <article
@@ -122,6 +141,7 @@ export function UnansweredFilesGrid({ files }: { files: UnansweredFile[] }) {
           </article>
         ))}
       </div>
+      )}
     </div>
   );
 }

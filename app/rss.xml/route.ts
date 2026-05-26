@@ -34,10 +34,11 @@ export async function GET() {
     .join("\n");
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(site.name)} Watch Desk</title>
     <link>${site.url}/watch-desk</link>
+    <atom:link href="${site.url}/rss.xml" rel="self" type="application/rss+xml" />
     <description>${escapeXml(site.description)}</description>
     <language>en-IN</language>
     <lastBuildDate>${new Date(feedPosts[0]?.updatedDate ?? "2026-05-21").toUTCString()}</lastBuildDate>

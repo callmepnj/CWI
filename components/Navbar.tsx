@@ -31,7 +31,8 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const pathname = usePathname();
-  const moreActive = moreItems.some((item) => pathname === item.href);
+  const isActive = (href: string) => href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+  const moreActive = moreItems.some((item) => isActive(item.href));
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/92 shadow-[0_10px_30px_rgba(11,18,32,0.06)] backdrop-blur-xl">
@@ -64,7 +65,7 @@ export function Navbar() {
               href={item.href}
               className={cn(
                 "rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink/70 transition hover:bg-skywash hover:text-royal",
-                pathname === item.href && "bg-skywash text-royal"
+                isActive(item.href) && "bg-skywash text-royal"
               )}
             >
               {item.label}
@@ -90,7 +91,7 @@ export function Navbar() {
                     href={item.href}
                     className={cn(
                       "block rounded-2xl px-4 py-3 text-sm font-bold text-ink/75 transition hover:bg-skywash hover:text-royal",
-                      pathname === item.href && "bg-skywash text-royal"
+                      isActive(item.href) && "bg-skywash text-royal"
                     )}
                     onClick={() => setMoreOpen(false)}
                   >
@@ -128,7 +129,7 @@ export function Navbar() {
                 href={item.href}
                 className={cn(
                   "rounded-2xl bg-paper px-4 py-3 text-sm font-black uppercase tracking-[0.12em] text-ink",
-                  pathname === item.href && "bg-skywash text-royal ring-1 ring-royal/15"
+                  isActive(item.href) && "bg-skywash text-royal ring-1 ring-royal/15"
                 )}
                 onClick={() => setOpen(false)}
               >
@@ -145,7 +146,7 @@ export function Navbar() {
                   href={item.href}
                   className={cn(
                     "rounded-xl px-4 py-2.5 text-sm font-bold text-ink/65 transition hover:bg-skywash hover:text-royal",
-                    pathname === item.href && "bg-skywash text-royal"
+                    isActive(item.href) && "bg-skywash text-royal"
                   )}
                   onClick={() => setOpen(false)}
                 >

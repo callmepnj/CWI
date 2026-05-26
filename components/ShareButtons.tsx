@@ -53,6 +53,7 @@ export function ShareButtons({ title, path, summary }: ShareButtonsProps) {
             href={item.href}
             target="_blank"
             rel="noreferrer"
+            aria-label={`${item.label}: ${title}`}
             className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-ink transition hover:border-royal hover:bg-skywash hover:text-royal"
           >
             <Icon className="h-4 w-4" />

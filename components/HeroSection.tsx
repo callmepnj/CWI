@@ -15,8 +15,6 @@ export function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-white">
       <div className="absolute inset-0 -z-10 cwi-grid opacity-80" />
-      <div className="absolute -right-28 top-16 -z-10 h-80 w-80 rounded-full bg-royal/15 blur-3xl" />
-      <div className="absolute -left-28 bottom-4 -z-10 h-72 w-72 rounded-full bg-saffron/25 blur-3xl" />
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
         <div className="flex flex-col justify-center">
           <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-royal px-4 py-2 font-mono text-[0.7rem] font-black uppercase tracking-[0.18em] text-white shadow-[0_14px_30px_rgba(11,92,255,0.22)]">
@@ -24,41 +22,29 @@ export function HeroSection() {
             Founder-led civic watch platform
           </p>
           <h1 className="max-w-5xl font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.06em] text-ink sm:text-7xl lg:text-8xl">
-            Cockroach Watch India — CWI Civic Watch Platform
+            Cockroach Watch India - CWI Civic Watch Platform
           </h1>
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-ink/82">
-            A founder-led civic watch platform documenting youth voice, public issues, civic satire, viral moments, creator culture, and the Cockroach wave across India.
-          </p>
-          <p className="mt-5 max-w-3xl leading-8 text-ink/68">
-            Cockroach Watch India, also known as CWI, is a founder-led independent civic watch platform documenting youth voice, public issues, civic satire, creator credit, viral claims, and public memory across India.
+            Cockroach Watch India, also known as CWI, documents youth voice, public issues, civic satire, creator credit, viral claims, and public memory with source-backed context.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
               <Link href="/submit">Submit a civic report to CWI <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="green">
-              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
+              <Link href="/live-newsroom">Enter Live Newsroom</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/join">Join the CWI Watch</Link>
+              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
             </Button>
           </div>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Button asChild size="sm" variant="ghost">
-              <Link href={site.youtube} target="_blank">YouTube</Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link href={site.x} target="_blank">Follow on X</Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link href={site.instagram} target="_blank">Instagram</Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link href={site.telegram} target="_blank">Telegram</Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link href={site.bluesky} target="_blank">Bluesky</Link>
-            </Button>
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-black uppercase tracking-[0.14em] text-ink/58">
+            <span>Follow CWI:</span>
+            <Link href={site.youtube} target="_blank" rel="noreferrer" className="transition hover:text-royal">YouTube</Link>
+            <Link href={site.x} target="_blank" rel="noreferrer" className="transition hover:text-royal">X</Link>
+            <Link href={site.instagram} target="_blank" rel="noreferrer" className="transition hover:text-royal">Instagram</Link>
+            <Link href={site.telegram} target="_blank" rel="noreferrer" className="transition hover:text-royal">Telegram</Link>
+            <Link href={site.bluesky} target="_blank" rel="noreferrer" className="transition hover:text-royal">Bluesky</Link>
           </div>
           <p className="mt-8 flex max-w-3xl items-start gap-3 rounded-3xl border border-royal/15 bg-skywash/85 p-4 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-ink/70">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-royal" />

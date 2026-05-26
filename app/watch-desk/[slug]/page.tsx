@@ -195,7 +195,7 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
 
               <h1 className="mt-6 font-display text-4xl font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink sm:text-6xl">
-                {post.title} - CWI Watch Desk
+                {post.title}
               </h1>
               <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
               <p className="mt-5 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">

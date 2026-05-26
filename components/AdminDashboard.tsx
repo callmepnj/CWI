@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type React from "react";
 import {
   Activity,
@@ -136,10 +136,69 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
   const commentCountRef = useRef<number | null>(null);
 
   const safeSection = normalizeSection(currentSection);
+  const safeSectionRef = useRef<SectionId>(safeSection);
+
+  useEffect(() => {
+    safeSectionRef.current = safeSection;
+  }, [safeSection]);
+
+  const handleSessionExpired = useCallback(() => {
+    setError("Session expired. Please log in again.");
+    window.setTimeout(() => {
+      window.location.href = "/admin/login?expired=1";
+    }, 500);
+  }, []);
+
+  const loadDashboard = useCallback(async (force = false) => {
+    setError("");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    let timedOut = false;
+    const response = await fetch(`/api/admin/dashboard${force ? "?force=1" : ""}`, {
+      signal: controller.signal,
+      cache: "no-store"
+    }).catch((fetchError: unknown) => {
+      timedOut = fetchError instanceof DOMException && fetchError.name === "AbortError";
+      return null;
+    });
+    window.clearTimeout(timeout);
+    const json = await response?.json().catch(() => null);
+
+    if (response?.status === 401) {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!response?.ok || !json?.ok) {
+      setError(
+        timedOut
+          ? "Admin dashboard data timed out after 15 seconds. Refresh once; if it repeats, check Vercel DATABASE_URL and Supabase pooler status."
+          : json?.error ?? "Admin dashboard could not load."
+      );
+      return;
+    }
+
+    setDegradedMessage(json.degraded ? json.error ?? "Admin dashboard is in setup mode." : "");
+    const nextCommentCount = Array.isArray(json.data?.comments) ? json.data.comments.length : 0;
+    if (safeSectionRef.current === "comments" && commentCountRef.current !== null && nextCommentCount > commentCountRef.current) {
+      setMessage("New comment received");
+    }
+    commentCountRef.current = nextCommentCount;
+    setData(json.data);
+  }, [handleSessionExpired]);
+
+  function handleUnauthorizedResponse(response: Response | null | undefined) {
+    if (response?.status !== 401) {
+      return false;
+    }
+
+    handleSessionExpired();
+    return true;
+  }
 
   useEffect(() => {
     loadDashboard();
-  }, []);
+  }, [loadDashboard]);
 
   useEffect(() => {
     setCurrentSection(activeSection);
@@ -183,40 +242,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }, 15000);
 
     return () => window.clearInterval(timer);
-  }, [safeSection]);
-
-  async function loadDashboard(force = false) {
-    setError("");
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 15000);
-    let timedOut = false;
-    const response = await fetch(`/api/admin/dashboard${force ? "?force=1" : ""}`, {
-      signal: controller.signal,
-      cache: "no-store"
-    }).catch((fetchError: unknown) => {
-      timedOut = fetchError instanceof DOMException && fetchError.name === "AbortError";
-      return null;
-    });
-    window.clearTimeout(timeout);
-    const json = await response?.json().catch(() => null);
-
-    if (!response?.ok || !json?.ok) {
-      setError(
-        timedOut
-          ? "Admin dashboard data timed out after 15 seconds. Refresh once; if it repeats, check Vercel DATABASE_URL and Supabase pooler status."
-          : json?.error ?? "Admin dashboard could not load."
-      );
-      return;
-    }
-
-    setDegradedMessage(json.degraded ? json.error ?? "Admin dashboard is in setup mode." : "");
-    const nextCommentCount = Array.isArray(json.data?.comments) ? json.data.comments.length : 0;
-    if (safeSection === "comments" && commentCountRef.current !== null && nextCommentCount > commentCountRef.current) {
-      setMessage("New comment received");
-    }
-    commentCountRef.current = nextCommentCount;
-    setData(json.data);
-  }
+  }, [loadDashboard, safeSection]);
 
   function changeSection(section: SectionId) {
     setCurrentSection(section);
@@ -244,6 +270,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     const json = await response?.json().catch(() => null);
     setPending("");
 
+    if (handleUnauthorizedResponse(response)) {
+      failProgress("Session expired.");
+      return;
+    }
+
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? json?.message ?? "Agent action failed.");
       failProgress("Agent action failed.");
@@ -269,6 +300,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     const json = await response?.json().catch(() => null);
     setPending("");
 
+    if (handleUnauthorizedResponse(response)) {
+      failProgress("Session expired.");
+      return;
+    }
+
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Approval update failed.");
       failProgress("Approval update failed.");
@@ -288,6 +324,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     const { response, json } = await requestPublish(id);
     setPending("");
+
+    if (handleUnauthorizedResponse(response)) {
+      failProgress("Session expired.");
+      return;
+    }
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Publish AI failed.");
@@ -315,6 +356,12 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }).catch(() => null);
     const approvalJson = await approvalResponse?.json().catch(() => null);
 
+    if (handleUnauthorizedResponse(approvalResponse)) {
+      setPending("");
+      failProgress("Session expired.");
+      return;
+    }
+
     if (!approvalResponse?.ok || !approvalJson?.ok) {
       setPending("");
       setError(approvalJson?.error ?? "Approval update failed.");
@@ -329,6 +376,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     const { response, json } = await requestPublish(id);
     setPending("");
+
+    if (handleUnauthorizedResponse(response)) {
+      failProgress("Session expired.");
+      return;
+    }
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Publish AI failed after approval.");
@@ -377,6 +429,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     const json = await response?.json().catch(() => null);
     setPending("");
 
+    if (handleUnauthorizedResponse(response)) {
+      failProgress("Session expired.");
+      return;
+    }
+
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Article draft could not be generated for this approval item.");
       failProgress("Article draft generation failed.");
@@ -401,6 +458,11 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
     }).catch(() => null);
     const json = await response?.json().catch(() => null);
     setPending("");
+
+    if (handleUnauthorizedResponse(response)) {
+      failProgress("Session expired.");
+      return;
+    }
 
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Comment update failed.");
@@ -1191,6 +1253,14 @@ function ManualLinkSection({
     const json = await response?.json().catch(() => null);
     setPending(false);
 
+    if (response?.status === 401) {
+      setError("Session expired. Please log in again.");
+      window.setTimeout(() => {
+        window.location.href = "/admin/login?expired=1";
+      }, 500);
+      return;
+    }
+
     if (!response?.ok || !json?.ok) {
       setError(json?.error ?? "Manual link could not be processed.");
       return;
@@ -1379,7 +1449,11 @@ function CommentsSection({
         <CardLabel>Comment moderation</CardLabel>
         <p className="leading-7 text-ink/70">Approve only real comments. Reject hate, threats, doxxing, spam, harassment, or unverified allegations presented as fact.</p>
       </Card>
-      {records.map((comment) => (
+      {records.map((comment) => {
+        const statusUpdatedAt = text(comment.updated_at);
+        const currentStatus = normalizeCommentStatus(text(comment.status));
+
+        return (
         <Card key={`${text(comment.source)}-${text(comment.id)}`}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -1387,12 +1461,16 @@ function CommentsSection({
               <h3 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">{text(comment.article)}</h3>
               <p className="mt-3 text-sm font-black uppercase tracking-[0.1em] text-ink/50">{text(comment.name)}</p>
               <p className="mt-3 leading-7 text-ink/72">{text(comment.comment)}</p>
+              {statusUpdatedAt ? (
+                <p className="mt-3 font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-ink/45">
+                  Action history: marked {currentStatus.replace(/_/g, " ")} on {formatAdminDateTime(statusUpdatedAt)}
+                </p>
+              ) : null}
             </div>
             <StatusPill status={text(comment.status)} />
           </div>
           <div className="mt-5 flex flex-wrap gap-2">
             {["approved", "rejected", "spam", "pending"].map((status) => {
-              const currentStatus = normalizeCommentStatus(text(comment.status));
               return (
               <Button key={status} type="button" size="sm" variant={status === "approved" ? "default" : "outline"} disabled={pending === `${text(comment.id)}:${status}` || currentStatus === status} onClick={() => updateComment(text(comment.source), text(comment.id), status)}>
                 {status}
@@ -1401,7 +1479,8 @@ function CommentsSection({
             })}
           </div>
         </Card>
-      ))}
+        );
+      })}
       {records.length === 0 ? <Card><p className="font-bold text-ink/64">No comments yet.</p></Card> : null}
     </div>
   );
@@ -1518,6 +1597,15 @@ function formatValue(value: unknown) {
 function formatDate(value: unknown) {
   if (!value || typeof value !== "string") return "Not run";
   return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+}
+
+function formatAdminDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
 function text(value: unknown) {

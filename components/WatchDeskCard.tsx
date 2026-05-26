@@ -5,6 +5,9 @@ import { Card, CardLabel } from "@/components/ui/card";
 import type { WatchPost } from "@/data/posts";
 
 export function WatchDeskCard({ post }: { post: WatchPost }) {
+  const sourceLabel = post.sourceLabel || "Source listed in article";
+  const credit = post.credit || "Credit pending review";
+
   return (
     <Card className="flex h-full flex-col">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -30,7 +33,7 @@ export function WatchDeskCard({ post }: { post: WatchPost }) {
         ))}
       </div>
       <p className="mt-5 text-xs font-bold uppercase leading-5 tracking-[0.08em] text-ink/58">
-        Source/Credit: {post.sourceLabel} / {post.credit}
+        Source/Credit: {sourceLabel} / {credit}
       </p>
       <Link href={`/watch-desk/${post.slug}`} className="mt-6 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
         Read on CWI Watch Desk <ArrowRight className="h-4 w-4" />

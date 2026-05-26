@@ -16,15 +16,25 @@ export const mockProvider: AITextProvider = {
 
 function buildMockText(taskName: string, userPrompt: string) {
   const topic = extractTopic(userPrompt);
+  const destination = extractDestination(userPrompt);
+  const isLiveNewsroom = destination === "live_newsroom";
+  const sectionLabel = isLiveNewsroom ? "CWI Live Newsroom" : "CWI Watch Desk";
+  const sectionPath = isLiveNewsroom ? "/live-newsroom" : "/watch-desk";
+  const slug = slugify(topic);
+  const sourceUrl = extractUrl(userPrompt);
   const notice = "Mock mode active - no real AI call.";
 
   if (taskName.includes("Research")) {
+    const sources = sourceUrl
+      ? [{ title: "Admin supplied source link", url: sourceUrl, publisher: "Manual input", reliability: "Needs human verification" }]
+      : [];
+
     return JSON.stringify({
       notice,
       topic,
       summary: `${notice} Research shell for ${topic}. Replace with verified source extraction before production use.`,
-      sources: [{ title: "Admin supplied source", url: "", publisher: "Manual input", reliability: "Needs review" }],
-      sourceCount: 1,
+      sources,
+      sourceCount: sources.length,
       whatHappened: "Admin supplied a topic or link for CWI review.",
       whatWeKnow: "Only the submitted context is available in mock mode.",
       whatRemainsUnclear: "All factual claims require source-backed verification.",
@@ -33,9 +43,10 @@ function buildMockText(taskName: string, userPrompt: string) {
       riskNotes: ["Mock output must not be published as reporting."],
       conflictingClaims: [],
       publicReaction: "Not assessed in mock mode.",
-      suggestedAngle: `Source-backed CWI Watch Desk review of ${topic}.`,
+      suggestedAngle: `Source-backed ${sectionLabel} review of ${topic}.`,
       suggestedSocialAngle: `Short CWI update after verification: ${topic}.`,
-      sourceConfidenceScore: 35
+      sourceConfidenceScore: sources.length ? 45 : 20,
+      category: isLiveNewsroom ? "Live Newsroom" : "Watch Desk"
     });
   }
 
@@ -55,42 +66,41 @@ function buildMockText(taskName: string, userPrompt: string) {
   if (taskName.includes("Article")) {
     return JSON.stringify({
       notice,
-      title: `${topic} - CWI Watch Desk`,
-      slug: slugify(topic),
-      category: "Watch Desk",
+      title: topic,
+      slug,
+      category: isLiveNewsroom ? "Live Newsroom" : "Watch Desk",
       summary: `${notice} Article draft shell for ${topic}.`,
       body: [
         { heading: "Short answer", body: "This is a mock-mode draft shell. Verified reporting is required before publication." },
         { heading: "What happened", body: "Use source-backed details from the research pack here." },
         { heading: "What we know", body: "List verified or attributed facts only." },
         { heading: "What remains unclear", body: "Separate claims, rumours, and developing details." },
-        { heading: "Why it matters", body: "CWI tracks public-interest topics with context, source labels, and editorial caution." },
+        { heading: "Why it matters", body: `${sectionLabel} tracks public-interest topics with context, source labels, and editorial caution.` },
         { heading: "CWI context", body: "Cockroach Watch India - CWI documents, verifies, and amplifies public-interest conversations with context and source attribution." },
         { heading: "Sources and further reading", body: "Attach verified sources before approval." }
       ],
       sources: [],
       disclaimer:
         "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Claims require attribution and human review.",
-      relatedArticles: ["/watch-desk", "/india-unanswered-files", "/submit"]
+      relatedArticles: [sectionPath, "/india-unanswered-files", "/submit"]
     });
   }
 
   if (taskName.includes("SEO")) {
-    const slug = slugify(topic);
     return JSON.stringify({
       notice,
-      seoTitle: `${topic} - CWI Watch Desk | Cockroach Watch India`,
-      metaDescription: `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this update.`,
-      canonicalUrl: `${site.url}/watch-desk/${slug}`,
-      ogTitle: `${topic} - CWI Watch Desk`,
-      ogDescription: `CWI Watch Desk context for ${topic}.`,
+      seoTitle: `${topic} - ${sectionLabel} | Cockroach Watch India`,
+      metaDescription: `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why ${sectionLabel} is tracking this update.`,
+      canonicalUrl: `${site.url}${sectionPath}/${slug}`,
+      ogTitle: `${topic} - ${sectionLabel}`,
+      ogDescription: `${sectionLabel} context for ${topic}.`,
       ogImage: `${site.url}/opengraph-image`,
       twitterTitle: `${topic} - Cockroach Watch India`,
-      twitterDescription: `CWI Watch Desk context for ${topic}.`,
+      twitterDescription: `${sectionLabel} context for ${topic}.`,
       schemaJson: { "@type": "NewsArticle", headline: topic },
       breadcrumbSchema: {},
-      internalLinks: ["/", "/watch", "/watch-desk", "/submit"],
-      altText: [`Cockroach Watch India CWI Watch Desk visual on ${topic}.`],
+      internalLinks: ["/", "/watch", sectionPath, "/submit"],
+      altText: [`Cockroach Watch India ${sectionLabel} visual on ${topic}.`],
       searchConsoleChecklist: ["Check live canonical after publish.", "Confirm sitemap after publish."]
     });
   }
@@ -100,13 +110,13 @@ function buildMockText(taskName: string, userPrompt: string) {
       notice,
       instagramCaption: `${topic}\n\nMock mode active - no real AI call.\n\nDocument. Verify. Amplify.`,
       facebookCaption: `${topic}\n\nCWI is reviewing this topic with source attribution.`,
-      xCaption: `${topic}\nCWI Watch Desk review queued. ${site.url}`,
+      xCaption: `${topic}\n${sectionLabel} review queued. ${site.url}${sectionPath}/${slug}`,
       redditTitle: `${topic} - what verified context should CWI add?`,
       redditBody: "Discussion prompt for verified sources and context only.",
-      youtubeTitle: `${topic} | CWI Watch Desk`,
+      youtubeTitle: `${topic} | ${sectionLabel}`,
       youtubeDescription: "Mock mode social description. Human approval required.",
       pinnedComment: `Read and submit corrections at ${site.url}/submit.`,
-      blueskyCaption: `${topic} - CWI is tracking with context. ${site.url}`,
+      blueskyCaption: `${topic} - CWI is tracking with context. ${site.url}${sectionPath}/${slug}`,
       discordMessage: `CWI topic queued: ${topic}`,
       hashtags: ["#CWI", "#CockroachWatchIndia", "#DocumentVerifyAmplify"]
     });
@@ -118,6 +128,16 @@ function buildMockText(taskName: string, userPrompt: string) {
 function extractTopic(prompt: string) {
   const topicMatch = prompt.match(/topic["']?\s*[:=]\s*["']?([^"',\n}]+)/i);
   return (topicMatch?.[1] ?? "CWI topic").trim();
+}
+
+function extractDestination(prompt: string) {
+  const destinationMatch = prompt.match(/contentDestination["']?\s*[:=]\s*["']?([a-z_-]+)/i);
+  return (destinationMatch?.[1] ?? "live_newsroom").trim().toLowerCase();
+}
+
+function extractUrl(prompt: string) {
+  const urlMatch = prompt.match(/url["']?\s*[:=]\s*["']?(https?:\/\/[^"',\s}]+)/i);
+  return (urlMatch?.[1] ?? "").trim();
 }
 
 function slugify(value: string) {

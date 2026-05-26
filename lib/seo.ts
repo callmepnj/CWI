@@ -54,7 +54,10 @@ export function createMetadata({ title, description, path = "/", keywords = [], 
     description,
     keywords: mergedKeywords,
     alternates: {
-      canonical: url
+      canonical: url,
+      types: {
+        "application/rss+xml": `${site.url}/rss.xml`
+      }
     },
     robots: {
       index: true,

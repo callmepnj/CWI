@@ -27,10 +27,12 @@ export function ArticleRating({ articleType, articleSlug }: ArticleRatingProps) 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
 
+    setLoading(true);
     fetch(`/api/article-ratings?type=${encodeURIComponent(articleType)}&slug=${encodeURIComponent(articleSlug)}`)
       .then((response) => response.json())
       .then((data) => {
@@ -42,7 +44,12 @@ export function ArticleRating({ articleType, articleSlug }: ArticleRatingProps) 
           });
         }
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
 
     return () => {
       active = false;
@@ -101,7 +108,7 @@ export function ArticleRating({ articleType, articleSlug }: ArticleRatingProps) 
         Ratings are submitted by real visitors only. CWI does not seed fake stars or artificial reviews.
       </p>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="mt-5 flex min-h-12 flex-wrap items-center gap-3">
         <div className="flex gap-1" onMouseLeave={() => setHoveredRating(0)}>
           {[1, 2, 3, 4, 5].map((value) => (
             <button
@@ -118,7 +125,9 @@ export function ArticleRating({ articleType, articleSlug }: ArticleRatingProps) 
           ))}
         </div>
         <div className="text-sm font-bold text-ink/68">
-          {rating.ratingCount > 0 && rating.averageRating ? (
+          {loading ? (
+            <span className="inline-flex h-5 w-64 max-w-full animate-pulse rounded-full bg-paper" aria-label="Loading reader rating" />
+          ) : rating.ratingCount > 0 && rating.averageRating ? (
             <span>{rating.averageRating.toFixed(1)} / 5 from {rating.ratingCount.toLocaleString("en-IN")} reader rating{rating.ratingCount === 1 ? "" : "s"}</span>
           ) : (
             <span>No ratings yet. Be the first real reader to rate it.</span>

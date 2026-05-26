@@ -17,6 +17,7 @@ export function CommentSection({ articleSlug }: { articleSlug: string }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [commentText, setCommentText] = useState("");
 
   useEffect(() => {
     fetch(`/api/comments?slug=${encodeURIComponent(articleSlug)}`)
@@ -65,6 +66,7 @@ export function CommentSection({ articleSlug }: { articleSlug: string }) {
     }
 
     form.reset();
+    setCommentText("");
     setMessage(data.message ?? "Comment received for moderation.");
   }
 
@@ -96,8 +98,13 @@ export function CommentSection({ articleSlug }: { articleSlug: string }) {
             minLength={10}
             maxLength={1200}
             rows={5}
+            value={commentText}
+            onChange={(event) => setCommentText(event.target.value)}
             className="rounded-2xl border border-line bg-paper px-4 py-3 normal-case tracking-normal outline-none focus:border-royal"
           />
+          <span className="text-right font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-ink/45">
+            {commentText.length} / 1200
+          </span>
         </label>
         <Button type="submit" disabled={pending} className="w-fit">
           <Send className="h-4 w-4" />

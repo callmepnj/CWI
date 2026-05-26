@@ -27,7 +27,7 @@ export function PollCard() {
         ))}
       </div>
       <p className="mt-5 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-ink/62">
-        {selected ? `Recorded locally in this session: ${selected}.` : "This frontend poll is a UI placeholder until backend analytics are connected."}
+        {selected ? `Your session choice: ${selected}.` : "Choose one view for this session. This quick reflection is not a public vote or published result."}
       </p>
     </Card>
   );

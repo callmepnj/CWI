@@ -16,7 +16,7 @@ export function FounderStatement() {
     <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
       <Card>
         <CardLabel>Founder Statement</CardLabel>
-        <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">A Statement From The Founders</h2>
+        <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">Why CWI exists</h2>
         <div className="mt-6 space-y-5 text-lg leading-8 text-ink/72">
           <p>
             We created Cockroach Watch India because this moment is bigger than one meme, one post, or one trend. Across India, young people are recording injustice, questioning power, exposing local issues, correcting misinformation, and refusing to stay silent.

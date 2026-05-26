@@ -18,6 +18,14 @@ export function RoleCard({
   cta: string;
   icon: LucideIcon;
 }) {
+  const roleParam = encodeURIComponent(
+    title
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  );
+
   return (
     <Card className="flex h-full flex-col">
       <CardLabel>Watcher Role</CardLabel>
@@ -36,7 +44,7 @@ export function RoleCard({
       </div>
       <div className="mt-auto pt-7">
         <Button asChild variant="outline" className="w-full text-[0.68rem] sm:text-xs">
-          <Link href="/submit">{cta}</Link>
+          <Link href={`/submit?role=${roleParam}`}>{cta}</Link>
         </Button>
       </div>
     </Card>
