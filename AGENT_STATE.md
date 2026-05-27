@@ -274,3 +274,12 @@ Next steps:
 - Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, and `npm run env:check:vercel`.
 - Local production smoke on `http://127.0.0.1:3013` returned `/` 200, `/live-newsroom` 200, `/live-newsroom/manipur-violence` 200, `/archive` 200, `/archive/what-is-cockroach-janta-party` 200, `/watch-desk` 307, `/admin/live-newsroom/news-intelligence` 307, `/admin/live-newsroom/aiishness-checker` 307, `/corrections` 200, `/rss.xml` 200, `/sitemap.xml` 200, and `/robots.txt` 200.
 - Remaining blocker: `npm run db:check` still fails `28P01`, so local DB credentials are still rejected. DB-backed end-to-end publish testing requires corrected Supabase/Postgres credentials.
+
+2026-05-27 Support CWI page pass:
+- User requested a professional `/support` page for voluntary reader support that is calm, non-political, legally clear, and UPI-ready without collecting sensitive data.
+- Added `/support` with SEO metadata, WebPage/Organization/FAQPage JSON-LD, a warm civic-newsroom layout, UPI support card, amount suggestions, support-use cards, independence safeguards, transparency note, CWI editorial note, FAQ, contact/correction CTAs, and final legal disclaimer.
+- Added `components/SupportUpiPanel.tsx` for client-side UPI amount selection, custom amount validation, copy-to-clipboard, UPI deep link opening, QR placeholder handling, and disabled states when UPI details are not configured.
+- Added optional UPI env keys to `.env.example`: `CWI_UPI_ID`, `CWI_UPI_PAYEE_NAME`, `NEXT_PUBLIC_CWI_UPI_ID`, and `NEXT_PUBLIC_CWI_UPI_PAYEE_NAME`. QR path is `public/images/support/upi-qr.png`; the page shows a clean placeholder until the file exists.
+- Integrated support links into navbar, footer, Live Newsroom CTA, Live Newsroom detail correction block, archive detail footer, About page, Editorial Policy page, shared important routes, and static sitemap generation.
+- Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, and `npm run env:check:vercel`.
+- Remaining blocker unchanged: `npm run db:check` still fails `28P01`, so local Supabase/Postgres credentials are still rejected. This does not block the static support page, but DB-backed workflows still need corrected credentials.

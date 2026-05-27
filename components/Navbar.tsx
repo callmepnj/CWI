@@ -13,7 +13,8 @@ const primaryItems = [
   { label: "Live Newsroom", href: "/live-newsroom" },
   { label: "Archive", href: "/archive" },
   { label: "Unanswered Files", href: "/india-unanswered-files" },
-  { label: "Submit", href: "/submit" }
+  { label: "Submit", href: "/submit" },
+  { label: "Support CWI", href: "/support" }
 ];
 
 const moreItems = [

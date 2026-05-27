@@ -276,9 +276,14 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
             <FileText className="h-8 w-8 text-saffron" />
             <h2 className="mt-4 font-display text-3xl font-black uppercase tracking-[-0.03em]">Submit correction or report</h2>
             <p className="mt-3 leading-8 text-white/76">Seen a source, correction, or public-interest update? Send it to CWI with context and dates.</p>
-            <Link href="/submit" className="mt-5 inline-flex rounded-full bg-saffron px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink">
-              Submit Update
-            </Link>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/submit" className="inline-flex rounded-full bg-saffron px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink">
+                Submit Update
+              </Link>
+              <Link href="/support" className="inline-flex rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-white">
+                Support CWI
+              </Link>
+            </div>
           </section>
 
           <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card">

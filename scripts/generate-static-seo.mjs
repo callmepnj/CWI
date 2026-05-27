@@ -16,6 +16,7 @@ const staticRoutes = [
   "/india-unanswered-files",
   "/archive",
   "/corrections",
+  "/support",
   "/issues",
   "/join",
   "/submit",

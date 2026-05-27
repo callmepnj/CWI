@@ -10,6 +10,7 @@ const footerLinks = [
   { label: "India Unanswered Files", href: "/india-unanswered-files" },
   { label: "Corrections", href: "/corrections" },
   { label: "Submit Report", href: "/submit" },
+  { label: "Support", href: "/support" },
   { label: "About CWI", href: "/about" },
   { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Contact CWI", href: "/contact" },

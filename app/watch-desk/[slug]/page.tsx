@@ -208,6 +208,9 @@ export default async function WatchPostPage({ params }: Props) {
                 <Link href="/submit" className="inline-flex rounded-full bg-skywash px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-royal ring-1 ring-royal/15">
                   Submit correction
                 </Link>
+                <Link href="/support" className="inline-flex rounded-full bg-[#E9F4E8] px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-[#1E6B4A] ring-1 ring-[#1E6B4A]/15">
+                  Support independent CWI work
+                </Link>
                 <Link href="/" className="inline-flex rounded-full bg-paper px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/62 ring-1 ring-line">
                   Read more at Cockroach Watch India
                 </Link>

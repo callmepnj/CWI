@@ -275,9 +275,14 @@ export default async function LiveNewsroomPage() {
             <FileText className="h-9 w-9 text-saffron" />
             <h2 className="mt-5 font-display text-4xl font-black uppercase tracking-[-0.04em]">Seen an update, source, correction, or report?</h2>
             <p className="mt-4 max-w-3xl leading-8 text-white/78">Submit it to CWI. Add source links, dates, creator credit, and what remains unclear.</p>
-            <Link className="mt-7 inline-flex items-center gap-2 rounded-full bg-saffron px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink" href="/submit">
-              Submit Update <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link className="inline-flex items-center gap-2 rounded-full bg-saffron px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink" href="/submit">
+                Submit Update <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-white" href="/support">
+                Support independent CWI work
+              </Link>
+            </div>
           </div>
         </div>
       </section>

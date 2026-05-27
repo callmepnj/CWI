@@ -29,6 +29,7 @@ export const importantRoutes = [
   "/india-unanswered-files",
   "/archive",
   "/corrections",
+  "/support",
   "/issues",
   "/join",
   "/submit",

@@ -61,7 +61,11 @@ export default function EditorialPolicyPage() {
           <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">
             Submit Report
           </Link>{" "}
-          form.
+          form. Reader support for this work is voluntary and available on the{" "}
+          <Link href="/support" className="font-bold text-royal underline-offset-4 hover:underline">
+            Support CWI
+          </Link>{" "}
+          page.
         </p>
       </Card>
       <div className="mt-8 grid gap-6 md:grid-cols-2">
