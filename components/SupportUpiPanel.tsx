@@ -6,10 +6,11 @@ import { CheckCircle, Copy, CreditCard, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const amountOptions = [
-  { label: "INR 49", value: "49", note: "Keeps small updates moving." },
-  { label: "INR 99", value: "99", note: "Helps cover tools, hosting, and basic research time." },
-  { label: "INR 199", value: "199", note: "Supports source tracking and newsroom maintenance." },
-  { label: "INR 499", value: "499", note: "Helps improve Live Newsroom, archive work, and public advisories." },
+  { label: "₹10", value: "10", note: "For fresh air and one more page load." },
+  { label: "₹49", value: "49", note: "Helps keep small updates moving." },
+  { label: "₹99", value: "99", note: "Supports tools, hosting, and basic research time." },
+  { label: "₹199", value: "199", note: "Helps with source tracking and newsroom maintenance." },
+  { label: "₹499", value: "499", note: "Supports archive work, public advisories, and cleaner visuals." },
   { label: "Custom", value: "custom", note: "Support any amount you are comfortable with." }
 ];
 
@@ -30,6 +31,7 @@ export function SupportUpiPanel({
   const upiReady = Boolean(upiId && payeeName);
   const activeAmount = selectedAmount === "custom" ? customAmount.trim() : selectedAmount;
   const amountIsValid = !activeAmount || (/^\d+(\.\d{1,2})?$/.test(activeAmount) && Number(activeAmount) >= 1);
+  const selectedAmountLabel = activeAmount && amountIsValid ? `Selected support: ₹${Number(activeAmount).toLocaleString("en-IN")}` : "";
   const upiLink = useMemo(() => {
     if (!upiReady) return "";
     const params = new URLSearchParams({
@@ -68,13 +70,20 @@ export function SupportUpiPanel({
           </div>
         </div>
 
-        <div className="mt-5 grid gap-5 sm:grid-cols-[180px_1fr]">
-          <div className="grid min-h-[180px] place-items-center rounded-2xl border border-dashed border-[#B9C9B5] bg-[#F6F2E8] p-4">
+        <div className="mt-5 grid gap-5 sm:grid-cols-[260px_1fr]">
+          <div className="grid min-h-[260px] place-items-center rounded-2xl border border-dashed border-[#B9C9B5] bg-[#F6F2E8] p-4">
             {qrAvailable ? (
-              <Image src={qrPath} alt="CWI UPI QR code" width={160} height={160} className="h-40 w-40 rounded-xl object-contain" />
+              <Image
+                src={qrPath}
+                alt="CWI support UPI QR code for voluntary reader support"
+                width={240}
+                height={240}
+                className="h-60 w-60 rounded-xl object-contain"
+                priority
+              />
             ) : (
-              <div className="grid h-40 w-40 place-items-center rounded-xl border border-[#D9CFAE] bg-white text-center">
-                <p className="px-4 text-sm font-black uppercase leading-5 tracking-[0.08em] text-ink/54">QR code coming soon</p>
+              <div className="grid h-60 w-60 place-items-center rounded-xl border border-[#D9CFAE] bg-white text-center">
+                <p className="px-4 text-sm font-black uppercase leading-5 tracking-[0.08em] text-ink/54">QR code will be added soon.</p>
               </div>
             )}
           </div>
@@ -121,6 +130,11 @@ export function SupportUpiPanel({
                 Open UPI App
               </Button>
             </div>
+            {selectedAmountLabel ? (
+              <p className="rounded-2xl border border-[#B9C9B5] bg-[#E9F4E8] px-4 py-3 text-sm font-black uppercase tracking-[0.08em] text-[#1E6B4A]">
+                {selectedAmountLabel}
+              </p>
+            ) : null}
             <p className="text-sm font-semibold leading-6 text-ink/60">Please double-check the UPI name before sending support.</p>
           </div>
         </div>
@@ -128,7 +142,9 @@ export function SupportUpiPanel({
 
       <section id="amounts" className="rounded-[1.5rem] border border-[#CAD8C7] bg-white p-5 shadow-card">
         <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Choose what feels right</h2>
-        <p className="mt-2 text-sm font-semibold leading-6 text-ink/62">These are suggestions only. The site does not process payments.</p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-ink/62">
+          These are suggestions only. You can support any amount you are comfortable with. The site does not process payments.
+        </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {amountOptions.map((option) => (
             <button

@@ -46,3 +46,33 @@ a {
     linear-gradient(90deg, rgba(11, 92, 255, 0.06) 1px, transparent 1px);
   background-size: 42px 42px;
 }
+
+@keyframes cwi-support-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.cwi-support-marquee-track {
+  animation: cwi-support-marquee 42s linear infinite;
+}
+
+.cwi-support-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .cwi-support-marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+  }
+}

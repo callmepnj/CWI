@@ -391,6 +391,7 @@ async function adminOsSchemaLooksReady() {
         to_regclass('public.cwi_trend_radar_items') is not null as cwi_trend_radar_items,
         to_regclass('public.aiishness_reports') is not null as aiishness_reports,
         to_regclass('public.news_intelligence_items') is not null as news_intelligence_items,
+        to_regclass('public.supporter_notes') is not null as supporter_notes,
         to_regclass('public.big_brain_rules') is not null as big_brain_rules,
         to_regclass('public.memory_graph_nodes') is not null as memory_graph_nodes,
         to_regclass('public.memory_graph_edges') is not null as memory_graph_edges,
@@ -1030,6 +1031,24 @@ export async function ensureAdminOsTables() {
         updated_at timestamptz not null default now()
       );
 
+      create table if not exists supporter_notes (
+        id uuid primary key default gen_random_uuid(),
+        display_name text,
+        handle text,
+        amount numeric(10,2),
+        amount_display_mode text not null default 'hidden',
+        amount_range text,
+        comment text not null,
+        supporter_badge text not null default 'Supporter',
+        consent_to_display boolean not null default false,
+        payment_verified boolean not null default false,
+        status text not null default 'pending',
+        admin_notes text,
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now(),
+        approved_at timestamptz
+      );
+
       create table if not exists big_brain_rules (
         id uuid primary key default gen_random_uuid(),
         rule_key text not null unique,
@@ -1117,6 +1136,9 @@ export async function ensureAdminOsTables() {
 
       create index if not exists news_intelligence_items_status_idx
       on news_intelligence_items (approval_status, status, updated_at desc);
+
+      create index if not exists supporter_notes_public_idx
+      on supporter_notes (status, consent_to_display, payment_verified, approved_at desc, created_at desc);
 
       create index if not exists news_intelligence_items_type_idx
       on news_intelligence_items (item_type, updated_at desc);

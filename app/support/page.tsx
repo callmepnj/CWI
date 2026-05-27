@@ -9,14 +9,33 @@ import {
   HeartHandshake,
   Landmark,
   Newspaper,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from "lucide-react";
+import { SupportNoteForm } from "@/components/SupportNoteForm";
 import { SupportUpiPanel } from "@/components/SupportUpiPanel";
 import { Button } from "@/components/ui/button";
+import { getApprovedSupporterNotes, type PublicSupporterNote } from "@/lib/db/support";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-const qrPath = "/images/support/upi-qr.png";
+export const dynamic = "force-dynamic";
+
+const qrPath = "/images/support/cwi-support-qr.png";
+
+const supportGestureLines = [
+  "₹10 for fresh air, not ₹10,000 for drama",
+  "₹19 for one clean source check",
+  "₹29 to keep one page alive",
+  "₹49 for hosting fuel",
+  "₹99 for one newsroom push",
+  "₹149 for better timelines",
+  "₹199 for source tracking",
+  "₹499 for serious archive work",
+  "Custom support, zero pressure",
+  "Small amount, clean intent",
+  "Support only if you can"
+];
 
 const whereSupportGoes = [
   ["Website and hosting", "Keeping CWI online, fast, and readable.", Newspaper],
@@ -40,7 +59,7 @@ const faqs = [
   {
     question: "Is this a political donation?",
     answer:
-      "No. Support for CWI is voluntary reader support for an independent civic-watch, satire, commentary, and public archive platform. It is not a political donation or party membership."
+      "No. Support for CWI is voluntary reader support for an independent civic-watch, satire, commentary, Live Newsroom, and public archive platform. It is not political membership or party donation."
   },
   {
     question: "Is CWI official CJP?",
@@ -56,8 +75,12 @@ const faqs = [
       "UPI payments may show payment details to the receiver depending on the app and bank. Do not send support if you are uncomfortable with that."
   },
   {
-    question: "Can I request a correction or takedown?",
-    answer: "Yes. Use the Submit Report / Correction page or email CWI with the link, reason, and source."
+    question: "Can I show my support publicly?",
+    answer: "Yes, only if you submit a note and give permission. CWI reviews supporter notes before displaying them publicly."
+  },
+  {
+    question: "Why is my note not visible?",
+    answer: "Supporter notes appear only after admin review, consent confirmation, payment/support verification, and moderation."
   },
   {
     question: "Can brands support CWI?",
@@ -122,12 +145,13 @@ const organizationJsonLd = {
   description: "Independent civic watch, satire, commentary, and public archive platform."
 };
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const supporterNotes = await getApprovedSupporterNotes(24).catch(() => []);
   const rawUpiId = process.env.NEXT_PUBLIC_CWI_UPI_ID || process.env.CWI_UPI_ID || "";
   const rawPayeeName = process.env.NEXT_PUBLIC_CWI_UPI_PAYEE_NAME || process.env.CWI_UPI_PAYEE_NAME || "";
   const upiId = isConfigured(rawUpiId) ? rawUpiId.trim() : "";
   const payeeName = isConfigured(rawPayeeName) ? rawPayeeName.trim() : "";
-  const qrAvailable = existsSync(join(process.cwd(), "public", "images", "support", "upi-qr.png"));
+  const qrAvailable = existsSync(join(process.cwd(), "public", "images", "support", "cwi-support-qr.png"));
 
   return (
     <main className="bg-[#F6F1E7] bg-paper-grain text-ink [background-size:18px_18px]">
@@ -151,27 +175,36 @@ export default function SupportPage() {
               Help keep Cockroach Watch India independent, careful, and useful.
             </p>
             <p className="mt-5 max-w-3xl text-lg font-semibold leading-8 text-ink/72">
-              CWI tracks public issues, viral claims, youth voice, creator credit, and verified updates through the Live Newsroom and India Unanswered Files. Reader support helps us keep the site running, improve verification, maintain the archive, and publish cleaner public-interest updates.
+              CWI tracks public issues, viral claims, youth voice, creator credit, public advisories, and source-backed updates through the Live Newsroom and India Unanswered Files. Reader support helps keep the website running, improve verification, maintain the archive, and publish cleaner public-interest updates.
             </p>
             <p className="mt-4 max-w-3xl leading-8 text-ink/68">
-              Cockroach Watch India is built around one simple job: track what is being said, what is verified, what is still unclear, and what deserves public attention.
+              Cockroach Watch India — CWI is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button asChild className="bg-[#1E6B4A] hover:bg-[#16563B]">
-                <a href="#upi">Support via UPI</a>
+                <a href="#upi">Scan QR to Support</a>
               </Button>
               <Button asChild variant="outline">
                 <a href="#where-support-goes">See how support is used</a>
               </Button>
             </div>
             <p className="mt-5 rounded-2xl border border-[#D9CFAE] bg-white/76 p-4 text-sm font-bold leading-6 text-ink/68">
-              Support is voluntary. It does not create political membership, party membership, or formal affiliation.
+              Support keeps CWI online. It does not buy coverage, influence, or membership.
             </p>
           </div>
 
           <SupportUpiPanel upiId={upiId} payeeName={payeeName} qrAvailable={qrAvailable} qrPath={qrPath} />
         </div>
       </section>
+
+      <SupportGestureTicker />
+
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+        <SupporterWall notes={supporterNotes} />
+        <SupportNoteForm />
+      </section>
+
+      <SupporterNotesStrip notes={supporterNotes} />
 
       <section id="where-support-goes" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <SectionHeader eyebrow="How support is used" title="Where your support goes" />
@@ -191,7 +224,7 @@ export default function SupportPage() {
           <div>
             <SectionHeader eyebrow="Independence" title="What support does not mean" />
             <p className="mt-5 leading-8 text-ink/70">
-              Supporting CWI does not make you a member of any political party or organization. It does not buy editorial control, guaranteed coverage, or influence over what CWI publishes. CWI may decline support, correction requests, submissions, or collaborations that conflict with its safety, credit, and editorial rules.
+              Supporting CWI does not make you a member of any political party or organization. It does not buy editorial control, guaranteed coverage, takedowns, allegations, or influence over what CWI publishes.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
@@ -209,7 +242,7 @@ export default function SupportPage() {
         <article className="rounded-[1.5rem] border border-[#DED6C7] bg-white p-6 shadow-card">
           <SectionHeader eyebrow="Transparency" title="Transparency" />
           <p className="mt-5 leading-8 text-ink/70">
-            CWI is a small independent project. Reader support helps with hosting, research tools, design, public archive work, and newsroom maintenance. As the project grows, CWI should publish periodic support-use notes so readers know how support is being used.
+            CWI is a small independent project. Reader support helps with hosting, source tracking, design, archive maintenance, and newsroom work. As CWI grows, we should publish periodic support-use notes so readers can see how support is being used.
           </p>
           <div className="mt-6 rounded-2xl border border-[#D9CFAE] bg-[#FFF7D6] p-4">
             <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-[#7A5200]">Coming soon</p>
@@ -278,11 +311,119 @@ export default function SupportPage() {
 
         <div className="mt-8 rounded-[1.5rem] border border-[#DED6C7] bg-white p-6 shadow-card">
           <p className="text-sm font-bold leading-7 text-ink/68">
-            Cockroach Watch India is an independent civic watch, satire, commentary, and public archive platform. CWI is not the official Cockroach Janta Party and is not affiliated with any political party or organization unless clearly declared. Reader support is voluntary and does not create membership, editorial control, or formal affiliation.
+            Cockroach Watch India is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform. CWI is not the official Cockroach Janta Party and is not affiliated with any political party or organization unless clearly declared. Reader support is voluntary and does not create membership, editorial control, guaranteed coverage, or formal affiliation.
           </p>
         </div>
       </section>
     </main>
+  );
+}
+
+function SupportGestureTicker() {
+  const tickerItems = [...supportGestureLines, ...supportGestureLines];
+
+  return (
+    <section className="border-b border-[#DED6C7] bg-[#FAF7EF]">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <SectionHeader eyebrow="Support ideas, not fixed plans" title="Small support. Real help." />
+          <p className="max-w-2xl text-sm font-semibold leading-6 text-ink/64">
+            You do not need to send a huge amount. Even a small gesture helps keep the Watch online. These are only suggested support gestures.
+          </p>
+        </div>
+        <div className="mt-7 overflow-hidden rounded-[1.5rem] border border-[#CAD8C7] bg-white py-4 shadow-card">
+          <div className="cwi-support-marquee-track flex w-max gap-3 px-4">
+            {tickerItems.map((line, index) => (
+              <span
+                key={`${line}-${index}`}
+                className="rounded-full border border-[#B9C9B5] bg-[#E9F4E8] px-4 py-2 text-sm font-black uppercase tracking-[0.08em] text-[#1E6B4A]"
+              >
+                {line}
+              </span>
+            ))}
+          </div>
+        </div>
+        <p className="mt-3 text-sm font-semibold leading-6 text-ink/58">
+          You can support any amount you are comfortable with. No pressure, no membership, no editorial influence.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function SupporterWall({ notes }: { notes: PublicSupporterNote[] }) {
+  return (
+    <section className="rounded-[1.5rem] border border-[#DED6C7] bg-white p-5 shadow-card">
+      <div className="flex items-start gap-3">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#E9F4E8] text-[#1E6B4A]">
+          <Sparkles className="h-6 w-6" />
+        </div>
+        <div>
+          <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-[#1E6B4A]">Public supporter wall</p>
+          <h2 className="mt-2 font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Supporter notes</h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-ink/64">
+            Small messages from people who chose to support CWI. Notes appear only after consent, verification, moderation, and admin approval.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3">
+        {notes.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#D9CFAE] bg-[#FAF7EF] p-5">
+            <p className="font-bold leading-7 text-ink/62">
+              No supporter notes yet. When approved supporters choose to share a message, it will appear here.
+            </p>
+          </div>
+        ) : (
+          notes.slice(0, 6).map((note) => (
+            <article key={note.id} className="rounded-2xl border border-[#DED6C7] bg-[#FAF7EF] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-display text-xl font-black uppercase tracking-[-0.02em] text-ink">
+                    {note.handle || note.displayName || "CWI Supporter"}
+                  </p>
+                  <p className="mt-1 font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-[#1E6B4A]">
+                    {note.supporterBadge} / {note.amountLabel}
+                  </p>
+                </div>
+                <time className="text-xs font-bold uppercase tracking-[0.1em] text-ink/46" dateTime={note.approvedAt || note.createdAt}>
+                  {formatSupportDate(note.approvedAt || note.createdAt)}
+                </time>
+              </div>
+              <p className="mt-3 leading-7 text-ink/72">“{note.comment}”</p>
+            </article>
+          ))
+        )}
+      </div>
+    </section>
+  );
+}
+
+function SupporterNotesStrip({ notes }: { notes: PublicSupporterNote[] }) {
+  if (notes.length === 0) {
+    return null;
+  }
+
+  const stripNotes = [...notes.slice(0, 8), ...notes.slice(0, 8)];
+
+  return (
+    <section className="border-y border-[#DED6C7] bg-[#E9F4E8]">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <p className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Backed by readers, not pressure.</p>
+        <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-[#B9C9B5] bg-white py-4 shadow-card">
+          <div className="cwi-support-marquee-track flex w-max gap-3 px-4">
+            {stripNotes.map((note, index) => (
+              <span
+                key={`${note.id}-${index}`}
+                className="rounded-full border border-[#CAD8C7] bg-[#FAF7EF] px-4 py-2 text-sm font-black text-ink/74"
+              >
+                “{note.comment}” — {note.handle || note.displayName || note.supporterBadge}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -293,6 +434,15 @@ function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
       <h2 className="mt-2 font-display text-4xl font-black uppercase tracking-[-0.04em] text-ink">{title}</h2>
     </div>
   );
+}
+
+function formatSupportDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" }).format(date);
 }
 
 function isConfigured(value: string) {

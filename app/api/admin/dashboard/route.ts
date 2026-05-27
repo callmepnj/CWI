@@ -64,7 +64,10 @@ function buildSetupModeDashboard() {
       trendRadarItems: 0,
       qualityReviews: 0,
       aiishnessReports: 0,
-      newsIntelligenceItems: 0
+      newsIntelligenceItems: 0,
+      supporterNotes: 0,
+      pendingSupporterNotes: 0,
+      approvedSupporterNotes: 0
     },
     agents: [],
     approvals: [],
@@ -113,6 +116,7 @@ function buildSetupModeDashboard() {
     costUsageLogs: [],
     aiishnessReports: [],
     newsIntelligenceItems: [],
+    supporterNotes: [],
     latestPublicArticles: [],
     latestUnansweredFiles: [],
     liveNewsroomItems: [],

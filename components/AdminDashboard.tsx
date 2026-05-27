@@ -79,6 +79,7 @@ type AdminData = {
   costUsageLogs: AdminRecord[];
   aiishnessReports: AdminRecord[];
   newsIntelligenceItems: AdminRecord[];
+  supporterNotes: AdminRecord[];
   latestPublicArticles: AdminRecord[];
   latestUnansweredFiles: AdminRecord[];
   liveNewsroomItems: AdminRecord[];
@@ -89,6 +90,7 @@ const sections = [
   ["overview", "Overview", Activity],
   ["command-center", "Command Center", Gauge],
   ["live-newsroom", "Live Newsroom", Newspaper],
+  ["support", "Support", HeartHandshake],
   ["agents", "Agent Control", Bot],
   ["approval", "Approval Queue", ClipboardCheck],
   ["manual-link", "Manual Link Processor", LinkIcon],
@@ -696,6 +698,7 @@ function AdminSection({
   if (section === "uiux-fixes") return <RecordList title="UI/UX Fixes" records={data.uiuxAudits} fields={["page", "issue", "severity", "suggested_text", "fix_status"]} />;
   if (section === "reports") return <ReportsSection records={data.reports} />;
   if (section === "comments") return <CommentsSection records={data.comments} pending={pending} updateComment={updateComment} />;
+  if (section === "support") return <SupportAdminSection records={data.supporterNotes} refresh={refresh} />;
   if (section === "sources") return <RecordList title="Sources" records={data.sources} fields={["name", "source_type", "url", "trust_level", "active", "notes"]} />;
   if (section === "keywords") return <RecordList title="Keywords" records={data.keywords} fields={["keyword", "keyword_group", "priority", "active"]} />;
   if (section === "big-brain") return <BigBrainSection data={data} pending={pending} runAction={runAction} />;
@@ -1484,6 +1487,228 @@ function SocialPacksSection({ records }: { records: AdminRecord[] }) {
 
 function ReportsSection({ records }: { records: AdminRecord[] }) {
   return <RecordList title="Reports / Submissions" records={records} fields={["type", "name", "contact", "city", "state", "source_url", "message", "status"]} />;
+}
+
+function SupportAdminSection({ records, refresh }: { records: AdminRecord[]; refresh: () => Promise<void> }) {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [saving, setSaving] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const visibleRecords =
+    activeTab === "pending"
+      ? records.filter((record) => text(record.status) === "pending")
+      : activeTab === "approved"
+        ? records.filter((record) => text(record.status) === "approved")
+        : activeTab === "rejected"
+          ? records.filter((record) => text(record.status) === "rejected")
+          : records;
+
+  async function submitSupporterNote(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setSaving("create");
+    setError("");
+    setMessage("");
+
+    const response = await fetch("/api/admin/supporter-notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        displayName: String(form.get("displayName") || ""),
+        handle: String(form.get("handle") || ""),
+        amount: String(form.get("amount") || ""),
+        amountDisplayMode: String(form.get("amountDisplayMode") || "hidden"),
+        comment: String(form.get("comment") || ""),
+        supporterBadge: String(form.get("supporterBadge") || "Supporter"),
+        consentToDisplay: form.get("consentToDisplay") === "on",
+        paymentVerified: form.get("paymentVerified") === "on",
+        status: String(form.get("status") || "pending"),
+        adminNotes: String(form.get("adminNotes") || "")
+      })
+    }).catch(() => null);
+    const json = await response?.json().catch(() => null);
+    setSaving("");
+
+    if (response?.status === 401) {
+      window.location.href = "/admin/login?expired=1";
+      return;
+    }
+
+    if (!response?.ok || !json?.ok) {
+      setError(json?.error ?? "Supporter note could not be saved.");
+      return;
+    }
+
+    event.currentTarget.reset();
+    setMessage("Supporter note saved.");
+    await refresh();
+  }
+
+  async function patchSupporterNote(record: AdminRecord, patch: Record<string, unknown>) {
+    const id = text(record.id);
+    setSaving(`${id}:${text(patch.status) || "update"}`);
+    setError("");
+    setMessage("");
+
+    const response = await fetch("/api/admin/supporter-notes", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        displayName: text(record.displayName),
+        handle: text(record.handle),
+        amount: text(record.amount),
+        amountDisplayMode: text(record.amountDisplayMode),
+        comment: text(record.comment),
+        supporterBadge: text(record.supporterBadge),
+        consentToDisplay: Boolean(record.consentToDisplay),
+        paymentVerified: Boolean(record.paymentVerified),
+        status: text(record.status),
+        adminNotes: text(record.adminNotes),
+        ...patch
+      })
+    }).catch(() => null);
+    const json = await response?.json().catch(() => null);
+    setSaving("");
+
+    if (response?.status === 401) {
+      window.location.href = "/admin/login?expired=1";
+      return;
+    }
+
+    if (!response?.ok || !json?.ok) {
+      setError(json?.error ?? "Supporter note could not be updated.");
+      return;
+    }
+
+    setMessage("Supporter note updated.");
+    await refresh();
+  }
+
+  return (
+    <div className="grid gap-5">
+      <Card>
+        <CardLabel>Support CWI</CardLabel>
+        <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Supporter notes moderation</h2>
+        <p className="mt-3 leading-7 text-ink/70">
+          Public display is allowed only when consent is true, payment/support is manually verified, and status is approved. Never publish transaction IDs, phone numbers, emails, UPI IDs, bank details, or private admin notes.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {[
+            ["overview", "Overview"],
+            ["add", "Add Supporter Note"],
+            ["pending", "Pending Notes"],
+            ["approved", "Approved Notes"],
+            ["rejected", "Rejected Notes"],
+            ["settings", "Support Settings"]
+          ].map(([id, label]) => (
+            <Button key={id} type="button" size="sm" variant={activeTab === id ? "default" : "outline"} onClick={() => setActiveTab(id)}>
+              {label}
+            </Button>
+          ))}
+        </div>
+      </Card>
+
+      {message ? <p className="rounded-2xl bg-leaf/10 p-4 text-sm font-bold text-[#047766]">{message}</p> : null}
+      {error ? <p className="rounded-2xl bg-urgent/10 p-4 text-sm font-bold text-urgent">{error}</p> : null}
+
+      {activeTab === "overview" ? (
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card><CardLabel>Total</CardLabel><p className="text-4xl font-black">{records.length}</p></Card>
+          <Card><CardLabel>Pending</CardLabel><p className="text-4xl font-black">{records.filter((record) => text(record.status) === "pending").length}</p></Card>
+          <Card><CardLabel>Approved</CardLabel><p className="text-4xl font-black">{records.filter((record) => text(record.status) === "approved").length}</p></Card>
+          <Card><CardLabel>Public-ready</CardLabel><p className="text-4xl font-black">{records.filter((record) => text(record.status) === "approved" && Boolean(record.consentToDisplay) && Boolean(record.paymentVerified)).length}</p></Card>
+        </div>
+      ) : null}
+
+      {activeTab === "add" ? (
+        <Card>
+          <CardLabel>Add Supporter Note</CardLabel>
+          <form className="grid gap-4" onSubmit={submitSupporterNote}>
+            <div className="grid gap-4 md:grid-cols-2">
+              <AdminInput name="displayName" label="Display name" placeholder="CWI Supporter" />
+              <AdminInput name="handle" label="Handle" placeholder="@handle" />
+              <AdminInput name="amount" label="Amount" placeholder="Optional INR amount" />
+              <AdminSelect name="amountDisplayMode" label="Amount display" defaultValue="hidden" options={["hidden", "range", "exact"]} />
+              <AdminSelect name="supporterBadge" label="Badge" defaultValue="Supporter" options={["Supporter", "Early Supporter", "Live Newsroom Backer", "Archive Supporter", "Source Check Supporter", "Public Advisory Supporter"]} />
+              <AdminSelect name="status" label="Status" defaultValue="pending" options={["pending", "approved", "rejected", "hidden"]} />
+            </div>
+            <label className="grid gap-2 text-sm font-black uppercase tracking-[0.08em] text-ink/65">
+              Comment
+              <textarea name="comment" required maxLength={320} className="min-h-28 rounded-2xl border border-line bg-paper px-4 py-3 normal-case tracking-normal outline-none focus:border-royal" />
+            </label>
+            <label className="grid gap-2 text-sm font-black uppercase tracking-[0.08em] text-ink/65">
+              Admin notes
+              <textarea name="adminNotes" maxLength={500} className="min-h-20 rounded-2xl border border-line bg-paper px-4 py-3 normal-case tracking-normal outline-none focus:border-royal" />
+            </label>
+            <div className="grid gap-2">
+              <label className="flex items-center gap-2 text-sm font-bold text-ink/70"><input name="consentToDisplay" type="checkbox" /> Supporter gave permission to display comment.</label>
+              <label className="flex items-center gap-2 text-sm font-bold text-ink/70"><input name="paymentVerified" type="checkbox" /> Support/payment manually verified.</label>
+            </div>
+            <Button type="submit" disabled={saving === "create"}>{saving === "create" ? "Saving..." : "Save supporter note"}</Button>
+          </form>
+        </Card>
+      ) : null}
+
+      {activeTab === "settings" ? (
+        <Card>
+          <CardLabel>Support settings</CardLabel>
+          <div className="grid gap-3 leading-7 text-ink/72">
+            <p>Public wall rule: status approved + consent true + payment verified true.</p>
+            <p>Default amount display is hidden. Use range unless exact amount display was clearly approved.</p>
+            <p>Do not store or publish phone numbers, emails, transaction IDs, UPI IDs, bank names, PAN, Aadhaar, addresses, voter details, or political preference.</p>
+          </div>
+        </Card>
+      ) : null}
+
+      {activeTab !== "add" && activeTab !== "settings" ? (
+        <div className="grid gap-4">
+          {visibleRecords.length === 0 ? (
+            <Card><p className="font-bold text-ink/64">No supporter notes in this view.</p></Card>
+          ) : (
+            visibleRecords.map((record) => {
+              const id = text(record.id);
+              return (
+                <Card key={id}>
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <CardLabel>{text(record.supporterBadge)}</CardLabel>
+                      <h3 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">{text(record.displayName) || "CWI Supporter"}</h3>
+                      <p className="mt-1 text-sm font-black uppercase tracking-[0.1em] text-ink/50">{text(record.handle) || "No handle"} / {text(record.amountLabel)}</p>
+                      <p className="mt-3 leading-7 text-ink/72">{text(record.comment)}</p>
+                      <p className="mt-3 font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-ink/45">
+                        Consent: {String(Boolean(record.consentToDisplay))} / Verified: {String(Boolean(record.paymentVerified))}
+                      </p>
+                      {text(record.adminNotes) ? <p className="mt-2 rounded-2xl bg-paper p-3 text-xs font-bold leading-5 text-ink/56">Admin note: {text(record.adminNotes)}</p> : null}
+                    </div>
+                    <SupportStatusPill status={text(record.status)} />
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <Button type="button" size="sm" disabled={saving === `${id}:approved`} onClick={() => patchSupporterNote(record, { status: "approved", consentToDisplay: true, paymentVerified: true })}>Approve</Button>
+                    <Button type="button" size="sm" variant="outline" disabled={saving === `${id}:rejected`} onClick={() => patchSupporterNote(record, { status: "rejected" })}>Reject</Button>
+                    <Button type="button" size="sm" variant="outline" disabled={saving === `${id}:hidden`} onClick={() => patchSupporterNote(record, { status: "hidden" })}>Hide</Button>
+                    <Button type="button" size="sm" variant="outline" disabled={saving === `${id}:pending`} onClick={() => patchSupporterNote(record, { status: "pending" })}>Pending</Button>
+                  </div>
+                </Card>
+              );
+            })
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function SupportStatusPill({ status }: { status: string }) {
+  const normalized = status.trim().toLowerCase();
+  const className =
+    normalized === "approved"
+      ? "bg-leaf/10 text-[#047766] ring-leaf/20"
+      : normalized === "rejected" || normalized === "hidden"
+        ? "bg-urgent/10 text-urgent ring-urgent/20"
+        : "bg-saffron/15 text-[#8A5B00] ring-saffron/20";
+
+  return <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ring-1 ${className}`}>{normalized || "pending"}</span>;
 }
 
 function CommentsSection({

@@ -299,3 +299,12 @@ Next steps:
 - Added the article URL to the static sitemap generator and regenerated `public/sitemap.xml`.
 - Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, `npm run env:check:vercel`, `git diff --check`, and local production smoke for the article URL, `/live-newsroom`, `/latest`, `/rss.xml`, and `/sitemap.xml`.
 - Remaining blocker unchanged: `npm run db:check` still fails `28P01`, so local DB credentials are still rejected. The article is fallback/static-safe and does not depend on DB publication.
+
+2026-05-27 Support page QR and supporter wall pass:
+- User requested `/support` updates with the real local CWI support QR image, a small support gesture ticker, amount selection, optional supporter-note form, public supporter wall, and `/admin/support` moderation.
+- Real QR source was found locally at `Support qr.jpeg`, converted/copied into the committed project asset `public/images/support/cwi-support-qr.png`, and the raw local source filename is ignored so it is not accidentally committed.
+- `/support` now uses the real QR path, keeps a clean QR fallback, shows voluntary/non-political trust language, adds the calm moving support gesture ticker with reduced-motion handling, shows amount-selected UPI deep links, renders only approved supporter notes, and shows an honest empty state when no approved notes exist.
+- Added `supporter_notes` schema support, DB helpers in `lib/db/support.ts`, public `GET/POST /api/supporter-notes`, protected admin `GET/POST/PATCH /api/admin/supporter-notes`, and `/admin/support` inside the existing AdminDashboard.
+- Public supporter notes require consent, payment/support verification, and `status = approved` before display. Public output excludes transaction IDs, phone numbers, emails, UPI IDs, bank details, and admin notes.
+- Verification passed so far: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, `npm run env:check:vercel`, local smoke for `/support`, `/admin/support`, `/api/supporter-notes`, `/images/support/cwi-support-qr.png`, `/sitemap.xml`, `/robots.txt`, and unauthenticated `/api/admin/supporter-notes` returning 401.
+- Remaining blocker unchanged: `npm run db:check` still fails `28P01`; local Supabase/Postgres credentials are rejected, so DB-backed supporter-note creation/moderation cannot be fully exercised locally until the database password is corrected. The public page falls back safely when DB reads fail.

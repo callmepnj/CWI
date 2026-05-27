@@ -7,6 +7,7 @@ import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/lib/db/live-newsroom";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { getLatestAiishnessReports, getNewsIntelligenceItems, saveNewsIntelligenceItem } from "@/lib/db/news-intelligence";
+import { getAdminSupporterNotes } from "@/lib/db/support";
 import { site } from "@/lib/site";
 import { cwiOsAgents, syncBigBrainRules } from "@/lib/ai/big-brain";
 import { syncStaticPublicMemory } from "@/lib/ai/source-memory";
@@ -238,6 +239,7 @@ async function buildAdminDashboardData() {
   const liveNewsroomFallbackItems = getLiveNewsroomFallbackItems(24);
   const aiishnessReports = await getLatestAiishnessReports(40).catch(() => []);
   const newsIntelligenceItems = await getNewsIntelligenceItems(60).catch(() => []);
+  const supporterNotes = await getAdminSupporterNotes(120).catch(() => []);
   const estimatedMonthlyCost = Number(costs.rows[0]?.month_cost ?? 0);
   const estimatedDailyCost = Number(dailyCosts.rows[0]?.day_cost ?? 0);
   const pendingApprovals = approvalRows.filter((row) => normalizeApprovalStatus(row.status) === "waiting_for_approval").length;
@@ -270,7 +272,10 @@ async function buildAdminDashboardData() {
       trendRadarItems: trendRadarItems.rows.length,
       qualityReviews: qualityScores.rows.length,
       aiishnessReports: aiishnessReports.length,
-      newsIntelligenceItems: newsIntelligenceItems.length
+      newsIntelligenceItems: newsIntelligenceItems.length,
+      supporterNotes: supporterNotes.length,
+      pendingSupporterNotes: supporterNotes.filter((note) => note.status === "pending").length,
+      approvedSupporterNotes: supporterNotes.filter((note) => note.status === "approved").length
     },
     agents: agents.rows,
     approvals: approvalRows,
@@ -299,6 +304,7 @@ async function buildAdminDashboardData() {
     costUsageLogs: costUsageLogs.rows,
     aiishnessReports,
     newsIntelligenceItems,
+    supporterNotes,
     liveNewsroomItems,
     liveNewsroomFallbackItems,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),

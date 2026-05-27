@@ -33,9 +33,14 @@ export default function ContactPage() {
           <CardLabel>Support Email</CardLabel>
           <Mail className="h-8 w-8 text-royal" />
           <h2 className="mt-5 break-words font-display text-3xl font-black uppercase leading-tight tracking-[-0.04em]">{site.email}</h2>
-          <Button asChild className="mt-7">
-            <Link href={`mailto:${site.email}`}>Email CWI</Link>
-          </Button>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Button asChild>
+              <Link href={`mailto:${site.email}`}>Email CWI</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/support">Support independent CWI work</Link>
+            </Button>
+          </div>
         </Card>
         <Card>
           <CardLabel>Contact Categories</CardLabel>
