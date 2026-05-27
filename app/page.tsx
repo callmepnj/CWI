@@ -55,7 +55,7 @@ const homepageWebPageJsonLd = {
 export const metadata = createMetadata({
   title: "Cockroach Watch India - CWI Live Newsroom",
   description:
-    "Cockroach Watch India is an independent civic watch, satire, commentary, public archive, and youth voice platform. Enter the CWI Live Newsroom for source-backed updates.",
+    "Cockroach Watch India is an independent civic watch, satire, commentary, public archive, and youth voice platform. Enter the CWI Live Newsroom for verified context and corrections.",
   path: "/",
   keywords: ["Cockroach Watch India", "CWI Live Newsroom", "CWI", "India Unanswered Files", "public advisories", "youth voice"]
 });
@@ -75,7 +75,7 @@ export default async function HomePage() {
       <Section
         eyebrow="CWI Live Newsroom"
         title="Live from CWI Newsroom"
-        subtitle="Latest source-backed updates, public advisories, and India Unanswered Files coverage."
+        subtitle="New public updates, advisories, and India Unanswered Files coverage with visible sources and dates."
       >
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {liveItems.map((item) => (
@@ -114,7 +114,7 @@ export default async function HomePage() {
       <Section
         eyebrow="India Unanswered Files"
         title="India Unanswered Files"
-        subtitle="Public issues, civic memory, and questions that still need answers inside the CWI Live Newsroom ecosystem."
+        subtitle="Public issues where records, responsibility, or official answers still need closer tracking."
       >
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {unansweredFiles.slice(0, 6).map((file) => (
@@ -130,7 +130,7 @@ export default async function HomePage() {
       <Section title="Submit a Report" subtitle="Send a public issue, source link, correction, creator credit request, or civic story to Cockroach Watch India.">
         <div className="rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-8 text-white shadow-soft">
           <FileText className="h-9 w-9 text-saffron" />
-          <h2 className="mt-5 font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">Help CWI verify public memory.</h2>
+          <h2 className="mt-5 font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">Help CWI verify the record.</h2>
           <p className="mt-4 max-w-3xl text-white/76">
             Submit source links, dates, creator credit, corrections, and public-interest context. Do not submit private data, threats, hate, or unverified allegations as fact.
           </p>
@@ -143,7 +143,7 @@ export default async function HomePage() {
       <Section
         eyebrow="What is CWI?"
         title="What is Cockroach Watch India?"
-        subtitle="Independent civic watch, satire, and commentary platform tracking youth voice, public issues, creator credit, and source-backed public memory."
+        subtitle="Independent civic watch, satire, and commentary platform tracking youth voice, public issues, corrections, and source trails."
       >
         <div className="grid gap-5 md:grid-cols-3">
           {[

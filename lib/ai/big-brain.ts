@@ -30,13 +30,20 @@ export const cwiBigBrain = {
   ],
   bannedUrls: ["cwi-ten" + ".vercel.app", "preview deployment URLs", "local development URLs in production metadata"],
   publicTrustBannedTerms: [
-    "mock mode",
+    "Mock mode active",
     "no real AI call",
-    "internal draft wording",
-    "database vendor wording",
-    "test content wording",
-    "false source wording",
-    "placeholder content wording"
+    "draft shell",
+    "Supabase backend",
+    "AI OS approved draft",
+    "generated placeholder",
+    "fake source",
+    "test article",
+    "lorem ipsum",
+    "backend connected",
+    "API response",
+    "debugging",
+    "console output",
+    "admin-only"
   ],
   approvalRule: "Agents prepare everything. Human approves everything. Nothing publishes without approval.",
   budget: {
@@ -58,7 +65,7 @@ export type BigBrainRule = {
 };
 
 export const defaultBigBrainRules: BigBrainRule[] = [
-  rule("brand.identity", "Brand Identity", "CWI Identity", "Cockroach Watch India - CWI is an independent civic watch, satire, commentary, and public-memory platform."),
+  rule("brand.identity", "Brand Identity", "CWI Identity", "Cockroach Watch India - CWI is an independent civic watch, satire, commentary, public archive, and youth voice platform."),
   rule("brand.independence", "Brand Identity", "Independent CWI", "CWI is not the official Cockroach Janta Party and is not affiliated with any political party unless officially declared."),
   rule("brand.domain", "Brand Identity", "Official Domain", `Use ${site.url} for production URLs. Never use preview deployment URLs or local development URLs in production metadata.`),
   rule("brand.lines", "Brand Identity", "Core Lines", cwiBigBrain.coreLines.join("\n")),
@@ -72,9 +79,9 @@ export const defaultBigBrainRules: BigBrainRule[] = [
   rule("wording.safe", "Safe Wording", "Safe Wording", "Use: reportedly, according to, publicly circulating, claimed, developing, source-backed, official clarification awaited, CWI has not independently verified this."),
   rule("wording.avoid", "Banned Wording", "Avoid Unless Proven", "Avoid: confirmed unless truly confirmed, hacked if only claims exist, guilty unless court-confirmed, scam unless legally/source-backed and safe, expose, destroy, attack, target."),
   rule("public.trust_cleanup", "Banned Wording", "Public Trust Cleanup", "Never expose public-facing internal testing, storage, debug, placeholder, false-source, undefined, or null wording."),
-  rule("seo.keywords", "SEO Keywords", "Primary Keywords", "Cockroach Watch India, CWI, CWI Live Newsroom, CWI Archive, CWI articles, CWI India Unanswered Files, India Unanswered Files, CWI public issues, CWI youth voice, CWI civic watch, Document Verify Amplify."),
-  rule("article.template", "Article Templates", "CWI Article Structure", "H1 headline, Short answer, What happened, What changed, What we know, What remains unclear, Why it matters, CWI context, Timeline, Sources and further reading, Related CWI articles, Submit correction/report CTA, Disclaimer."),
-  rule("article.context", "Article Templates", "Required CWI Context", "Cockroach Watch India - CWI is tracking this topic through the CWI Live Newsroom as part of its public archive on youth voice, civic satire, creator-led commentary, public issues, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest conversations with context and source attribution."),
+  rule("seo.keywords", "SEO Keywords", "Primary Keywords", "Cockroach Watch India, CWI, CWI Live Newsroom, CWI Archive, CWI articles, CWI India Unanswered Files, India Unanswered Files, public advisories, civic news, youth voice."),
+  rule("article.template", "Article Templates", "CWI Article Structure", "Status, title, one-line summary, dates, source count, Short answer, What changed, What happened, What CWI knows, What CWI does not know, Why it matters, Source trail, Timeline, Before you share, Correction CTA, Related updates, one disclaimer."),
+  rule("article.human_style", "Article Templates", "Human Writing", "Start with what changed. Use dates and source names. Avoid repeated slogans, public social-caption blocks, keyword stuffing, generic why-it-matters paragraphs, and identical article openings."),
   rule("caption.templates", "Caption Templates", "Default Ending", `Document. Verify. Amplify.\nThe youth are not silent. India is watching.\nWebsite: ${site.url}`),
   rule("image.rules", "Image Rules", "Visual Desk Rules", "Every article needs hero image, thumbnail, OG image, alt text, and credit/source note where required. Avoid wrong-topic, repeated, blurry, or misspelled images."),
   rule("verification.labels", "Verification Labels", "Allowed Labels", "Verified, Source-backed, Reported, Developing, Opinion, Satire/Context, Unverified, Risky."),
@@ -83,6 +90,8 @@ export const defaultBigBrainRules: BigBrainRule[] = [
   rule("vertical.archive", "Archive Knowledge", "CWI Archive", "CWI Archive preserves older explainers, notes, and context posts. Current source-backed updates live in the CWI Live Newsroom."),
   rule("vertical.live_newsroom", "Live Newsroom Rules", "CWI Live Newsroom", "Live Newsroom is the default CWI OS destination. Existing agents must prepare source-backed updates for /live-newsroom unless the admin selects Public Advisory, India Unanswered Files, Social Only, or passive Archive migration."),
   rule("vertical.live_newsroom_seo", "Live Newsroom Rules", "Live Newsroom SEO", "Use /live-newsroom/[slug] canonical URLs, NewsArticle, BlogPosting, and BreadcrumbList schema for Live Newsroom detail pages."),
+  rule("vertical.news_intelligence", "Live Newsroom Rules", "News Intelligence", "Track approved claims, source trails, timelines, advisories, corrections, what changed, and what CWI does not know. Do not auto-publish or claim breaking news without sources."),
+  rule("quality.aiishness", "Approval Rules", "AI-ishness Gate", "If AI-ishness score is above 60, block publishing. If score is 41-60, require human review. Below 40 can continue through approval."),
   rule("vertical.unanswered", "India Unanswered Files Knowledge", "India Unanswered Files", "India Unanswered Files is one content vertical inside CWI OS. It is not a separate isolated AI system."),
   rule("social.style", "Social Platform Style Guide", "Platform Style", "Instagram/Facebook can be emotional but responsible. X/Bluesky must be short and direct. Reddit must be discussion-first. YouTube needs clear title, short description, pinned comment, and 5-10 hashtags."),
   rule("ux.copy", "UI/UX Writing Standards", "No Developer Terms", "Remove public-facing developer words such as backend, Supabase, Firebase, API, custom storage, placeholder, upload placeholder, broken labels, or internal implementation language.")

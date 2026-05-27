@@ -18,7 +18,7 @@ export function WatchPageHero() {
           The Watch
         </h1>
         <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-white/78">
-          A live civic watch hub for public issues, viral claims, source-backed updates, creator credit, and youth voice.
+          A civic watch hub for public issues, viral claims, source trails, corrections, and youth voice.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button asChild variant="saffron">
@@ -33,12 +33,12 @@ export function WatchPageHero() {
         </div>
         <div className="mt-10 overflow-hidden rounded-full border border-white/10 bg-white/[0.06] px-4 py-3">
           <p className="whitespace-nowrap font-mono text-[0.68rem] font-black uppercase tracking-[0.2em] text-saffron">
-            Live Watch • Public Issues • Verify Before Sharing • Creator Credit • Youth Voice
+            Live Watch - Public Issues - Verify Before Sharing - Corrections Open - Youth Voice
           </p>
         </div>
         <p className="mt-6 flex max-w-3xl items-start gap-3 rounded-3xl border border-white/10 bg-white/[0.06] p-4 text-sm font-bold leading-6 text-white/68">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-saffron" />
-          Not just content. Public memory. The Watch never sleeps.
+          Check the source trail before sharing. Send corrections when the record changes.
         </p>
       </div>
     </section>

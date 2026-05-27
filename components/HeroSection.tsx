@@ -28,7 +28,7 @@ export function HeroSection() {
             Document. Verify. Amplify.
           </p>
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-ink/82">
-            Independent civic watch, satire, and commentary platform tracking youth voice, public issues, creator credit, and source-backed public memory.
+            Independent civic watch, satire, and commentary platform tracking youth voice, public issues, creator credit, source trails, and corrections.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
@@ -65,7 +65,7 @@ export function HeroSection() {
                   <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.22em] text-saffron">
                     CWI Live Newsroom
                   </p>
-                  <p className="mt-3 font-display text-4xl font-black uppercase leading-none">Public Memory Command</p>
+                  <p className="mt-3 font-display text-4xl font-black uppercase leading-none">Live Newsroom Desk</p>
                 </div>
                 <div className="grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-white/10 ring-1 ring-white/20">
                   <RadioTower className="h-8 w-8 text-saffron" />

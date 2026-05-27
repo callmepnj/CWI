@@ -15,14 +15,14 @@ export function ArticleDiscussionPrompts({
 }: ArticleDiscussionPromptsProps) {
   return (
     <Card className="mt-8">
-      <CardLabel>CWI discussion prompts</CardLabel>
+      <CardLabel>Reader review</CardLabel>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
           <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">
-            Add context, not noise
+            Useful notes for readers
           </h2>
           <p className="mt-3 leading-7 text-ink/70">
-            These prompts are written by Cockroach Watch India to guide useful public discussion. They are not user comments, reviews, or endorsements.
+            These notes are meant to keep discussion tied to sources, dates, and missing context.
           </p>
           <div className="mt-5 grid gap-3">
             {prompts.map((prompt) => (
@@ -36,7 +36,7 @@ export function ArticleDiscussionPrompts({
 
         <div>
           <h3 className="font-display text-2xl font-black uppercase tracking-[-0.03em] text-ink">
-            Reader questions to consider
+            Questions still worth asking
           </h3>
           <div className="mt-5 grid gap-3">
             {questions.map((question) => (

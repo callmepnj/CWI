@@ -6,6 +6,7 @@ import { normalizeApprovalStatus } from "@/lib/db/approval";
 import { getPublishedWatchPosts } from "@/lib/db/articles";
 import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/lib/db/live-newsroom";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
+import { getLatestAiishnessReports, getNewsIntelligenceItems, saveNewsIntelligenceItem } from "@/lib/db/news-intelligence";
 import { site } from "@/lib/site";
 import { cwiOsAgents, syncBigBrainRules } from "@/lib/ai/big-brain";
 import { syncStaticPublicMemory } from "@/lib/ai/source-memory";
@@ -235,6 +236,8 @@ async function buildAdminDashboardData() {
   const dbPublishedPosts = await getPublishedWatchPosts(8).catch(() => []);
   const liveNewsroomItems = await getPublishedLiveNewsroomItems(24).catch(() => []);
   const liveNewsroomFallbackItems = getLiveNewsroomFallbackItems(24);
+  const aiishnessReports = await getLatestAiishnessReports(40).catch(() => []);
+  const newsIntelligenceItems = await getNewsIntelligenceItems(60).catch(() => []);
   const estimatedMonthlyCost = Number(costs.rows[0]?.month_cost ?? 0);
   const estimatedDailyCost = Number(dailyCosts.rows[0]?.day_cost ?? 0);
   const pendingApprovals = approvalRows.filter((row) => normalizeApprovalStatus(row.status) === "waiting_for_approval").length;
@@ -265,7 +268,9 @@ async function buildAdminDashboardData() {
       bigBrainRules: bigBrainRules.rows.length,
       activeWorkflows: workflows.rows.filter((row) => ["queued", "running", "awaiting_approval"].includes(String(row.status))).length,
       trendRadarItems: trendRadarItems.rows.length,
-      qualityReviews: qualityScores.rows.length
+      qualityReviews: qualityScores.rows.length,
+      aiishnessReports: aiishnessReports.length,
+      newsIntelligenceItems: newsIntelligenceItems.length
     },
     agents: agents.rows,
     approvals: approvalRows,
@@ -292,6 +297,8 @@ async function buildAdminDashboardData() {
     memoryGraphNodes: memoryGraphNodes.rows,
     memoryGraphEdges: memoryGraphEdges.rows,
     costUsageLogs: costUsageLogs.rows,
+    aiishnessReports,
+    newsIntelligenceItems,
     liveNewsroomItems,
     liveNewsroomFallbackItems,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
@@ -480,6 +487,26 @@ export async function runAgentAction(action: string) {
     return { ok: true, message: `Trend radar generated ${result.generated} items.`, data: result };
   }
 
+  if (action === "news-intelligence") {
+    return createNewsIntelligencePack("watch_brief");
+  }
+
+  if (action === "public-advisory-pack") {
+    return createNewsIntelligencePack("public_advisory");
+  }
+
+  if (action === "claim-tracker") {
+    return createNewsIntelligencePack("claim_tracker");
+  }
+
+  if (action === "source-trail") {
+    return createNewsIntelligencePack("source_trail");
+  }
+
+  if (action === "timeline-builder") {
+    return createNewsIntelligencePack("timeline");
+  }
+
   if (action === "stop-non-essential") {
     await getPool().query(`update agents set status = 'paused', updated_at = now() where id not in ('command-ai', 'system-health-ai', 'publish-ai', 'memory-graph-ai');`);
     await logTask("system-health-ai", "Stopped all non-essential tasks", "completed", 0);
@@ -573,6 +600,51 @@ async function createDailyBriefing() {
   invalidateAdminDashboardCache();
 
   return { ok: true, message: "Daily briefing generated and sent to approval queue.", id: result.rows[0].id };
+}
+
+async function createNewsIntelligencePack(itemType: "watch_brief" | "public_advisory" | "claim_tracker" | "source_trail" | "timeline") {
+  const [lead] = getLiveNewsroomFallbackItems(3);
+  const titleMap: Record<typeof itemType, string> = {
+    watch_brief: "Today's Watch Brief",
+    public_advisory: "Public Advisory draft",
+    claim_tracker: "Claim Tracker review",
+    source_trail: "Source Trail review",
+    timeline: "Timeline Builder review"
+  };
+  const title = `${titleMap[itemType]}: ${lead?.title ?? "Live Newsroom priority"}`;
+  const summary =
+    itemType === "public_advisory"
+      ? "Draft a verify-before-sharing advisory from visible sources only. Human approval is required before publication."
+      : "News Intelligence pack prepared for editor review. It tracks what changed, what remains unclear, sources, timeline, and next action.";
+  const id = await saveNewsIntelligenceItem({
+    itemType,
+    title,
+    summary,
+    status: lead?.verificationStatus ?? "Developing",
+    category: lead?.category ?? "Live Newsroom",
+    sourceCount: lead?.sourceCount ?? 0,
+    sources: lead?.sources ?? [],
+    whatChanged: lead?.whatChanged ?? "Needs editor review.",
+    whatWeKnow: lead?.whatWeKnow ?? "No public item selected.",
+    whatWeDontKnow: lead?.whatWeDontKnow?.join("\n") ?? "Sources and unknowns need review.",
+    timeline: lead?.timeline ?? [],
+    beforeYouShare: lead?.beforeYouShare?.join("\n") ?? "Check the date.\nCheck the original source.",
+    editorNote: "Prepared by CWI News Intelligence for human review only."
+  });
+
+  await createApprovalQueueItem({
+    topic: title,
+    type: "News Intelligence",
+    summary,
+    verificationStatus: lead?.verificationStatus ?? "Developing",
+    riskLevel: "Medium",
+    sourceCount: lead?.sourceCount ?? 0,
+    suggestedAction: "Review the intelligence pack, request more sources if needed, then approve or reject."
+  });
+  await logTask("command-ai", `Prepared News Intelligence pack: ${itemType}`, "completed", 2, { newsIntelligenceItemId: id });
+  invalidateAdminDashboardCache();
+
+  return { ok: true, message: "News Intelligence pack sent to approval queue.", id };
 }
 
 async function createPriorityResearchPack() {
@@ -750,16 +822,15 @@ async function createArticleDraft(researchPackId: string | null, topic: string, 
     h1: `${topic} - CWI Live Newsroom`,
     shortAnswer: summary || `${topic} is queued for CWI review with source attribution required before publishing.`,
     sections: [
-      { heading: "What happened", body: "This section must be completed only from verified source links in the research pack." },
-      { heading: "What we know", body: "List source-backed details with dates, outlets, and official/public records." },
-      { heading: "What remains unclear", body: "Separate claims, rumours, developing details, and unanswered questions." },
-      { heading: "Why it matters", body: "Explain the civic, youth, digital-rights, creator-credit, or public-interest relevance." },
-      {
-        heading: "CWI context",
-        body:
-          "Cockroach Watch India - CWI is tracking this topic through the CWI Live Newsroom as part of its public archive on youth voice, civic satire, creator-led commentary, public issues, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest conversations with context and source attribution."
-      }
+      { heading: "What changed", body: "Add the newest source-supported change with date and source name." },
+      { heading: "What happened", body: "Complete this only from reviewed source links in the research pack." },
+      { heading: "What CWI knows", body: "List attributed details with dates, outlets, official records, or public statements." },
+      { heading: "What CWI does not know", body: "Separate claims, screenshots, developing details, and unanswered questions." },
+      { heading: "Why it matters", body: "Explain the reader impact without slogans or keyword stuffing." }
     ],
+    whatWeDontKnow: ["Which details are independently verified beyond the submitted source.", "Whether an official clarification has been issued."],
+    beforeYouShare: ["Check the date.", "Check the original source.", "Do not post private personal data.", "Send CWI a source if you have one."],
+    editorNote: "Draft prepared for human review only.",
     disclaimer:
       "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.",
     cta: `Submit corrections or source links at ${site.url}/submit.`

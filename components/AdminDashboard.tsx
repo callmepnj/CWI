@@ -77,6 +77,8 @@ type AdminData = {
   memoryGraphNodes: AdminRecord[];
   memoryGraphEdges: AdminRecord[];
   costUsageLogs: AdminRecord[];
+  aiishnessReports: AdminRecord[];
+  newsIntelligenceItems: AdminRecord[];
   latestPublicArticles: AdminRecord[];
   latestUnansweredFiles: AdminRecord[];
   liveNewsroomItems: AdminRecord[];
@@ -119,6 +121,7 @@ const agentActions = [
   ["social-pack", "Generate Signal Pack"],
   ["image-pack", "Generate Visual Pack"],
   ["uiux-audit", "Run UX Guardian"],
+  ["aiishness-check", "Run AI-ishness Check"],
   ["system-health", "Check Health Monitor"],
   ["stop-non-essential", "Stop Non-Essential Tasks"]
 ] as const;
@@ -824,6 +827,11 @@ function LiveNewsroomSection({
   const liveSocial = data.socialPacks.filter(liveFilter);
   const liveImages = data.imageLibrary.filter(liveFilter);
   const published = [...data.liveNewsroomItems, ...data.liveNewsroomFallbackItems];
+  const blockedAiishness = data.aiishnessReports.filter((item) => Number(item.score ?? 0) > 60).length;
+  const reviewAiishness = data.aiishnessReports.filter((item) => {
+    const score = Number(item.score ?? 0);
+    return score >= 41 && score <= 60;
+  }).length;
 
   return (
     <div className="grid gap-5">
@@ -847,12 +855,55 @@ function LiveNewsroomSection({
         <MiniMetric label="Published items" value={String(published.length)} />
         <MiniMetric label="Waiting approvals" value={String(liveApprovals.filter((item) => normalizeApprovalStatus(text(item.status)) === "waiting_for_approval").length)} />
         <MiniMetric label="Drafts waiting" value={String(liveDrafts.filter((item) => text(item.publish_status) !== "Published").length)} />
-        <MiniMetric label="Failed tasks" value={text(data.health.failed_tasks)} />
+        <MiniMetric label="AI-ish blocks" value={String(blockedAiishness)} />
       </div>
+
+      <Card>
+        <CardLabel>CWI News Intelligence</CardLabel>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Claims, sources, timelines, advisories</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/70">
+              These tools prepare review packs for Live Newsroom only. They do not publish, rewrite public pages, or create archive-first content without approval.
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button type="button" disabled={pending === "news-intelligence"} onClick={() => runAction("news-intelligence")}>Add to Today&apos;s Brief</Button>
+            <Button type="button" variant="outline" disabled={pending === "claim-tracker"} onClick={() => runAction("claim-tracker")}>Add to Claim Tracker</Button>
+            <Button type="button" variant="outline" disabled={pending === "source-trail"} onClick={() => runAction("source-trail")}>Build Source Trail</Button>
+            <Button type="button" variant="outline" disabled={pending === "timeline-builder"} onClick={() => runAction("timeline-builder")}>Build Timeline</Button>
+            <Button type="button" variant="outline" disabled={pending === "public-advisory-pack"} onClick={() => runAction("public-advisory-pack")}>Convert to Public Advisory</Button>
+            <Button type="button" variant="outline" disabled={pending === "research-only"} onClick={() => runAction("research-only")}>Request More Sources</Button>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <MiniMetric label="Intelligence items" value={String(data.newsIntelligenceItems.length)} />
+          <MiniMetric label="Needs rewrite review" value={String(reviewAiishness)} />
+          <MiniMetric label="Failed tasks" value={text(data.health.failed_tasks)} />
+        </div>
+      </Card>
+
+      <Card>
+        <CardLabel>AI-ishness Checker</CardLabel>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Repetition and public trust scan</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/70">
+              The scan flags repetitive slogans, public social-caption blocks, old technical wording, weak dates, and generic article patterns. Scores above 60 block publishing.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" disabled={pending === "aiishness-check"} onClick={() => runAction("aiishness-check")}>Run AI-ishness Check</Button>
+            <Button type="button" variant="outline" disabled={pending === "aiishness-check"} onClick={() => runAction("aiishness-check")}>Rewrite Less AI-ish</Button>
+          </div>
+        </div>
+      </Card>
 
       <ManualLinkSection onComplete={refresh} defaultDestination="live_newsroom" compactTitle="Manual Link Processor" />
 
       <div className="grid gap-5 xl:grid-cols-2">
+        <PreviewList title="News Intelligence" records={data.newsIntelligenceItems} fields={["item_type", "title", "status", "source_count", "approval_status"]} />
+        <PreviewList title="AI-ishness Reports" records={data.aiishnessReports} fields={["content_type", "page_url", "score", "status"]} />
         <PreviewList title="Research Packs" records={liveResearch} fields={["topic", "category", "source_count", "status"]} />
         <PreviewList title="Verification Reports" records={liveVerification} fields={["verification_status", "risk_level", "publish_recommendation"]} />
         <PreviewList title="Drafts" records={liveDrafts} fields={["title", "slug", "category", "verification_status", "publish_status"]} />
@@ -1670,6 +1721,10 @@ function actionRequest(action: string) {
 
   if (action === "system-health") {
     return { endpoint: "/api/ai/health", body: {} };
+  }
+
+  if (action === "aiishness-check") {
+    return { endpoint: "/api/ai/aiishness", body: {} };
   }
 
   return { endpoint: "/api/admin/agent-actions", body: { action } };

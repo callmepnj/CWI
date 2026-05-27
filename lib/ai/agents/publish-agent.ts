@@ -1,4 +1,5 @@
 import { runArticleAgent } from "@/lib/ai/agents/article-agent";
+import { assessAiishness, extractPublicTrustBlockers } from "@/lib/ai/aiishness";
 import { improveArticleDraft, saveQualityScore, scoreArticleQuality } from "@/lib/ai/quality-engine";
 import { rememberArticleDraft } from "@/lib/ai/source-memory";
 import { assertArticleDraftAllowed } from "@/lib/ai/verification-engine";
@@ -6,6 +7,7 @@ import { attachDraftToApprovalItem, getApprovalItem, isPublishApproved, updateAp
 import { getArticleDraft, saveArticleDraft } from "@/lib/db/articles";
 import { normalizeContentDestination } from "@/lib/ai/content-destination";
 import { saveLiveNewsroomItemFromDraft } from "@/lib/db/live-newsroom";
+import { saveAiishnessReport } from "@/lib/db/news-intelligence";
 
 export async function runPublishAgent(approvalQueueId: string) {
   const approval = await getApprovalItem(approvalQueueId);
@@ -27,7 +29,34 @@ export async function runPublishAgent(approvalQueueId: string) {
   const contentDestination = normalizeContentDestination(approval.content_destination || articleDraft.content_destination);
 
   if (contentDestination !== "live_newsroom") {
-    throw new Error("Publishing blocked. CWI Publish AI only publishes approved Live Newsroom items in v1.1. Archive is passive.");
+    throw new Error("Publishing blocked. CWI Publish AI only publishes approved Live Newsroom items in v1.2. Archive is passive.");
+  }
+
+  const sourceCount = Number(approval.source_count ?? articleDraft.source_count ?? 0);
+  if (sourceCount < 1) {
+    throw new Error("Publishing blocked. Source count is 0.");
+  }
+
+  if (!asText(approval.verification_report_id)) {
+    throw new Error("Publishing blocked. Verification Report required before publishing.");
+  }
+
+  const draftText = JSON.stringify(articleDraft.draft ?? {});
+  const blockers = extractPublicTrustBlockers(draftText);
+  if (blockers.length) {
+    throw new Error(`Publishing blocked. Public trust blocker found: ${blockers[0]}.`);
+  }
+
+  const aiishness = assessAiishness({
+    contentType: "article_draft",
+    contentId: asText(articleDraft.id),
+    pageUrl: `/live-newsroom/${asText(articleDraft.slug)}`,
+    title: asText(articleDraft.title),
+    text: draftText
+  });
+  await saveAiishnessReport(aiishness).catch(() => undefined);
+  if (aiishness.score > 60) {
+    throw new Error(`Publishing blocked. AI-ishness score is ${aiishness.score}/100.`);
   }
 
   if (contentDestination === "live_newsroom") {

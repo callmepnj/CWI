@@ -56,7 +56,7 @@ export function Footer() {
             </p>
           </div>
           <p className="mt-4 max-w-xl text-white/72">
-            Cockroach Watch India — CWI is an independent civic watch, satire, and commentary platform. We document, verify, and amplify youth voice, public issues, civic satire, creator credit, and source-backed updates.
+            Cockroach Watch India - CWI is an independent civic watch, satire, and commentary platform. The Live Newsroom keeps updates tied to sources, dates, corrections, and human review.
           </p>
           <p className="mt-6 max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-4 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-white/78">
             {site.disclaimer}

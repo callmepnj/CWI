@@ -1,1 +1,6 @@
-export { generateMetadata, default } from "@/app/watch-desk/[slug]/page";
+export {
+  default,
+  dynamic,
+  generateMetadata,
+  revalidate
+} from "../../watch-desk/[slug]/page";

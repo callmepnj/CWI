@@ -384,7 +384,7 @@ export default async function UnansweredFilePage({ params }: Props) {
             </Card>
 
             <Card>
-              <CardLabel>Internal links</CardLabel>
+              <CardLabel>Explore CWI</CardLabel>
               <div className="grid gap-2">
                 {[
                   ["CWI India Unanswered Files", unansweredFilesPath],

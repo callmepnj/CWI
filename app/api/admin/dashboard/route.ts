@@ -62,7 +62,9 @@ function buildSetupModeDashboard() {
       bigBrainRules: 0,
       activeWorkflows: 0,
       trendRadarItems: 0,
-      qualityReviews: 0
+      qualityReviews: 0,
+      aiishnessReports: 0,
+      newsIntelligenceItems: 0
     },
     agents: [],
     approvals: [],
@@ -109,6 +111,8 @@ function buildSetupModeDashboard() {
     memoryGraphNodes: [],
     memoryGraphEdges: [],
     costUsageLogs: [],
+    aiishnessReports: [],
+    newsIntelligenceItems: [],
     latestPublicArticles: [],
     latestUnansweredFiles: [],
     liveNewsroomItems: [],

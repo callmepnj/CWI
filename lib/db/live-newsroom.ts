@@ -1,5 +1,6 @@
 import { posts, type ArticleSource } from "@/data/posts";
 import { getFileVisual, unansweredFiles } from "@/data/unanswered-files";
+import { assessAiishness } from "@/lib/ai/aiishness";
 import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
@@ -25,6 +26,32 @@ export type LiveNewsroomTimelineItem = {
   summary: string;
 };
 
+export type LiveNewsroomSourceTrailItem = {
+  name: string;
+  type: string;
+  date: string;
+  url: string;
+  supports: string;
+  doesNotProve: string;
+};
+
+export type LiveNewsroomClaimTrackerItem = {
+  claim: string;
+  topic: string;
+  firstSeen: string;
+  source: string;
+  status: LiveNewsroomStatus | "False/Misleading" | "Needs context" | "Blocked";
+  evidenceLevel: string;
+  cwiNote: string;
+};
+
+export type LiveNewsroomCorrectionItem = {
+  date: string;
+  whatChanged: string;
+  whyChanged: string;
+  note: string;
+};
+
 export type LiveNewsroomItem = {
   id: string;
   title: string;
@@ -40,8 +67,17 @@ export type LiveNewsroomItem = {
   whatHappened: string;
   whatChanged: string;
   whatWeKnow: string;
+  whatWeDontKnow: string[];
   whatRemainsUnclear: string;
   timeline: LiveNewsroomTimelineItem[];
+  beforeYouShare: string[];
+  editorNote: string;
+  aiishnessScore: number;
+  claimTracker: LiveNewsroomClaimTrackerItem[];
+  sourceTrail: LiveNewsroomSourceTrailItem[];
+  correctionHistory: LiveNewsroomCorrectionItem[];
+  regionTags: string[];
+  topicTags: string[];
   cwiContext: string;
   tags: string[];
   heroImage: string;
@@ -73,8 +109,17 @@ type LiveNewsroomRow = {
   what_happened: string | null;
   what_changed: string | null;
   what_we_know: string | null;
+  what_we_dont_know: string | null;
   what_remains_unclear: string | null;
   timeline_json: unknown;
+  before_you_share: string | null;
+  editor_note: string | null;
+  aiishness_score: number | null;
+  claim_tracker_json: unknown;
+  source_trail_json: unknown;
+  correction_history_json: unknown;
+  region_tags_json: unknown;
+  topic_tags_json: unknown;
   cwi_context: string | null;
   tags_json: unknown;
   hero_image: string | null;
@@ -103,7 +148,7 @@ export async function saveLiveNewsroomItemFromDraft(input: {
   const title = asText(input.articleDraft.title, asText(draft.title, "CWI Live Newsroom update"));
   const slug = slugify(asText(input.articleDraft.slug, asText(draft.slug, title)));
   const category = asText(input.articleDraft.category, asText(draft.category, "Live Newsroom"));
-  const verificationStatus = asText(input.approval.verification_status, asText(input.articleDraft.verification_status, "Developing"));
+  const verificationStatus = normalizeStatus(asText(input.approval.verification_status, asText(input.articleDraft.verification_status, "Developing")));
   const riskLevel = asText(input.approval.risk_level, "Medium");
   const sourceCount = Number(input.approval.source_count ?? input.articleDraft.source_count ?? 0);
   const sections = extractSections(draft);
@@ -120,6 +165,45 @@ export async function saveLiveNewsroomItemFromDraft(input: {
   const seo = await latestSeoForDraft(articleDraftId);
   const image = await latestImageForApproval(input.approval.image_pack_id);
   const canonicalUrl = asText(seo?.canonical_url, `${site.url}/live-newsroom/${slug}`);
+  const whatHappened = asText(draft.whatHappened || nestedBody.whatHappened, sections.find((section) => section.heading === "What happened")?.paragraphs.join("\n\n") || summary);
+  const whatChanged = asText(
+    draft.whatChanged || nestedBody.whatChanged,
+    sections.find((section) => section.heading === "What changed")?.paragraphs.join("\n\n") ||
+      latestTimelineSummary(timeline) ||
+      "No material change has been recorded yet. CWI will update this page when new verified context is reviewed."
+  );
+  const whatWeKnow = asText(draft.whatWeKnow || nestedBody.whatWeKnow, sections.find((section) => section.heading === "What we know")?.paragraphs.join("\n\n") || summary);
+  const whatWeDontKnow = normalizeStringArray(draft.whatWeDontKnow || draft.what_we_dont_know || nestedBody.whatWeDontKnow || nestedBody.what_we_dont_know);
+  const whatRemainsUnclear = asText(
+    draft.whatRemainsUnclear || nestedBody.whatRemainsUnclear,
+    sections.find((section) => section.heading === "What remains unclear")?.paragraphs.join("\n\n") ||
+      "CWI is keeping this update open for corrections, official clarification, and additional verified context."
+  );
+  const beforeYouShare = normalizeStringArray(draft.beforeYouShare || draft.before_you_share || nestedBody.beforeYouShare);
+  const sourceTrail = normalizeSourceTrail(draft.sourceTrail || draft.source_trail_json || nestedBody.sourceTrail, sources, timeline, title);
+  const claimTracker = normalizeClaimTracker(draft.claimTracker || draft.claim_tracker_json, title, category, verificationStatus, sourceCount, sources, whatRemainsUnclear, timeline[0]?.date || new Date().toISOString().slice(0, 10));
+  const correctionHistory = normalizeCorrectionHistory(draft.correctionHistory || draft.correction_history_json);
+  const regionTags = normalizeStringArray(draft.regionTags || draft.region_tags_json);
+  const topicTags = normalizeStringArray(draft.topicTags || draft.topic_tags_json).length
+    ? normalizeStringArray(draft.topicTags || draft.topic_tags_json)
+    : tags;
+  const editorNote = asText(
+    draft.editorNote || draft.editor_note,
+    verificationStatus === "Developing" || verificationStatus === "Reported"
+      ? "CWI is keeping this page updated because some details are moving faster than confirmed information."
+      : ""
+  );
+  const aiishnessScore = Number(
+    draft.aiishnessScore ??
+      draft.aiishness_score ??
+      assessAiishness({
+        contentType: "live_newsroom_item",
+        contentId: articleDraftId,
+        pageUrl: canonicalUrl,
+        title,
+        text: `${summary}\n${sections.flatMap((section) => section.paragraphs).join("\n")}`
+      }).score
+  );
 
   const result = await getPool().query<{ id: string }>(
     `
@@ -139,22 +223,31 @@ export async function saveLiveNewsroomItemFromDraft(input: {
             what_happened = $13,
             what_changed = $14,
             what_we_know = $15,
-            what_remains_unclear = $16,
-            timeline_json = $17,
-            cwi_context = $18,
-            tags_json = $19,
-            hero_image = $20,
-            thumbnail_image = $21,
-            og_image = $22,
-            alt_text = $23,
+            what_we_dont_know = $16,
+            what_remains_unclear = $17,
+            timeline_json = $18,
+            before_you_share = $19,
+            editor_note = $20,
+            aiishness_score = $21,
+            claim_tracker_json = $22,
+            source_trail_json = $23,
+            correction_history_json = $24,
+            region_tags_json = $25,
+            topic_tags_json = $26,
+            cwi_context = $27,
+            tags_json = $28,
+            hero_image = $29,
+            thumbnail_image = $30,
+            og_image = $31,
+            alt_text = $32,
             updated_at = now(),
-            author = $24,
-            related_items_json = $25,
-            seo_title = $26,
-            seo_description = $27,
-            canonical_url = $28,
+            author = $33,
+            related_items_json = $34,
+            seo_title = $35,
+            seo_description = $36,
+            canonical_url = $37,
             status = 'published',
-            metadata = $29
+            metadata = $38
         where article_draft_id = $1
         returning id
       ),
@@ -162,12 +255,14 @@ export async function saveLiveNewsroomItemFromDraft(input: {
         insert into live_newsroom_items (
           article_draft_id, approval_queue_id, title, slug, category, type, summary,
           body, verification_status, risk_level, source_count, sources_json,
-          what_happened, what_changed, what_we_know, what_remains_unclear, timeline_json,
-          cwi_context, tags_json, hero_image, thumbnail_image, og_image, alt_text,
+          what_happened, what_changed, what_we_know, what_we_dont_know, what_remains_unclear, timeline_json,
+          before_you_share, editor_note, aiishness_score, claim_tracker_json, source_trail_json,
+          correction_history_json, region_tags_json, topic_tags_json, cwi_context, tags_json, hero_image, thumbnail_image, og_image, alt_text,
           author, related_items_json, seo_title, seo_description, canonical_url, status, metadata
         )
         select $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-          $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, 'published', $29
+          $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
+          $31, $32, $33, $34, $35, $36, $37, 'published', $38
         where not exists (select 1 from updated)
         returning id
       )
@@ -188,20 +283,20 @@ export async function saveLiveNewsroomItemFromDraft(input: {
       riskLevel,
       sourceCount,
       JSON.stringify(sources),
-      asText(draft.whatHappened || nestedBody.whatHappened, sections.find((section) => section.heading === "What happened")?.paragraphs.join("\n\n") || summary),
-      asText(
-        draft.whatChanged || nestedBody.whatChanged,
-        sections.find((section) => section.heading === "What changed")?.paragraphs.join("\n\n") ||
-          latestTimelineSummary(timeline) ||
-          "No material change has been recorded yet. CWI will update this page when new source-backed context is reviewed."
-      ),
-      asText(draft.whatWeKnow || nestedBody.whatWeKnow, sections.find((section) => section.heading === "What we know")?.paragraphs.join("\n\n") || summary),
-      asText(
-        draft.whatRemainsUnclear || nestedBody.whatRemainsUnclear,
-        sections.find((section) => section.heading === "What remains unclear")?.paragraphs.join("\n\n") ||
-          "CWI is keeping this update open for corrections, official clarification, and additional source-backed context."
-      ),
+      whatHappened,
+      whatChanged,
+      whatWeKnow,
+      whatWeDontKnow.length ? whatWeDontKnow.join("\n") : whatRemainsUnclear,
+      whatRemainsUnclear,
       JSON.stringify(timeline),
+      beforeYouShare.length ? beforeYouShare.join("\n") : defaultBeforeYouShare.join("\n"),
+      editorNote,
+      aiishnessScore,
+      JSON.stringify(claimTracker),
+      JSON.stringify(sourceTrail),
+      JSON.stringify(correctionHistory),
+      JSON.stringify(regionTags),
+      JSON.stringify(topicTags),
       asText(draft.cwiContext || draft.disclaimer, cwiContext),
       JSON.stringify(tags),
       image?.heroImage || `${site.url}/opengraph-image`,
@@ -213,7 +308,7 @@ export async function saveLiveNewsroomItemFromDraft(input: {
       asText(seo?.seo_title, `${title} - CWI Live Newsroom | Cockroach Watch India`),
       asText(seo?.meta_description, `Cockroach Watch India Live Newsroom explains ${title}, what is known, what remains unclear, and why CWI is tracking this public-interest update.`),
       canonicalUrl,
-      JSON.stringify({ approvalQueueId, articleDraftId, source: "CWI Publish Gate" })
+      JSON.stringify({ approvalQueueId, articleDraftId, source: "CWI Publish Gate", aiishnessScore })
     ]
   );
 
@@ -226,7 +321,9 @@ export async function getPublishedLiveNewsroomItems(limit = 80) {
     `
       select id::text, title, slug, category, type, summary, body, verification_status,
         risk_level, source_count, sources_json, what_happened, what_changed, what_we_know,
-        what_remains_unclear, timeline_json, cwi_context, tags_json, hero_image,
+        what_we_dont_know, what_remains_unclear, timeline_json, before_you_share,
+        editor_note, aiishness_score, claim_tracker_json, source_trail_json,
+        correction_history_json, region_tags_json, topic_tags_json, cwi_context, tags_json, hero_image,
         thumbnail_image, og_image, alt_text, published_at::text, updated_at::text,
         author, related_items_json, seo_title, seo_description, canonical_url, status
       from live_newsroom_items
@@ -246,7 +343,9 @@ export async function getPublishedLiveNewsroomItem(slug: string) {
     `
       select id::text, title, slug, category, type, summary, body, verification_status,
         risk_level, source_count, sources_json, what_happened, what_changed, what_we_know,
-        what_remains_unclear, timeline_json, cwi_context, tags_json, hero_image,
+        what_we_dont_know, what_remains_unclear, timeline_json, before_you_share,
+        editor_note, aiishness_score, claim_tracker_json, source_trail_json,
+        correction_history_json, region_tags_json, topic_tags_json, cwi_context, tags_json, hero_image,
         thumbnail_image, og_image, alt_text, published_at::text, updated_at::text,
         author, related_items_json, seo_title, seo_description, canonical_url, status
       from live_newsroom_items
@@ -274,10 +373,19 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
     sourceCount: post.sources.length,
     sources: post.sources,
     whatHappened: sectionText(post.sections, "What happened") || post.summary,
-    whatChanged: "Archived context from older CWI coverage. Current updates now belong in the CWI Live Newsroom.",
+    whatChanged: "This is archived context. Current updates now appear in the Live Newsroom.",
     whatWeKnow: sectionText(post.sections, "What we know") || post.content[0] || post.summary,
-    whatRemainsUnclear: sectionText(post.sections, "What remains unclear") || "This item is source-backed but remains open for corrections and new context.",
+    whatWeDontKnow: [sectionText(post.sections, "What remains unclear") || "Whether newer public records have changed the context since this archive item was prepared."],
+    whatRemainsUnclear: sectionText(post.sections, "What remains unclear") || "This archive item remains open for corrections and newer records.",
     timeline: [{ date: post.date, title: "Archive publication", summary: post.summary }],
+    beforeYouShare: defaultBeforeYouShare,
+    editorNote: "",
+    aiishnessScore: 0,
+    claimTracker: buildClaimTracker(post.title, post.category, normalizeStatus(post.verificationStatus), post.sources.length, post.sources, sectionText(post.sections, "What remains unclear"), post.date),
+    sourceTrail: buildSourceTrail(post.sources, [{ date: post.date, title: "Archive publication", summary: post.summary }], post.title),
+    correctionHistory: [],
+    regionTags: ["National"],
+    topicTags: post.tags,
     cwiContext,
     tags: post.tags,
     heroImage: post.ogImage,
@@ -318,12 +426,33 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
         note: source.note
       })) as ArticleSource[],
       whatHappened: file.sections[0]?.body || file.summary,
-      whatChanged: "CWI is preserving this file as public memory inside the Live Newsroom ecosystem.",
+      whatChanged: "This file is now grouped inside Live Newsroom so updates, corrections, and source trails are easier to follow.",
       whatWeKnow: file.groundReality,
+      whatWeDontKnow: file.unansweredQuestions.slice(0, 5),
       whatRemainsUnclear: file.unansweredQuestion,
       timeline: file.timeline.slice(0, 8).map((item) => ({ date: item.date, title: item.title, summary: item.summary })),
+      beforeYouShare: defaultBeforeYouShare,
+      editorNote: "CWI keeps this file open because official records, court updates, and public reporting can change the picture over time.",
+      aiishnessScore: 0,
+      claimTracker: buildClaimTracker(file.title, "India Unanswered Files", "Source-backed", file.sourceCount, file.sources.map((source) => ({
+        name: source.name,
+        outlet: source.publisher,
+        url: source.url,
+        type: source.type === "Official response" ? "Official source" : source.type === "Explainer" ? "Feature" : "News report",
+        note: source.note
+      })) as ArticleSource[], file.unansweredQuestion, "2026-05-26"),
+      sourceTrail: buildSourceTrail(file.sources.map((source) => ({
+        name: source.name,
+        outlet: source.publisher,
+        url: source.url,
+        type: source.type === "Official response" ? "Official source" : source.type === "Explainer" ? "Feature" : "News report",
+        note: source.note
+      })) as ArticleSource[], file.timeline.slice(0, 8).map((item) => ({ date: item.date, title: item.title, summary: item.summary })), file.title),
+      correctionHistory: [],
+      regionTags: file.location ? [file.location] : ["National"],
+      topicTags: ["India Unanswered Files", file.category],
       cwiContext,
-      tags: ["India Unanswered Files", "CWI public memory", file.category],
+      tags: ["India Unanswered Files", file.category],
       heroImage: file.heroImage || visual.src,
       thumbnailImage: file.thumbnailImage || visual.src,
       ogImage: file.ogImage || visual.src,
@@ -362,10 +491,21 @@ function rowToLiveNewsroomItem(row: LiveNewsroomRow): LiveNewsroomItem {
     sourceCount: Number(row.source_count ?? 0),
     sources: extractSources(row.sources_json),
     whatHappened: asText(row.what_happened, summary),
-    whatChanged: asText(row.what_changed, "No material change has been recorded yet. CWI will update this page when new source-backed context is reviewed."),
+    whatChanged: asText(row.what_changed, "No material change has been recorded yet. CWI will update this page when new verified context is reviewed."),
     whatWeKnow: asText(row.what_we_know, summary),
-    whatRemainsUnclear: asText(row.what_remains_unclear, "CWI is tracking corrections, official clarifications, and new source-backed updates."),
+    whatWeDontKnow: normalizeTextList(row.what_we_dont_know).length
+      ? normalizeTextList(row.what_we_dont_know)
+      : [asText(row.what_remains_unclear, "What remains unknown is listed for editorial review.")],
+    whatRemainsUnclear: asText(row.what_remains_unclear, "CWI is tracking corrections, official clarifications, and new verified updates."),
     timeline: normalizeTimeline(row.timeline_json),
+    beforeYouShare: normalizeTextList(row.before_you_share).length ? normalizeTextList(row.before_you_share) : defaultBeforeYouShare,
+    editorNote: asText(row.editor_note),
+    aiishnessScore: Number(row.aiishness_score ?? 0),
+    claimTracker: normalizeClaimTracker(row.claim_tracker_json, row.title, asText(row.category, "Live Newsroom"), normalizeStatus(row.verification_status), Number(row.source_count ?? 0), extractSources(row.sources_json), asText(row.what_remains_unclear), dateOnly(row.published_at)),
+    sourceTrail: normalizeSourceTrail(row.source_trail_json, extractSources(row.sources_json), normalizeTimeline(row.timeline_json), row.title),
+    correctionHistory: normalizeCorrectionHistory(row.correction_history_json),
+    regionTags: normalizeStringArray(row.region_tags_json),
+    topicTags: normalizeStringArray(row.topic_tags_json),
     cwiContext: asText(row.cwi_context, cwiContext),
     tags: normalizeStringArray(row.tags_json),
     heroImage: asText(row.hero_image, `${site.url}/opengraph-image`),
@@ -430,7 +570,14 @@ async function latestImageForApproval(imagePackId: unknown) {
 }
 
 const cwiContext =
-  "Cockroach Watch India - CWI is tracking this topic through the CWI Live Newsroom as part of its public archive on youth voice, civic satire, creator-led commentary, public issues, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest conversations with context and source attribution.";
+  "CWI keeps this page open for source updates, corrections, and clearer context as stronger information becomes available.";
+
+const defaultBeforeYouShare = [
+  "Check the date before sharing.",
+  "Look for the original source, not only reposts.",
+  "Do not post phone numbers, addresses, or private data.",
+  "Send CWI a source if you have one."
+];
 
 function extractSections(value: unknown) {
   const direct = normalizeSections(value);
@@ -497,9 +644,129 @@ function normalizeTimeline(value: unknown): LiveNewsroomTimelineItem[] {
     .filter((item) => item.summary);
 }
 
+function normalizeSourceTrail(
+  value: unknown,
+  fallbackSources: ArticleSource[],
+  timeline: LiveNewsroomTimelineItem[],
+  topic: string
+): LiveNewsroomSourceTrailItem[] {
+  if (Array.isArray(value)) {
+    const trail = value
+      .map((item) => {
+        const record = asRecord(item);
+        const url = asText(record.url || record.href || record.sourceUrl);
+        return {
+          name: asText(record.name || record.sourceName || record.title, url ? hostFromUrl(url) : "Source"),
+          type: asText(record.type || record.sourceType, "Reference"),
+          date: asText(record.date || record.publishedDate || record.publishedAt, "Date not listed"),
+          url: url || site.url,
+          supports: asText(record.supports || record.whatThisSourceSupports || record.note, `This source is part of the source trail for ${topic}.`),
+          doesNotProve: asText(record.doesNotProve || record.whatThisSourceDoesNotProve, "It does not prove claims outside its own reporting or statement.")
+        };
+      })
+      .filter((item) => item.name);
+    if (trail.length) return trail;
+  }
+
+  return buildSourceTrail(fallbackSources, timeline, topic);
+}
+
+function buildSourceTrail(sources: ArticleSource[], timeline: LiveNewsroomTimelineItem[], topic: string): LiveNewsroomSourceTrailItem[] {
+  return sources.slice(0, 8).map((source, index) => ({
+    name: source.name,
+    type: source.type || "Reference",
+    date: timeline[index]?.date || "Date not listed",
+    url: source.url,
+    supports: source.note || `Source used for CWI review of ${topic}.`,
+    doesNotProve: "It does not prove claims that are not stated in the source itself."
+  }));
+}
+
+function normalizeClaimTracker(
+  value: unknown,
+  topic: string,
+  category: string,
+  status: LiveNewsroomStatus,
+  sourceCount: number,
+  sources: ArticleSource[],
+  cwiNote: string,
+  firstSeen: string
+): LiveNewsroomClaimTrackerItem[] {
+  if (Array.isArray(value)) {
+    const claims = value
+      .map((item) => {
+        const record = asRecord(item);
+        return {
+          claim: asText(record.claim || record.title, topic),
+          topic: asText(record.topic, category),
+          firstSeen: asText(record.firstSeen || record.first_seen || record.date, firstSeen),
+          source: asText(record.source || record.sourceName, sources[0]?.name || "Source pending review"),
+          status: normalizeClaimStatus(record.status || status),
+          evidenceLevel: asText(record.evidenceLevel || record.evidence_level, sourceCount > 2 ? "Multiple sources" : "Single source"),
+          cwiNote: asText(record.cwiNote || record.cwi_note || record.note, cwiNote)
+        };
+      })
+      .filter((claim) => claim.claim);
+    if (claims.length) return claims;
+  }
+
+  return buildClaimTracker(topic, category, status, sourceCount, sources, cwiNote, firstSeen);
+}
+
+function buildClaimTracker(
+  topic: string,
+  category: string,
+  status: LiveNewsroomStatus,
+  sourceCount: number,
+  sources: ArticleSource[],
+  cwiNote: string,
+  firstSeen: string
+): LiveNewsroomClaimTrackerItem[] {
+  return [
+    {
+      claim: topic,
+      topic: category,
+      firstSeen,
+      source: sources[0]?.name || "Source pending review",
+      status,
+      evidenceLevel: sourceCount > 2 ? "Multiple visible sources" : sourceCount > 0 ? "Visible source trail" : "Sources awaited",
+      cwiNote: cwiNote || "CWI is separating what is known from what still needs stronger sourcing."
+    }
+  ];
+}
+
+function normalizeCorrectionHistory(value: unknown): LiveNewsroomCorrectionItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      const record = asRecord(item);
+      return {
+        date: asText(record.date || record.correctionDate || record.updatedAt, "Date not listed"),
+        whatChanged: asText(record.whatChanged || record.what_changed, "Correction note saved."),
+        whyChanged: asText(record.whyChanged || record.why_changed, "Editorial update."),
+        note: asText(record.note || record.sourceNote, "Reviewed by CWI Editorial Desk.")
+      };
+    })
+    .filter((item) => item.whatChanged);
+}
+
+function normalizeTextList(value: unknown) {
+  if (Array.isArray(value)) return value.map((item) => asText(item)).filter(Boolean);
+  return asText(value)
+    .split(/\n+|;\s*/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function normalizeStringArray(value: unknown) {
   if (!Array.isArray(value)) return [];
   return value.map((item) => asText(item)).filter(Boolean);
+}
+
+function normalizeClaimStatus(value: unknown): LiveNewsroomClaimTrackerItem["status"] {
+  const status = asText(value);
+  if (["False/Misleading", "Needs context", "Blocked"].includes(status)) return status as LiveNewsroomClaimTrackerItem["status"];
+  return normalizeStatus(status);
 }
 
 function normalizeStatus(value: unknown): LiveNewsroomStatus {

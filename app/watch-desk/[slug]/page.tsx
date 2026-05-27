@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, CalendarDays, Clock, FileText, ShieldCheck, Tag } from "lucide-react";
 import { ArticleProgress } from "@/components/ArticleProgress";
-import { ArticleDiscussionPrompts } from "@/components/ArticleDiscussionPrompts";
 import { ArticleRating } from "@/components/ArticleRating";
 import { CommentSection } from "@/components/CommentSection";
 import { ShareButtons } from "@/components/ShareButtons";
@@ -164,9 +163,6 @@ export default async function WatchPostPage({ params }: Props) {
     .slice(0, 3);
   const latestPosts = posts.filter((item) => item.slug !== post.slug).slice(0, 5);
   const jsonLd = jsonLdForPost(post);
-  const discussionPrompts = buildWatchDiscussionPrompts(post);
-  const readerQuestions = buildWatchReaderQuestions(post);
-
   return (
     <>
       <ArticleProgress />
@@ -281,33 +277,12 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
             </div>
 
-            <ArticleDiscussionPrompts prompts={discussionPrompts} questions={readerQuestions} />
-
             <Card className="mt-8">
               <CardLabel>Article disclaimer</CardLabel>
               <p className="leading-8 text-ink/72">{articleDisclaimer}</p>
             </Card>
 
             <CommentSection articleSlug={post.slug} />
-
-            <Card className="mt-8">
-              <CardLabel>Social copy kit</CardLabel>
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <h2 className="font-display text-2xl font-black uppercase">X thread</h2>
-                  <ol className="mt-3 space-y-3 text-sm font-semibold leading-6 text-ink/70">
-                    {post.social.xThread.map((line, index) => (
-                      <li key={line}>{index + 1}. {line}</li>
-                    ))}
-                  </ol>
-                </div>
-                <div className="space-y-4 text-sm font-semibold leading-6 text-ink/70">
-                  <p><strong className="text-ink">Instagram:</strong> {post.social.instagramCaption}</p>
-                  <p><strong className="text-ink">Reddit:</strong> {post.social.redditPost}</p>
-                  <p><strong className="text-ink">YouTube Shorts:</strong> {post.social.youtubeShortsDescription}</p>
-                </div>
-              </div>
-            </Card>
 
             {relatedPosts.length > 0 ? (
               <section className="mt-10">
@@ -346,7 +321,7 @@ export default async function WatchPostPage({ params }: Props) {
             </Card>
 
             <Card>
-              <CardLabel>Internal links</CardLabel>
+              <CardLabel>Explore CWI</CardLabel>
               <div className="grid gap-2">
                 {[
                   ["Cockroach Watch India", "/"],
@@ -366,7 +341,7 @@ export default async function WatchPostPage({ params }: Props) {
             </Card>
 
             <Card>
-              <CardLabel>Latest updates</CardLabel>
+              <CardLabel>More archive items</CardLabel>
               <div className="space-y-4">
                 {latestPosts.map((latestPost) => (
                   <Link key={latestPost.slug} href={`/archive/${latestPost.slug}`} className="block border-b border-line pb-4 last:border-b-0 last:pb-0">
@@ -381,23 +356,6 @@ export default async function WatchPostPage({ params }: Props) {
       </article>
     </>
   );
-}
-
-function buildWatchDiscussionPrompts(post: (typeof posts)[number]) {
-  return [
-    `Share a source, public statement, creator credit note, or correction that could improve CWI's context on "${post.title}".`,
-    "Point out what is verified, what is only reported, and what still needs official clarification.",
-    "If this topic is circulating in your feed, explain what people are misunderstanding without posting private data or unverified allegations."
-  ];
-}
-
-function buildWatchReaderQuestions(post: (typeof posts)[number]) {
-  return [
-    `What does the CWI Archive clearly preserve about ${post.title}?`,
-    "Which claim in this article needs the strongest source before it is amplified further?",
-    "What should Cockroach Watch India follow next: public reaction, creator credit, official response, or correction?",
-    "Does this update affect youth voice, public issues, civic satire, or digital rights in a way CWI should archive?"
-  ];
 }
 
 function formatArticleDate(value: string) {

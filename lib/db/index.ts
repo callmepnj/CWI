@@ -389,6 +389,8 @@ async function adminOsSchemaLooksReady() {
         to_regclass('public.cwi_verification_gates') is not null as cwi_verification_gates,
         to_regclass('public.cwi_quality_scores') is not null as cwi_quality_scores,
         to_regclass('public.cwi_trend_radar_items') is not null as cwi_trend_radar_items,
+        to_regclass('public.aiishness_reports') is not null as aiishness_reports,
+        to_regclass('public.news_intelligence_items') is not null as news_intelligence_items,
         to_regclass('public.big_brain_rules') is not null as big_brain_rules,
         to_regclass('public.memory_graph_nodes') is not null as memory_graph_nodes,
         to_regclass('public.memory_graph_edges') is not null as memory_graph_edges,
@@ -447,7 +449,27 @@ async function adminOsSchemaLooksReady() {
         exists (
           select 1 from information_schema.columns
           where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'what_changed'
-        ) as live_newsroom_items_what_changed
+        ) as live_newsroom_items_what_changed,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'what_we_dont_know'
+        ) as live_newsroom_items_what_we_dont_know,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'before_you_share'
+        ) as live_newsroom_items_before_you_share,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'editor_note'
+        ) as live_newsroom_items_editor_note,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'aiishness_score'
+        ) as live_newsroom_items_aiishness_score,
+        exists (
+          select 1 from information_schema.columns
+          where table_schema = 'public' and table_name = 'live_newsroom_items' and column_name = 'source_trail_json'
+        ) as live_newsroom_items_source_trail_json
     `);
 
     return Object.values(result.rows[0] ?? {}).every(Boolean);
@@ -624,8 +646,17 @@ export async function ensureAdminOsTables() {
         what_happened text,
         what_changed text,
         what_we_know text,
+        what_we_dont_know text,
         what_remains_unclear text,
         timeline_json jsonb not null default '[]'::jsonb,
+        before_you_share text,
+        editor_note text,
+        aiishness_score integer not null default 0,
+        claim_tracker_json jsonb not null default '[]'::jsonb,
+        source_trail_json jsonb not null default '[]'::jsonb,
+        correction_history_json jsonb not null default '[]'::jsonb,
+        region_tags_json jsonb not null default '[]'::jsonb,
+        topic_tags_json jsonb not null default '[]'::jsonb,
         cwi_context text,
         tags_json jsonb not null default '[]'::jsonb,
         hero_image text,
@@ -964,6 +995,41 @@ export async function ensureAdminOsTables() {
         unique (topic, trend_type)
       );
 
+      create table if not exists aiishness_reports (
+        id uuid primary key default gen_random_uuid(),
+        content_type text not null,
+        content_id text,
+        page_url text,
+        score integer not null default 0,
+        flagged_lines_json jsonb not null default '[]'::jsonb,
+        issues_json jsonb not null default '[]'::jsonb,
+        rewrite_suggestions_json jsonb not null default '[]'::jsonb,
+        status text not null default 'human_review_required',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
+      create table if not exists news_intelligence_items (
+        id uuid primary key default gen_random_uuid(),
+        item_type text not null,
+        title text not null,
+        summary text,
+        status text not null default 'Developing',
+        category text,
+        source_count integer not null default 0,
+        sources_json jsonb not null default '[]'::jsonb,
+        what_changed text,
+        what_we_know text,
+        what_we_dont_know text,
+        timeline_json jsonb not null default '[]'::jsonb,
+        before_you_share text,
+        editor_note text,
+        related_live_newsroom_item_id uuid,
+        approval_status text not null default 'waiting_for_approval',
+        created_at timestamptz not null default now(),
+        updated_at timestamptz not null default now()
+      );
+
       create table if not exists big_brain_rules (
         id uuid primary key default gen_random_uuid(),
         rule_key text not null unique,
@@ -1046,6 +1112,15 @@ export async function ensureAdminOsTables() {
       create index if not exists cwi_trend_radar_priority_idx
       on cwi_trend_radar_items (priority_score desc, updated_at desc);
 
+      create index if not exists aiishness_reports_score_idx
+      on aiishness_reports (score desc, created_at desc);
+
+      create index if not exists news_intelligence_items_status_idx
+      on news_intelligence_items (approval_status, status, updated_at desc);
+
+      create index if not exists news_intelligence_items_type_idx
+      on news_intelligence_items (item_type, updated_at desc);
+
       create index if not exists big_brain_rules_category_priority_idx
       on big_brain_rules (category, priority);
 
@@ -1071,6 +1146,15 @@ export async function ensureAdminOsTables() {
       alter table social_packs add column if not exists content_destination text not null default 'live_newsroom';
       alter table image_library add column if not exists content_destination text not null default 'live_newsroom';
       alter table live_newsroom_items add column if not exists what_changed text;
+      alter table live_newsroom_items add column if not exists what_we_dont_know text;
+      alter table live_newsroom_items add column if not exists before_you_share text;
+      alter table live_newsroom_items add column if not exists editor_note text;
+      alter table live_newsroom_items add column if not exists aiishness_score integer not null default 0;
+      alter table live_newsroom_items add column if not exists claim_tracker_json jsonb not null default '[]'::jsonb;
+      alter table live_newsroom_items add column if not exists source_trail_json jsonb not null default '[]'::jsonb;
+      alter table live_newsroom_items add column if not exists correction_history_json jsonb not null default '[]'::jsonb;
+      alter table live_newsroom_items add column if not exists region_tags_json jsonb not null default '[]'::jsonb;
+      alter table live_newsroom_items add column if not exists topic_tags_json jsonb not null default '[]'::jsonb;
 
       alter table approval_queue add column if not exists item_type text;
       alter table approval_queue add column if not exists content_destination text not null default 'live_newsroom';

@@ -15,7 +15,7 @@ export const site = {
   shortDisclaimer:
     "Independent civic watch, satire, and commentary platform. Not affiliated with any political party or organization unless officially declared.",
   description:
-    "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform documenting youth voice, public issues, creator credit, viral claims, and India's unanswered files.",
+    "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform tracking Live Newsroom updates, public issues, corrections, and India's unanswered files.",
   keywords: [
     "Cockroach Watch India",
     "CWI",
@@ -26,22 +26,17 @@ export const site = {
     "CWI public issues",
     "CWI youth voice",
     "CWI digital rights",
-    "CWI creator credit",
-    "CWI public memory",
+    "CWI corrections",
     "India Unanswered Files",
     "CWI India Unanswered Files",
-    "Document Verify Amplify",
-    "The youth are not silent India is watching",
     "Cockroach Janta Party",
     "CJP",
     "Cockroach wave",
     "Gen Z politics India",
     "political satire India",
-    "civic satire India",
     "digital rights India",
     "viral claims India",
     "public issues India",
-    "creator credit",
     "citizen journalism India",
     "RTI",
     "fact check India"

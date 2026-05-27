@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, FileText, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ExternalLink, FileText } from "lucide-react";
 import {
   getLiveNewsroomFallbackItem,
   getLiveNewsroomFallbackItems,
@@ -48,6 +48,23 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
     .filter((candidate) => candidate.slug !== item.slug)
     .filter((candidate) => candidate.category === item.category || candidate.tags.some((tag) => item.tags.includes(tag)))
     .slice(0, 3);
+  const storySections = item.body.filter(
+    (section) =>
+      ![
+        "short answer",
+        "what happened",
+        "what changed",
+        "what we know",
+        "what cwi knows",
+        "what remains unclear",
+        "what cwi does not know",
+        "source trail",
+        "sources and further reading",
+        "before you share",
+        "cwi context",
+        "disclaimer"
+      ].includes(section.heading.toLowerCase())
+  );
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -71,6 +88,26 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
     mainEntityOfPage: `${site.url}/live-newsroom/${item.slug}`
   };
 
+  const blogPostingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: item.title,
+    description: item.summary,
+    url: `${site.url}/live-newsroom/${item.slug}`,
+    datePublished: item.publishedAt,
+    dateModified: item.updatedAt,
+    author: {
+      "@type": "Organization",
+      name: item.author
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Cockroach Watch India",
+      url: site.url
+    },
+    image: item.ogImage
+  };
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -84,6 +121,7 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
   return (
     <main className="bg-paper text-ink">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <article>
         <header className="border-b border-line bg-white">
@@ -118,16 +156,35 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
         </div>
 
         <div className="mx-auto grid max-w-5xl gap-8 px-4 pb-12 sm:px-6 lg:px-8">
+          {["Developing", "Reported", "Unverified", "Public Advisory"].includes(item.verificationStatus) ? (
+            <section className="rounded-[1.5rem] border border-saffron/35 bg-saffron/10 p-5 text-[#7A5200] shadow-card">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-1 h-5 w-5 shrink-0" />
+                <p className="font-bold leading-7">
+                  This is a developing update. CWI is tracking public sources and will update this page when stronger information is available.
+                </p>
+              </div>
+            </section>
+          ) : null}
+
           <InfoPanel title="Short answer" body={item.summary} />
-          <InfoPanel title="What happened" body={item.whatHappened} />
           <InfoPanel title="What changed" body={item.whatChanged} />
-          <InfoPanel title="What we know" body={item.whatWeKnow} />
-          <InfoPanel title="What remains unclear" body={item.whatRemainsUnclear} tone="warning" />
+          <InfoPanel title="What happened" body={item.whatHappened} />
+          <InfoPanel title="What CWI knows" body={item.whatWeKnow} />
+
+          <section className="rounded-[2rem] border border-saffron/35 bg-saffron/10 p-6 shadow-card">
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">What CWI does not know yet</h2>
+            <ul className="mt-4 grid gap-3 leading-7 text-ink/72">
+              {(item.whatWeDontKnow.length ? item.whatWeDontKnow : [item.whatRemainsUnclear]).map((point) => (
+                <li key={point} className="rounded-2xl border border-saffron/25 bg-white/70 p-4 font-semibold">{point}</li>
+              ))}
+            </ul>
+          </section>
 
           <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card">
             <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Why it matters</h2>
             <div className="mt-4 grid gap-5 leading-8 text-ink/72">
-              {item.body.map((section) => (
+              {(storySections.length ? storySections : [{ heading: "Why it matters", paragraphs: [item.summary] }]).map((section) => (
                 <div key={section.heading}>
                   <h3 className="font-display text-xl font-black uppercase tracking-[-0.02em] text-ink">{section.heading}</h3>
                   {section.paragraphs.map((paragraph) => (
@@ -138,12 +195,43 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
             </div>
           </section>
 
+          {item.editorNote ? (
+            <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card">
+              <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Editor&apos;s note</h2>
+              <p className="mt-4 leading-8 text-ink/72">{item.editorNote}</p>
+            </section>
+          ) : null}
+
           <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-royal" />
-              <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">CWI context</h2>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Source trail</h2>
+            <p className="mt-3 leading-7 text-ink/66">Sources are visible because CWI does not publish unsourced claims as fact.</p>
+            <div className="mt-5 grid gap-3">
+              {item.sourceTrail.length ? (
+                item.sourceTrail.map((source) => (
+                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40">
+                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{source.type} - {source.date}</p>
+                    <h3 className="mt-1 font-display text-xl font-black uppercase tracking-[-0.02em]">{source.name}</h3>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{source.supports}</p>
+                    <p className="mt-2 text-xs font-bold leading-5 text-ink/48">Does not prove: {source.doesNotProve}</p>
+                    <span className="mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-royal">
+                      Open source <ExternalLink className="h-3.5 w-3.5" />
+                    </span>
+                  </a>
+                ))
+              ) : item.sources.length ? (
+                item.sources.map((source) => (
+                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40">
+                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{source.outlet}</p>
+                    <h3 className="mt-1 font-display text-xl font-black uppercase tracking-[-0.02em]">{source.name}</h3>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{source.note}</p>
+                  </a>
+                ))
+              ) : (
+                <p className="rounded-3xl border border-saffron/35 bg-saffron/10 p-4 text-sm font-bold leading-6 text-[#8A5B00]">
+                  This item is missing visible sources and should not be treated as publish-ready until the source pack is reviewed.
+                </p>
+              )}
             </div>
-            <p className="mt-4 leading-8 text-ink/72">{item.cwiContext}</p>
           </section>
 
           {item.timeline.length ? (
@@ -162,26 +250,12 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
           ) : null}
 
           <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card">
-            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Sources and further reading</h2>
-            <p className="mt-3 leading-7 text-ink/66">Sources are visible because CWI does not publish unsourced claims as fact.</p>
-            <div className="mt-5 grid gap-3">
-              {item.sources.length ? (
-                item.sources.map((source) => (
-                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40">
-                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{source.outlet}</p>
-                    <h3 className="mt-1 font-display text-xl font-black uppercase tracking-[-0.02em]">{source.name}</h3>
-                    <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{source.note}</p>
-                    <span className="mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-royal">
-                      Open source <ExternalLink className="h-3.5 w-3.5" />
-                    </span>
-                  </a>
-                ))
-              ) : (
-                <p className="rounded-3xl border border-saffron/35 bg-saffron/10 p-4 text-sm font-bold leading-6 text-[#8A5B00]">
-                  This item is missing visible sources and should not be treated as publish-ready until the source pack is reviewed.
-                </p>
-              )}
-            </div>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Before you share</h2>
+            <ul className="mt-4 grid gap-3 leading-7 text-ink/72">
+              {item.beforeYouShare.map((point) => (
+                <li key={point} className="rounded-2xl border border-line bg-paper p-4 font-semibold">{point}</li>
+              ))}
+            </ul>
           </section>
 
           {related.length ? (

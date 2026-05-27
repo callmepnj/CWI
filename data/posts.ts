@@ -1029,37 +1029,37 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   const pullQuote = pick(
     [
       "A viral moment becomes useful only when it is documented with context, credit, and care.",
-      "The internet moves quickly; public memory needs a slower, more responsible record.",
-      "CWI treats the Cockroach wave as a civic signal, not as a rumor machine.",
+      "The internet moves quickly; the record needs dates, sources, and care.",
+      "CWI treats viral claims as claims until the source trail is clear.",
       "Satire can travel fast, but public-interest commentary still needs verification."
     ],
     index
   );
   const articleOpeners = [
-    `${seed.title} is about ${seed.focus}. Cockroach Watch India is tracking it through the CWI Archive because the subject connects public reporting, online reaction, civic satire, and the Cockroach wave.`,
+    `${seed.title} looks at ${seed.focus}. This archive item keeps the known record separate from online reaction.`,
     `The short answer: this article explains ${seed.focus} using public sources, cautious labels, and CWI's independent editorial distance from Cockroach Janta Party.`,
-    `At issue is ${seed.focus}. The CWI Archive treats this as a source-backed public-interest explainer, not as an official statement from CJP or any political organization.`
+    `At issue is ${seed.focus}. This is archived context, not an official statement from CJP or any political organization.`
   ];
   const contextParagraphs = [
     "The discussion is moving through posts, edits, short videos, comment sections, and creator-led explainers. That visibility matters, but visibility alone does not verify a claim.",
     "Online attention can make a topic feel settled before the facts are clear. Cockroach Watch India separates public reaction from confirmation, especially when screenshots, reposts, or edited clips are involved.",
-    "The strongest public signal is not only that people are sharing the topic. It is that they are using it to talk about recognition, frustration, accountability, and digital public memory."
+    "The strongest signal is not only that people are sharing the topic. It is that they are using it to talk about recognition, frustration, and accountability."
   ];
   const cwiMethodParagraphs = [
     "Cockroach Watch India uses careful labels for developing material: reportedly, publicly circulating, online discussion, internet reaction, viral trend, and public commentary. The aim is clarity, not exaggeration.",
-    "CWI's editorial standard is simple: Document. Verify. Amplify. The Archive documents the moment, checks the source trail where possible, credits creators, and explains public-interest context without impersonating Cockroach Janta Party.",
+    "The Archive records the moment, checks the source trail where possible, credits creators, and keeps CWI separate from Cockroach Janta Party.",
     "The Cockroach Watch India Archive avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
   ];
   const closingParagraphs = [
-    "What happens next depends on how creators, students, first-time voters, civic observers, and local communities continue to use the language. The youth are not silent. India is watching.",
-    "The next phase will be shaped by correction, repetition, creator credit, and whether the conversation stays attached to real public issues. Not just content. Public memory.",
-    "Readers should follow the source trail, compare claims, and treat viral certainty with caution. The Watch never sleeps, but it also does not outrun evidence."
+    "What happens next depends on how creators, students, first-time voters, and local communities continue to use the language.",
+    "The next phase will be shaped by corrections, repetition, creator credit, and whether the conversation stays attached to real public issues.",
+    "Readers should follow the source trail, compare claims, and treat viral certainty with caution."
   ];
   const sections = [
     {
       heading: "Short answer",
       paragraphs: [
-        `${pick(articleOpeners, index)} Read more source-backed updates at https://www.cockroachwatchindia.online.`,
+        `${pick(articleOpeners, index)} Current updates now belong in the Live Newsroom.`,
         "This is a Cockroach Watch India Archive article. CWI is not the official website of Cockroach Janta Party; it is an independent civic watch, satire, and commentary platform."
       ]
     },
@@ -1075,7 +1075,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
       heading: "What we know",
       paragraphs: [
         `According to public reporting and the official CJP website where relevant, the story should be read through separate layers: official self-description, media reporting, public reaction, satire, and still-developing claims. CWI does not merge those layers into one claim.`,
-        "The source-backed record shows that CJP-related attention is tied to youth frustration, digital satire, creator networks, and public reactions around the Cockroach wave. Specific facts depend on the named source and publication date."
+        "The visible record shows that CJP-related attention is tied to youth frustration, digital satire, creator networks, and public reactions. Specific facts depend on the named source and publication date."
       ]
     },
     {
@@ -1095,15 +1095,15 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     {
       heading: "CWI context",
       paragraphs: [
-        "Cockroach Watch India - CWI is tracking this topic through the CWI Archive as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. CWI's method is Document. Verify. Amplify. That means public-interest conversations need context and source attribution.",
+        "This archive item keeps the older public record visible while newer updates move to the Live Newsroom.",
         pick(cwiMethodParagraphs, index),
-        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Follow more source-backed updates on the CWI Archive at https://www.cockroachwatchindia.online/archive."
+        "This is why CWI keeps credit notes, correction requests, source links, and cautious verification labels inside the article record."
       ]
     },
     {
       heading: "CWI Note",
       paragraphs: [
-        "The CWI Archive documents public-interest updates with context, source attribution, and editorial caution. The youth are not silent. India is watching. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
+        "If you have a correction, source link, or credit request, send it through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
         pick(closingParagraphs, index),
         `Primary reference for this version: ${primarySource.outlet} - ${primarySource.name}. Additional sources are listed below for readers who want to check the reporting trail.`,
         coreDisclaimer
