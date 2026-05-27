@@ -6,6 +6,9 @@ import { site } from "@/lib/site";
 const footerLinks = [
   { label: "Home", href: "/" },
   { label: "Live Newsroom", href: "/live-newsroom" },
+  { label: "Latest CWI Updates", href: "/latest" },
+  { label: "Cockroach Watch India Guide", href: "/cockroach-watch-india" },
+  { label: "About Cockroach Watch India", href: "/about-cockroach-watch-india" },
   { label: "Archive", href: "/archive" },
   { label: "India Unanswered Files", href: "/india-unanswered-files" },
   { label: "Corrections", href: "/corrections" },

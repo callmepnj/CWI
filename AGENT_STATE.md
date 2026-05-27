@@ -283,3 +283,11 @@ Next steps:
 - Integrated support links into navbar, footer, Live Newsroom CTA, Live Newsroom detail correction block, archive detail footer, About page, Editorial Policy page, shared important routes, and static sitemap generation.
 - Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, and `npm run env:check:vercel`.
 - Remaining blocker unchanged: `npm run db:check` still fails `28P01`, so local Supabase/Postgres credentials are still rejected. This does not block the static support page, but DB-backed workflows still need corrected credentials.
+
+2026-05-27 Cockroach Watch India entity SEO pages:
+- User requested a publish-ready brand/entity SEO article targeting both spaced and unspaced searches: `Cockroach Watch India`, `CockroachWatchIndia`, `CWI`, and `@CockroachWatchIndia`, plus an about page and `/latest` interlinking.
+- Added `/cockroach-watch-india` as a news-style explainer and platform guide with the required H1, metadata, FAQ section, entity table, careful independence disclaimers, source/update caution, visible internal links, image alt text, FAQ JSON-LD, Organization JSON-LD, WebSite JSON-LD, Breadcrumb JSON-LD, and NewsArticle JSON-LD.
+- Added `/about-cockroach-watch-india` as a concise entity/about page and `/latest` as a Live Newsroom-backed latest updates page. The three routes link to each other and to Live Newsroom/submit without inventing updates.
+- Added entity terms to `site.keywords`, linked the new routes from the homepage, existing About page, navbar More menu, footer, shared SEO route list, static sitemap generator, and regenerated `public/sitemap.xml`.
+- Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, `npm run env:check:vercel`, and `git diff --check`. Build output includes `/cockroach-watch-india`, `/about-cockroach-watch-india`, and `/latest`.
+- Remaining blocker unchanged: `npm run db:check` still fails `28P01`, so local DB credentials are still rejected. These new pages are static/fallback-safe, but DB-backed workflows still need valid Supabase/Postgres credentials.

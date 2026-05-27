@@ -18,7 +18,12 @@ export const site = {
     "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform tracking Live Newsroom updates, public issues, corrections, and India's unanswered files.",
   keywords: [
     "Cockroach Watch India",
+    "CockroachWatchIndia",
+    "cockroach watch india",
+    "cockroachwatchindia",
+    "@CockroachWatchIndia",
     "CWI",
+    "CWI India",
     "CWI Live Newsroom",
     "CWI Archive",
     "CWI articles",

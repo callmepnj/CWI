@@ -158,6 +158,17 @@ export default async function HomePage() {
             </Card>
           ))}
         </div>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button asChild variant="outline">
+            <Link href="/cockroach-watch-india">Cockroach Watch India guide</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/about-cockroach-watch-india">About Cockroach Watch India</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/latest">Latest CWI updates</Link>
+          </Button>
+        </div>
       </Section>
 
       <Section eyebrow="Public Advisories" title="Public Advisories" subtitle="Verify-before-sharing notes, developing claims, creator credit requests, and platform restriction context.">

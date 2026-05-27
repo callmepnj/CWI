@@ -19,6 +19,9 @@ const primaryItems = [
 
 const moreItems = [
   { label: "About", href: "/about" },
+  { label: "CWI Guide", href: "/cockroach-watch-india" },
+  { label: "About Cockroach Watch India", href: "/about-cockroach-watch-india" },
+  { label: "Latest", href: "/latest" },
   { label: "Corrections", href: "/corrections" },
   { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Contact", href: "/contact" },

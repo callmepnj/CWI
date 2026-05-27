@@ -122,6 +122,9 @@ export default function AboutPage() {
             <Button asChild variant="outline">
               <Link href="/support">Support independent CWI work</Link>
             </Button>
+            <Button asChild variant="outline">
+              <Link href="/about-cockroach-watch-india">About Cockroach Watch India</Link>
+            </Button>
           </div>
         </Card>
         <div className="mt-8">
