@@ -15,6 +15,7 @@ const staticRoutes = [
   "/watch",
   "/watch/manipur-crisis",
   "/live-newsroom",
+  "/live-newsroom/neet-ug-2026-re-exam-stress-cbse-revaluation-student-help",
   "/latest",
   "/india-unanswered-files",
   "/archive",

@@ -291,3 +291,11 @@ Next steps:
 - Added entity terms to `site.keywords`, linked the new routes from the homepage, existing About page, navbar More menu, footer, shared SEO route list, static sitemap generator, and regenerated `public/sitemap.xml`.
 - Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, `npm run env:check:vercel`, and `git diff --check`. Build output includes `/cockroach-watch-india`, `/about-cockroach-watch-india`, and `/latest`.
 - Remaining blocker unchanged: `npm run db:check` still fails `28P01`, so local DB credentials are still rejected. These new pages are static/fallback-safe, but DB-backed workflows still need valid Supabase/Postgres credentials.
+
+2026-05-27 NEET/CBSE student support Live Newsroom article:
+- User asked to upload the latest NEET UG 2026 re-exam stress, CBSE re-evaluation/scanned answer sheet, and student mental health support news article to the website.
+- Added a source-backed public advisory fallback item at `/live-newsroom/neet-ug-2026-re-exam-stress-cbse-revaluation-student-help`, so it appears in Live Newsroom, `/latest`, and RSS even if the database is unavailable.
+- Article uses official NTA NEET, NTA public notices, CBSE official notices, CBSE OSM circular, PIB Tele MANAS, and one carefully handled news-report context source. It avoids sensational wording and does not include personal details, methods, places, images, or social posts related to any student death.
+- Added the article URL to the static sitemap generator and regenerated `public/sitemap.xml`.
+- Verification passed: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run validate:unanswered-files`, `npm run env:check`, `npm run env:check:vercel`, `git diff --check`, and local production smoke for the article URL, `/live-newsroom`, `/latest`, `/rss.xml`, and `/sitemap.xml`.
+- Remaining blocker unchanged: `npm run db:check` still fails `28P01`, so local DB credentials are still rejected. The article is fallback/static-safe and does not depend on DB publication.

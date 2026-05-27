@@ -359,6 +359,305 @@ export async function getPublishedLiveNewsroomItem(slug: string) {
   return result.rows[0] ? rowToLiveNewsroomItem(result.rows[0]) : null;
 }
 
+const neetCbseStudentHelpItem: LiveNewsroomItem = {
+  id: "cwi-live-neet-ug-2026-re-exam-stress-cbse-revaluation-student-help",
+  title: "NEET UG 2026 Re-Exam Stress: Official Updates, CBSE Re-Evaluation Issues and What Students Should Do Now",
+  slug: "neet-ug-2026-re-exam-stress-cbse-revaluation-student-help",
+  category: "Public Advisory",
+  type: "public_advisory",
+  summary:
+    "NEET UG 2026 aspirants and CBSE board students are facing stress around re-exam updates, answer-sheet access, re-evaluation confusion and misinformation. Students should rely on official NTA and CBSE notices, keep records, and seek support if exam stress becomes heavy.",
+  body: [
+    {
+      heading: "Latest NEET UG 2026 official updates",
+      paragraphs: [
+        "The official NTA NEET website has listed notices and activity links related to NEET UG 2026, including re-examination, refund of examination fee, provisional answer keys, present address and exam city updation, and confirmation page download.",
+        "Students should check neet.nta.nic.in regularly for the latest official notice. Do not depend on screenshots unless the same notice can be opened directly from the official NTA NEET website or an official NTA link."
+      ]
+    },
+    {
+      heading: "Why NEET students are stressed",
+      paragraphs: [
+        "NEET is not a one-day exam for most aspirants. Many students prepare for years, some repeat the exam, and families often spend heavily on coaching, hostel fees, travel and study material.",
+        "Uncertainty around a re-exam can affect sleep, concentration and confidence. Social media misinformation can make this worse because fake dates, edited circulars and unverified claims travel faster than official clarifications.",
+        "Students should not treat rumours as official updates. During uncertainty, the aim should be to protect routine, revision and mental health."
+      ]
+    },
+    {
+      heading: "Responsible note on student distress",
+      paragraphs: [
+        "Some news reports have linked the NEET controversy and re-exam uncertainty with severe distress among aspirants, including reported student deaths. This should be discussed carefully, without details, images, blame or speculation.",
+        "No exam is bigger than a student's life. Students feeling overwhelmed should speak to a parent, teacher, friend, counsellor, or call a mental health helpline."
+      ]
+    },
+    {
+      heading: "CBSE re-evaluation and scanned answer sheet issues",
+      paragraphs: [
+        "CBSE Class 10 and Class 12 students are also dealing with post-result stress. Students and parents have reported concerns such as portal crashes, payment failures, unclear scanned answer sheets, missing or incorrect answer-sheet concerns, fake circulars, deadline confusion and anxiety after result declaration.",
+        "The official CBSE website has posted notices related to extension of date for obtaining scanned copies of Class XII answer books, post-result declaration facilities, Know About On Screen Marking, and Class XII 2026 result-related updates.",
+        "Students should use only cbse.gov.in and official CBSE portals. If a circular is not available on the official CBSE website, students should verify it through their school before taking action."
+      ]
+    },
+    {
+      heading: "What is CBSE OSM?",
+      paragraphs: [
+        "CBSE OSM means On Screen Marking. In this system, answer books are scanned and evaluated digitally by examiners on a computer screen.",
+        "It does not mean computers check answers automatically. Teachers and examiners still evaluate the answers. CBSE's official OSM circular says the Board decided to introduce On-Screen Marking for evaluation of Class XII answer books beginning with the 2026 examinations."
+      ]
+    },
+    {
+      heading: "Student checklist for NEET aspirants",
+      paragraphs: [
+        "Check only the official NTA NEET website. Save PDFs or screenshots of official notices. Do not trust WhatsApp forwards. Keep admit card and application details ready. Make a short revision plan instead of restarting everything.",
+        "Sleep properly before study sessions. Avoid comparing marks constantly. Talk to someone if anxiety becomes too much. Contact NTA helpdesk only through official channels."
+      ]
+    },
+    {
+      heading: "Student checklist for CBSE students",
+      paragraphs: [
+        "Check official CBSE notices. Keep roll number and school details ready. Save payment receipts. Do not submit duplicate requests unless officially advised.",
+        "If an answer sheet is unclear, follow the official process. Avoid fake circulars and edited screenshots. Discuss serious concerns with school authorities."
+      ]
+    },
+    {
+      heading: "Mental health help for students",
+      paragraphs: [
+        "If a student feels hopeless, panicked, unable to sleep, or has thoughts of self-harm, they should immediately contact a trusted adult or professional support.",
+        "Tele MANAS is India's national tele-mental health support service. The helpline numbers are 14416 and 1800-891-4416. PIB says Tele MANAS provides 24x7 tele-mental health support and counselling access across India.",
+        "If there is immediate danger, contact local emergency services or go to the nearest hospital."
+      ]
+    },
+    {
+      heading: "For parents",
+      paragraphs: [
+        "Parents should avoid comparing their child with others. A line like everything depends on this exam can increase fear. Instead, help the student verify official updates, organise documents and maintain a simple routine.",
+        "Watch for changes in sleep, appetite, isolation, panic, hopelessness or sudden withdrawal. Encourage breaks, counselling and honest conversation. Remind the child that exams can be repeated, but life cannot."
+      ]
+    },
+    {
+      heading: "For schools and coaching centres",
+      paragraphs: [
+        "Schools and coaching centres should share only official notices. They should stop rumour-spreading, provide counselling support, create small revision support groups and train teachers to identify distress signs.",
+        "Institutions should also display Tele MANAS helpline information clearly. During exam uncertainty, communication should be calm, verified and student-first."
+      ]
+    },
+    {
+      heading: "FAQ",
+      paragraphs: [
+        "Where can students check official NEET UG 2026 updates? Students should check neet.nta.nic.in, the official NTA NEET website.",
+        "What should students do if they are confused about NEET re-exam updates? They should wait for official NTA notices, save verified PDFs and avoid acting on social media rumours.",
+        "Where can CBSE students check re-evaluation and scanned answer sheet notices? Students should check cbse.gov.in and official CBSE portals.",
+        "What is CBSE OSM? OSM means On Screen Marking. Answer books are scanned and evaluated digitally by examiners on a screen.",
+        "What should students do if exam stress becomes overwhelming? They should speak to a trusted adult, school counsellor or mental health professional. They can also call Tele MANAS at 14416 or 1800-891-4416.",
+        "What should parents avoid saying during exam uncertainty? Parents should avoid comparison, blame and statements suggesting that one exam decides the child's whole life."
+      ]
+    },
+    {
+      heading: "Conclusion",
+      paragraphs: [
+        "Students should follow official updates, avoid rumours, take one step at a time, and seek help when stress becomes too heavy. No exam result or re-exam is worth risking mental health."
+      ]
+    }
+  ],
+  verificationStatus: "Source-backed",
+  riskLevel: "Medium",
+  sourceCount: 7,
+  sources: [
+    {
+      name: "NTA NEET official website",
+      outlet: "National Testing Agency",
+      url: "https://neet.nta.nic.in/",
+      type: "Official source",
+      note: "Lists NEET UG 2026 latest news, public notices and candidate activity links."
+    },
+    {
+      name: "NTA NEET Public Notices",
+      outlet: "National Testing Agency",
+      url: "https://neet.nta.nic.in/public-notices/",
+      type: "Official source",
+      note: "Lists official NEET UG 2026 public notices including re-examination and answer-key notices."
+    },
+    {
+      name: "Present Address and Exam City Updation Window for NEET(UG) 2026",
+      outlet: "National Testing Agency",
+      url: "https://neet.nta.nic.in/present-address-and-exam-city-update-window-for-neetug-2026/",
+      type: "Official source",
+      note: "Official NTA page for present address and exam city updation window."
+    },
+    {
+      name: "CBSE official website",
+      outlet: "Central Board of Secondary Education",
+      url: "https://www.cbse.gov.in/cbsenew/cbse.html",
+      type: "Official source",
+      note: "Lists CBSE notices on scanned copies, post-result facilities, OSM and result-related updates."
+    },
+    {
+      name: "Introduction of On-Screen Marking for Class XII Examinations",
+      outlet: "Central Board of Secondary Education",
+      url: "https://www.cbse.gov.in/cbsenew/documents/OSM_Class%20XII_09022026.pdf",
+      type: "Official source",
+      note: "CBSE circular explaining the introduction of On-Screen Marking for Class XII answer books."
+    },
+    {
+      name: "Tele-MANAS initiative launch",
+      outlet: "Press Information Bureau",
+      url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1866498",
+      type: "Official source",
+      note: "PIB release describing Tele MANAS and the 14416 national tele-mental health helpline."
+    },
+    {
+      name: "NEET re-exam stress takes emotional toll on aspirants",
+      outlet: "Times of India",
+      url: "https://timesofindia.indiatimes.com/city/jaipur/neet-ug-cancellation-re-exam-stress-takes-emotional-toll-on-aspirants-in-kota-jaipur-and-sikar/amp_articleshow/131145260.cms",
+      type: "News report",
+      note: "Used only for broad context on stress among aspirants; personal details are intentionally not repeated."
+    }
+  ],
+  whatHappened:
+    "NEET UG 2026 re-exam notices, answer-key updates, fee refund activity and exam city/address updates have increased uncertainty for aspirants. At the same time, CBSE students are navigating scanned answer sheet and post-result processes after Class XII result-related notices.",
+  whatChanged:
+    "CWI is publishing this student-first guide after official NTA and CBSE notices appeared alongside growing public concern about exam stress, misinformation and post-result confusion.",
+  whatWeKnow:
+    "Official NTA pages list NEET UG 2026 notices and candidate activity links. CBSE's official site lists scanned answer book, post-result facility and OSM notices. PIB lists Tele MANAS as a 24x7 tele-mental health support service with helpline 14416 and 1800-891-4416.",
+  whatWeDontKnow: [
+    "Whether any future NEET UG 2026 timeline changes will be issued by NTA.",
+    "Whether individual CBSE portal or scanned answer sheet complaints have been resolved in specific cases.",
+    "Whether social media claims about new dates or procedures are genuine unless they appear on official portals."
+  ],
+  whatRemainsUnclear:
+    "Students still need to monitor official NTA and CBSE portals for current instructions. CWI is not treating screenshots, forwards or unofficial claims as updates.",
+  timeline: [
+    {
+      date: "09 Feb 2026",
+      title: "CBSE OSM circular",
+      summary: "CBSE issued a circular on introducing On-Screen Marking for Class XII answer books beginning with the 2026 examinations."
+    },
+    {
+      date: "12 May 2026",
+      title: "NTA NEET public notices listed",
+      summary: "The NTA NEET site listed public notices related to NEET UG 2026, including re-examination and fee refund information."
+    },
+    {
+      date: "15 May 2026",
+      title: "NEET exam city/address update page",
+      summary: "NTA published the present address and exam city updation window page for NEET UG 2026."
+    },
+    {
+      date: "May 2026",
+      title: "CBSE post-result notices",
+      summary: "CBSE listed notices related to scanned copies of Class XII answer books and post-result declaration facilities."
+    }
+  ],
+  beforeYouShare: [
+    "Check whether the NEET or CBSE notice opens from the official website.",
+    "Do not forward screenshots without verifying the source link.",
+    "Do not share personal details, roll numbers or private student information publicly.",
+    "If a student is distressed, share help resources instead of rumours."
+  ],
+  editorNote:
+    "CWI is keeping this update focused on official links, student safety and practical next steps. Details about reported student deaths are intentionally not repeated.",
+  aiishnessScore: 12,
+  claimTracker: [
+    {
+      claim: "NTA has listed NEET UG 2026 public notices and candidate activity links.",
+      topic: "NEET UG 2026",
+      firstSeen: "2026-05-27",
+      source: "NTA NEET official website",
+      status: "Verified",
+      evidenceLevel: "Official source",
+      cwiNote: "Students should check neet.nta.nic.in for current instructions."
+    },
+    {
+      claim: "CBSE introduced On-Screen Marking for Class XII answer books beginning with the 2026 examinations.",
+      topic: "CBSE OSM 2026",
+      firstSeen: "2026-02-09",
+      source: "CBSE OSM circular",
+      status: "Verified",
+      evidenceLevel: "Official source",
+      cwiNote: "OSM means digital evaluation by examiners on screen, not automatic computer marking."
+    },
+    {
+      claim: "Tele MANAS provides national tele-mental health support through 14416 and 1800-891-4416.",
+      topic: "Student mental health",
+      firstSeen: "2022-10-10",
+      source: "PIB Tele-MANAS release",
+      status: "Verified",
+      evidenceLevel: "Official source",
+      cwiNote: "Students in distress should contact trusted adults and professional support."
+    }
+  ],
+  sourceTrail: [
+    {
+      name: "NTA NEET official website",
+      type: "Official source",
+      date: "May 2026",
+      url: "https://neet.nta.nic.in/",
+      supports: "Shows latest NEET UG 2026 notices and candidate activity links.",
+      doesNotProve: "It does not validate social media screenshots unless they match the official site."
+    },
+    {
+      name: "NTA NEET Public Notices",
+      type: "Official source",
+      date: "May 2026",
+      url: "https://neet.nta.nic.in/public-notices/",
+      supports: "Shows official public notice titles related to NEET UG 2026.",
+      doesNotProve: "It does not prove claims not listed in official notices."
+    },
+    {
+      name: "CBSE official website",
+      type: "Official source",
+      date: "May 2026",
+      url: "https://www.cbse.gov.in/cbsenew/cbse.html",
+      supports: "Shows CBSE notices on scanned copies, post-result facilities and OSM.",
+      doesNotProve: "It does not resolve individual student complaints unless CBSE issues case-specific instructions."
+    },
+    {
+      name: "CBSE OSM circular",
+      type: "Official source",
+      date: "09 Feb 2026",
+      url: "https://www.cbse.gov.in/cbsenew/documents/OSM_Class%20XII_09022026.pdf",
+      supports: "Explains On-Screen Marking for Class XII answer books.",
+      doesNotProve: "It does not mean computers automatically evaluate subjective answers."
+    },
+    {
+      name: "PIB Tele-MANAS release",
+      type: "Official source",
+      date: "10 Oct 2022",
+      url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=1866498",
+      supports: "Confirms the Tele MANAS helpline number 14416 and 24x7 support model.",
+      doesNotProve: "It does not replace emergency medical or local emergency services."
+    }
+  ],
+  correctionHistory: [],
+  regionTags: ["National"],
+  topicTags: ["Education", "NEET UG 2026", "CBSE", "Student mental health", "Public Advisory"],
+  cwiContext:
+    "CWI is treating this as a student-safety and source-verification advisory. The focus is official links, practical checklists and mental health support, not panic.",
+  tags: [
+    "NEET UG 2026",
+    "NEET re-exam",
+    "NTA NEET",
+    "CBSE re-evaluation",
+    "CBSE scanned answer sheet",
+    "CBSE OSM",
+    "student mental health",
+    "Tele MANAS"
+  ],
+  heroImage: "/brand/banner.png",
+  thumbnailImage: "/brand/banner.png",
+  ogImage: "/brand/banner.png",
+  altText: "NEET UG 2026 re-exam stress and CBSE re-evaluation support guide for Indian students and parents",
+  publishedAt: "2026-05-27",
+  updatedAt: "2026-05-27",
+  author: "Cockroach Watch India Editorial Desk",
+  relatedItems: ["cockroach-watch-india", "about-cockroach-watch-india", "manipur-violence"],
+  seoTitle: "NEET UG 2026 Re-Exam Stress: NTA Updates, CBSE Re-Evaluation Issues & Student Help",
+  seoDescription:
+    "NEET UG 2026 re-exam and CBSE re-evaluation updates have increased stress among students. Check official NTA and CBSE updates, student checklist, and mental health help resources.",
+  canonicalUrl: `${site.url}/live-newsroom/neet-ug-2026-re-exam-stress-cbse-revaluation-student-help`,
+  status: "published"
+};
+
 export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
   const watchItems = posts.slice(0, 12).map((post) => ({
     id: `watch-${post.slug}`,
@@ -468,7 +767,7 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
     };
   });
 
-  return [...watchItems, ...unansweredItems].slice(0, limit);
+  return [neetCbseStudentHelpItem, ...watchItems, ...unansweredItems].slice(0, limit);
 }
 
 export function getLiveNewsroomFallbackItem(slug: string) {
