@@ -25,7 +25,6 @@ const moreItems = [
   { label: "Corrections", href: "/corrections" },
   { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Contact", href: "/contact" },
-  { label: "Watch", href: "/watch" },
   { label: "Issues", href: "/issues" },
   { label: "Charter", href: "/charter" },
   { label: "Youth Voice", href: "/youth-voice" },
@@ -58,7 +57,7 @@ export function Navbar() {
             <span className="block font-display text-lg font-black uppercase leading-none tracking-tight text-ink sm:text-xl">
               Cockroach Watch
             </span>
-            <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.22em] text-royal">
+            <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.22em] text-[#1E6B4A]">
               India / Civic Watch
             </span>
           </span>
@@ -70,8 +69,8 @@ export function Navbar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink/70 transition hover:bg-skywash hover:text-royal",
-                isActive(item.href) && "bg-skywash text-royal"
+                "rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink/70 transition hover:bg-[#E9F4E8] hover:text-[#1E6B4A]",
+                isActive(item.href) && "bg-[#E9F4E8] text-[#1E6B4A]"
               )}
             >
               {item.label}
@@ -81,8 +80,8 @@ export function Navbar() {
             <button
               type="button"
               className={cn(
-                "inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink/70 transition hover:bg-skywash hover:text-royal",
-                moreActive && "bg-skywash text-royal"
+                "inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink/70 transition hover:bg-[#E9F4E8] hover:text-[#1E6B4A]",
+                moreActive && "bg-[#E9F4E8] text-[#1E6B4A]"
               )}
               onClick={() => setMoreOpen((value) => !value)}
               onBlur={() => setTimeout(() => setMoreOpen(false), 120)}
@@ -96,8 +95,8 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "block rounded-2xl px-4 py-3 text-sm font-bold text-ink/75 transition hover:bg-skywash hover:text-royal",
-                      isActive(item.href) && "bg-skywash text-royal"
+                      "block rounded-2xl px-4 py-3 text-sm font-bold text-ink/75 transition hover:bg-[#E9F4E8] hover:text-[#1E6B4A]",
+                      isActive(item.href) && "bg-[#E9F4E8] text-[#1E6B4A]"
                     )}
                     onClick={() => setMoreOpen(false)}
                   >
@@ -135,7 +134,7 @@ export function Navbar() {
                 href={item.href}
                 className={cn(
                   "rounded-2xl bg-paper px-4 py-3 text-sm font-black uppercase tracking-[0.12em] text-ink",
-                  isActive(item.href) && "bg-skywash text-royal ring-1 ring-royal/15"
+                  isActive(item.href) && "bg-[#E9F4E8] text-[#1E6B4A] ring-1 ring-[#1E6B4A]/15"
                 )}
                 onClick={() => setOpen(false)}
               >
@@ -151,8 +150,8 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "rounded-xl px-4 py-2.5 text-sm font-bold text-ink/65 transition hover:bg-skywash hover:text-royal",
-                    isActive(item.href) && "bg-skywash text-royal"
+                    "rounded-xl px-4 py-2.5 text-sm font-bold text-ink/65 transition hover:bg-[#E9F4E8] hover:text-[#1E6B4A]",
+                    isActive(item.href) && "bg-[#E9F4E8] text-[#1E6B4A]"
                   )}
                   onClick={() => setOpen(false)}
                 >

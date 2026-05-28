@@ -72,6 +72,12 @@ export type LiveNewsroomItem = {
   timeline: LiveNewsroomTimelineItem[];
   beforeYouShare: string[];
   editorNote: string;
+  isLeadStory: boolean;
+  priorityScore: number;
+  lastCheckedAt: string;
+  sectionTags: string[];
+  displayImage: string;
+  isArchivedContext: boolean;
   aiishnessScore: number;
   claimTracker: LiveNewsroomClaimTrackerItem[];
   sourceTrail: LiveNewsroomSourceTrailItem[];
@@ -114,6 +120,12 @@ type LiveNewsroomRow = {
   timeline_json: unknown;
   before_you_share: string | null;
   editor_note: string | null;
+  is_lead_story: boolean | null;
+  priority_score: number | null;
+  last_checked_at: string | null;
+  section_tags_json: unknown;
+  display_image: string | null;
+  is_archived_context: boolean | null;
   aiishness_score: number | null;
   claim_tracker_json: unknown;
   source_trail_json: unknown;
@@ -322,13 +334,14 @@ export async function getPublishedLiveNewsroomItems(limit = 80) {
       select id::text, title, slug, category, type, summary, body, verification_status,
         risk_level, source_count, sources_json, what_happened, what_changed, what_we_know,
         what_we_dont_know, what_remains_unclear, timeline_json, before_you_share,
-        editor_note, aiishness_score, claim_tracker_json, source_trail_json,
+        editor_note, is_lead_story, priority_score, last_checked_at::text, section_tags_json,
+        display_image, is_archived_context, aiishness_score, claim_tracker_json, source_trail_json,
         correction_history_json, region_tags_json, topic_tags_json, cwi_context, tags_json, hero_image,
         thumbnail_image, og_image, alt_text, published_at::text, updated_at::text,
         author, related_items_json, seo_title, seo_description, canonical_url, status
       from live_newsroom_items
       where status = 'published'
-      order by published_at desc
+      order by is_lead_story desc, priority_score desc, published_at desc
       limit $1
     `,
     [limit]
@@ -344,7 +357,8 @@ export async function getPublishedLiveNewsroomItem(slug: string) {
       select id::text, title, slug, category, type, summary, body, verification_status,
         risk_level, source_count, sources_json, what_happened, what_changed, what_we_know,
         what_we_dont_know, what_remains_unclear, timeline_json, before_you_share,
-        editor_note, aiishness_score, claim_tracker_json, source_trail_json,
+        editor_note, is_lead_story, priority_score, last_checked_at::text, section_tags_json,
+        display_image, is_archived_context, aiishness_score, claim_tracker_json, source_trail_json,
         correction_history_json, region_tags_json, topic_tags_json, cwi_context, tags_json, hero_image,
         thumbnail_image, og_image, alt_text, published_at::text, updated_at::text,
         author, related_items_json, seo_title, seo_description, canonical_url, status
@@ -556,6 +570,12 @@ const neetCbseStudentHelpItem: LiveNewsroomItem = {
   ],
   editorNote:
     "CWI is keeping this update focused on official links, student safety and practical next steps. Details about reported student deaths are intentionally not repeated.",
+  isLeadStory: true,
+  priorityScore: 95,
+  lastCheckedAt: "2026-05-27",
+  sectionTags: ["Lead Story", "Public Advisory", "Education"],
+  displayImage: "/brand/banner.png",
+  isArchivedContext: false,
   aiishnessScore: 12,
   claimTracker: [
     {
@@ -679,6 +699,12 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
     timeline: [{ date: post.date, title: "Archive publication", summary: post.summary }],
     beforeYouShare: defaultBeforeYouShare,
     editorNote: "",
+    isLeadStory: false,
+    priorityScore: 20,
+    lastCheckedAt: post.updatedAt,
+    sectionTags: ["Archive"],
+    displayImage: post.ogImage,
+    isArchivedContext: true,
     aiishnessScore: 0,
     claimTracker: buildClaimTracker(post.title, post.category, normalizeStatus(post.verificationStatus), post.sources.length, post.sources, sectionText(post.sections, "What remains unclear"), post.date),
     sourceTrail: buildSourceTrail(post.sources, [{ date: post.date, title: "Archive publication", summary: post.summary }], post.title),
@@ -732,6 +758,12 @@ export function getLiveNewsroomFallbackItems(limit = 80): LiveNewsroomItem[] {
       timeline: file.timeline.slice(0, 8).map((item) => ({ date: item.date, title: item.title, summary: item.summary })),
       beforeYouShare: defaultBeforeYouShare,
       editorNote: "CWI keeps this file open because official records, court updates, and public reporting can change the picture over time.",
+      isLeadStory: false,
+      priorityScore: 70,
+      lastCheckedAt: "2026-05-26",
+      sectionTags: ["India Unanswered Files", file.category],
+      displayImage: file.thumbnailImage || visual.src,
+      isArchivedContext: false,
       aiishnessScore: 0,
       claimTracker: buildClaimTracker(file.title, "India Unanswered Files", "Source-backed", file.sourceCount, file.sources.map((source) => ({
         name: source.name,
@@ -799,6 +831,12 @@ function rowToLiveNewsroomItem(row: LiveNewsroomRow): LiveNewsroomItem {
     timeline: normalizeTimeline(row.timeline_json),
     beforeYouShare: normalizeTextList(row.before_you_share).length ? normalizeTextList(row.before_you_share) : defaultBeforeYouShare,
     editorNote: asText(row.editor_note),
+    isLeadStory: Boolean(row.is_lead_story),
+    priorityScore: Number(row.priority_score ?? 50),
+    lastCheckedAt: dateOnly(row.last_checked_at || row.updated_at || row.published_at),
+    sectionTags: normalizeStringArray(row.section_tags_json),
+    displayImage: asText(row.display_image, asText(row.thumbnail_image, asText(row.hero_image, `${site.url}/opengraph-image`))),
+    isArchivedContext: Boolean(row.is_archived_context),
     aiishnessScore: Number(row.aiishness_score ?? 0),
     claimTracker: normalizeClaimTracker(row.claim_tracker_json, row.title, asText(row.category, "Live Newsroom"), normalizeStatus(row.verification_status), Number(row.source_count ?? 0), extractSources(row.sources_json), asText(row.what_remains_unclear), dateOnly(row.published_at)),
     sourceTrail: normalizeSourceTrail(row.source_trail_json, extractSources(row.sources_json), normalizeTimeline(row.timeline_json), row.title),

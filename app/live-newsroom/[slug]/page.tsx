@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps) {
     title: `${item.title} - CWI Live Newsroom | Cockroach Watch India`,
     description:
       item.seoDescription ||
-      `Cockroach Watch India Live Newsroom explains ${item.title}, what is known, what remains unclear, and why CWI is tracking this public-interest update.`,
+      `Cockroach Watch India Live Newsroom explains ${item.title}, what is known, what remains unclear, and what readers should check before sharing.`,
     path: `/live-newsroom/${item.slug}`,
     keywords: ["CWI Live Newsroom", "Cockroach Watch India", "CWI", item.category, ...item.tags]
   });
@@ -119,14 +119,21 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
   };
 
   return (
-    <main className="bg-paper text-ink">
+    <main
+      className="text-ink"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(246,241,231,0.98), rgba(251,248,240,0.98)), radial-gradient(circle at 1px 1px, rgba(90,59,36,0.08) 1px, transparent 0)",
+        backgroundSize: "auto, 18px 18px"
+      }}
+    >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <article>
-        <header className="border-b border-line bg-white">
+        <header className="border-b border-[#DED6C7] bg-[#F9F5EC]">
           <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-            <Link href="/live-newsroom" className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.1em] text-royal">
+            <Link href="/live-newsroom" className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.1em] text-[#1E6B4A]">
               <ArrowLeft className="h-4 w-4" />
               Back to Live Newsroom
             </Link>
@@ -208,20 +215,20 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
             <div className="mt-5 grid gap-3">
               {item.sourceTrail.length ? (
                 item.sourceTrail.map((source) => (
-                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40">
-                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{source.type} - {source.date}</p>
+                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-[#1E6B4A]/40">
+                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-[#1E6B4A]">{source.type} - {source.date}</p>
                     <h3 className="mt-1 font-display text-xl font-black uppercase tracking-[-0.02em]">{source.name}</h3>
                     <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{source.supports}</p>
                     <p className="mt-2 text-xs font-bold leading-5 text-ink/48">Does not prove: {source.doesNotProve}</p>
-                    <span className="mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-royal">
+                    <span className="mt-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.1em] text-[#1E6B4A]">
                       Open source <ExternalLink className="h-3.5 w-3.5" />
                     </span>
                   </a>
                 ))
               ) : item.sources.length ? (
                 item.sources.map((source) => (
-                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40">
-                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{source.outlet}</p>
+                  <a key={`${source.name}-${source.url}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-3xl border border-line bg-paper p-4 transition hover:border-[#1E6B4A]/40">
+                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-[#1E6B4A]">{source.outlet}</p>
                     <h3 className="mt-1 font-display text-xl font-black uppercase tracking-[-0.02em]">{source.name}</h3>
                     <p className="mt-2 text-sm font-semibold leading-6 text-ink/64">{source.note}</p>
                   </a>
@@ -240,7 +247,7 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
               <div className="mt-5 grid gap-3">
                 {item.timeline.map((event, index) => (
                   <div key={`${event.date}-${index}`} className="rounded-3xl border border-line bg-paper p-4">
-                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{event.date}</p>
+                    <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-[#1E6B4A]">{event.date}</p>
                     <h3 className="mt-1 font-display text-xl font-black uppercase">{event.title}</h3>
                     <p className="mt-2 text-sm font-semibold leading-6 text-ink/66">{event.summary}</p>
                   </div>
@@ -263,8 +270,8 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
               <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Live Newsroom updates</h2>
               <div className="mt-5 grid gap-4 md:grid-cols-3">
                 {related.map((candidate) => (
-                  <Link key={candidate.slug} href={`/live-newsroom/${candidate.slug}`} className="rounded-3xl border border-line bg-paper p-4 transition hover:border-royal/40">
-                    <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.12em] text-royal">{candidate.category}</p>
+                  <Link key={candidate.slug} href={`/live-newsroom/${candidate.slug}`} className="rounded-3xl border border-line bg-paper p-4 transition hover:border-[#1E6B4A]/40">
+                    <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#1E6B4A]">{candidate.category}</p>
                     <h3 className="mt-2 font-display text-lg font-black uppercase leading-tight">{candidate.title}</h3>
                   </Link>
                 ))}
@@ -272,12 +279,12 @@ export default async function LiveNewsroomDetailPage({ params }: PageProps) {
             </section>
           ) : null}
 
-          <section className="rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102A63] to-royal p-7 text-white shadow-soft">
-            <FileText className="h-8 w-8 text-saffron" />
+          <section className="rounded-[2rem] border border-[#1E6B4A]/30 bg-[#1E6B4A] p-7 text-white shadow-soft">
+            <FileText className="h-8 w-8 text-[#F6C15D]" />
             <h2 className="mt-4 font-display text-3xl font-black uppercase tracking-[-0.03em]">Submit correction or report</h2>
             <p className="mt-3 leading-8 text-white/76">Seen a source, correction, or public-interest update? Send it to CWI with context and dates.</p>
             <div className="mt-5 flex flex-wrap gap-3">
-              <Link href="/submit" className="inline-flex rounded-full bg-saffron px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink">
+              <Link href="/submit" className="inline-flex rounded-full bg-[#F6C15D] px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink">
                 Submit Update
               </Link>
               <Link href="/support" className="inline-flex rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-black uppercase tracking-[0.1em] text-white">
@@ -309,7 +316,7 @@ function InfoPanel({ title, body, tone = "normal" }: { title: string; body: stri
 
 function Badge({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full bg-royal/10 px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-royal ring-1 ring-royal/15">
+    <span className="rounded-full bg-[#E9F4E8] px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.12em] text-[#1E6B4A] ring-1 ring-[#1E6B4A]/15">
       {children}
     </span>
   );

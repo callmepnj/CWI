@@ -513,6 +513,33 @@ export async function runAgentAction(action: string) {
     return createNewsIntelligencePack("timeline");
   }
 
+  if (
+    [
+      "set-lead-story",
+      "live-update-rail",
+      "correction-log",
+      "archive-context",
+      "priority-score",
+      "hide-live-newsroom",
+      "feature-unanswered-file",
+      "send-to-approval"
+    ].includes(action)
+  ) {
+    const messageMap: Record<string, string> = {
+      "set-lead-story": "Lead Story review pack",
+      "live-update-rail": "Live Update Rail review pack",
+      "correction-log": "Correction Log review pack",
+      "archive-context": "Archive Context review pack",
+      "priority-score": "Priority Score review pack",
+      "hide-live-newsroom": "Hide From Live Newsroom review pack",
+      "feature-unanswered-file": "India Unanswered Files feature review pack",
+      "send-to-approval": "Live Newsroom approval routing pack"
+    };
+    const packType = action === "correction-log" ? "timeline" : action === "feature-unanswered-file" ? "source_trail" : "watch_brief";
+    const result = await createNewsIntelligencePack(packType as "watch_brief" | "source_trail" | "timeline");
+    return { ...result, message: `${messageMap[action]} sent to approval queue.` };
+  }
+
   if (action === "stop-non-essential") {
     await getPool().query(`update agents set status = 'paused', updated_at = now() where id not in ('command-ai', 'system-health-ai', 'publish-ai', 'memory-graph-ai');`);
     await logTask("system-health-ai", "Stopped all non-essential tasks", "completed", 0);

@@ -4,6 +4,13 @@
 
 :root {
   color-scheme: light;
+  --cwi-cream: #f6f1e7;
+  --cwi-ink: #1c1712;
+  --cwi-green: #1e6b4a;
+  --cwi-saffron: #d9862b;
+  --cwi-brown: #5a3b24;
+  --cwi-muted: #74695e;
+  --cwi-border: #ded6c7;
 }
 
 * {

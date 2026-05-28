@@ -17,7 +17,6 @@ const footerLinks = [
   { label: "About CWI", href: "/about" },
   { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Contact CWI", href: "/contact" },
-  { label: "Watch", href: "/watch" },
   { label: "Manipur Investigation", href: "/watch/manipur-crisis" },
   { label: "Charter", href: "/charter" },
   { label: "Issues", href: "/issues" },

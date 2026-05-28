@@ -862,6 +862,32 @@ function LiveNewsroomSection({
       </div>
 
       <Card>
+        <CardLabel>Front page controls</CardLabel>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Live Newsroom section control</h2>
+            <p className="mt-3 max-w-3xl leading-7 text-ink/70">
+              Use these controls to prepare section changes for review: lead story, today&apos;s brief, update rail, verification desk, advisories, source ledger, corrections, archive context, and priority scoring. Publishing still goes through approval.
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button type="button" variant="outline" disabled={pending === "set-lead-story"} onClick={() => runAction("set-lead-story")}>Set Lead Story</Button>
+            <Button type="button" variant="outline" disabled={pending === "news-intelligence"} onClick={() => runAction("news-intelligence")}>Create Today&apos;s Brief</Button>
+            <Button type="button" variant="outline" disabled={pending === "live-update-rail"} onClick={() => runAction("live-update-rail")}>Add Update Rail Item</Button>
+            <Button type="button" variant="outline" disabled={pending === "claim-tracker"} onClick={() => runAction("claim-tracker")}>Add Verification Claim</Button>
+            <Button type="button" variant="outline" disabled={pending === "public-advisory-pack"} onClick={() => runAction("public-advisory-pack")}>Add Public Advisory</Button>
+            <Button type="button" variant="outline" disabled={pending === "source-trail"} onClick={() => runAction("source-trail")}>Add Source Ledger Entry</Button>
+            <Button type="button" variant="outline" disabled={pending === "correction-log"} onClick={() => runAction("correction-log")}>Add Correction</Button>
+            <Button type="button" variant="outline" disabled={pending === "archive-context"} onClick={() => runAction("archive-context")}>Mark Archived Context</Button>
+            <Button type="button" variant="outline" disabled={pending === "priority-score"} onClick={() => runAction("priority-score")}>Set Priority Score</Button>
+            <Button type="button" variant="outline" disabled={pending === "hide-live-newsroom"} onClick={() => runAction("hide-live-newsroom")}>Hide From Live Newsroom</Button>
+            <Button type="button" variant="outline" disabled={pending === "feature-unanswered-file"} onClick={() => runAction("feature-unanswered-file")}>Feature Unanswered File</Button>
+            <Button type="button" disabled={pending === "send-to-approval"} onClick={() => runAction("send-to-approval")}>Send to Approval Queue</Button>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
         <CardLabel>CWI News Intelligence</CardLabel>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
