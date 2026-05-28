@@ -107,7 +107,7 @@ export function improveArticleDraft(article: ArticleDraftLike, score: QualitySco
     body.push({
       heading: "CWI context",
       body:
-        "Cockroach Watch India - CWI documents public-interest issues with source attribution, editorial caution, and a correction path. Document. Verify. Amplify. The youth are not silent. India is watching."
+        "Cockroach Watch India - CWI documents public-interest issues with source attribution, editorial caution, and a correction path."
     });
   }
 

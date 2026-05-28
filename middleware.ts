@@ -1,4 +1,4 @@
-﻿import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 const officialHost = "www.cockroachwatchindia.online";
 const redirectHosts = new Set([["cwi-ten", "vercel", "app"].join("."), "cockroachwatchindia.online"]);
@@ -11,6 +11,7 @@ const routeRedirects: Array<[RegExp, string | ((pathname: string) => string)]> =
   [/^\/watch-desk\/(.+)$/, (pathname) => pathname.replace("/watch-desk/", "/archive/")],
   [/^\/watch$/, "/archive"],
   [/^\/watch\/manipur-crisis$/, "/india-unanswered-files/manipur-violence"],
+  [/^\/manipur-investigation$/, "/india-unanswered-files/manipur-violence"],
   [/^\/charter$/, "/editorial-policy#charter"],
   [/^\/issues$/, "/submit#what-to-submit"],
   [/^\/join$/, "/submit#how-to-contribute"],

@@ -12,6 +12,7 @@ export async function saveSystemHealthLog(input: {
   missingAltText?: number;
   failedTasks?: number;
   pendingApprovals?: number;
+  issueDetails?: Array<{ severity: string; page: string; issue: string }>;
 }) {
   await ensureAdminDatabase();
   const [monthCost, dayCost] = await Promise.all([getMonthCostInr(), getDayCostInr()]);
@@ -20,9 +21,9 @@ export async function saveSystemHealthLog(input: {
       insert into system_health_logs (
         website_status, database_status, sitemap_status, robots_status, old_url_check,
         broken_links, missing_metadata, missing_alt_text, failed_tasks,
-        monthly_budget_usage_inr, daily_ai_usage_inr, pending_approvals
+        monthly_budget_usage_inr, daily_ai_usage_inr, pending_approvals, issue_details
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
       returning id;
     `,
     [
@@ -37,7 +38,8 @@ export async function saveSystemHealthLog(input: {
       input.failedTasks ?? 0,
       monthCost,
       dayCost,
-      input.pendingApprovals ?? 0
+      input.pendingApprovals ?? 0,
+      JSON.stringify(input.issueDetails ?? [])
     ]
   );
   return result.rows[0].id;

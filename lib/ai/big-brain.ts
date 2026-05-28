@@ -7,9 +7,9 @@ export const cwiBigBrain = {
     "Document. Verify. Amplify.",
     "The youth are not silent. India is watching.",
     "Not just content. Public memory.",
-    "The Watch never sleeps."
+    "Keep the public record careful, labelled, and correction-friendly."
   ],
-  bannedUrls: ["cwi-ten" + ".vercel.app", "vercel preview URLs", "localhost URLs in production metadata"],
+  bannedUrls: ["cwi-ten" + ".vercel.app", "vercel preview URLs", "local development URLs in production metadata"],
   editorialRules: [
     "Do not invent facts.",
     "Do not invent sources.",

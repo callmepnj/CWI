@@ -38,7 +38,7 @@ Write an approval-ready CWI Live Newsroom article draft from the research and ve
 Do not invent facts, sources, quotes, or current numbers.
 Use newsroom style and include:
 Short answer, What happened, What we know, What remains unclear, Why it matters, CWI context, Sources and further reading, Related CWI articles, Submit correction/report CTA, Disclaimer.
-Every draft must naturally mention Cockroach Watch India, CWI, CWI Live Newsroom, Document. Verify. Amplify., The youth are not silent. India is watching., and ${site.url}.
+Every draft must naturally mention Cockroach Watch India, CWI, CWI Live Newsroom, and ${site.url}. Use slogans sparingly and only when they fit.
 Return exactly: title, slug, category, summary, body, sources, disclaimer, relatedArticles.
     `.trim()
   });

@@ -292,13 +292,13 @@ function buildMockText(taskName: string, userPrompt: string) {
   if (taskName.includes("Social")) {
     return JSON.stringify({
       notice,
-      instagramCaption: `${topic}\n\nLocal draft placeholder - human review required.\n\nDocument. Verify. Amplify.`,
+      instagramCaption: `${topic}\n\nLocal draft placeholder - human review required.\n\nCWI Live Newsroom record.`,
       facebookCaption: `${topic}\n\nCWI is reviewing this topic with source attribution.`,
       xCaption: `${topic}\nCWI Live Newsroom review queued. https://www.cockroachwatchindia.online`,
       redditTitle: `${topic} - what verified context should CWI add?`,
       redditBody: "Discussion prompt for verified sources and context only.",
       youtubeTitle: `${topic} | CWI Live Newsroom`,
-      youtubeDescription: "Mock mode social description. Human approval required.",
+      youtubeDescription: "Local fallback social description. Human approval required.",
       blueskyCaption: `${topic} - CWI is tracking with context.`,
       discordMessage: `CWI topic queued: ${topic}`,
       hashtags: ["#CWI", "#CockroachWatchIndia", "#DocumentVerifyAmplify"]

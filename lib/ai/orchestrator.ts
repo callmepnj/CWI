@@ -21,6 +21,16 @@ import { rememberApprovalItem, rememberArticleDraft, rememberResearchPack } from
 import { assertArticleDraftAllowed, runVerificationGate } from "@/lib/ai/verification-engine";
 import { completeWorkflow, createWorkflow, failWorkflow, markWorkflowAwaitingApproval, setWorkflowStep } from "@/lib/ai/workflow-state";
 
+type ContentDestination = "live_newsroom" | "india_unanswered_files" | "archive" | "public_advisory" | "social_only";
+
+const allowedContentDestinations = new Set<ContentDestination>([
+  "live_newsroom",
+  "india_unanswered_files",
+  "archive",
+  "public_advisory",
+  "social_only"
+]);
+
 type ManualLinkInput = {
   url: string;
   topic?: string;
@@ -29,6 +39,7 @@ type ManualLinkInput = {
   notes?: string;
   priority?: string;
   contentType?: string;
+  contentDestination?: string;
 };
 
 type TopicToArticleInput = {
@@ -44,7 +55,9 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
   const metadata = await extractUrlMetadata(url);
   const topic = clean(input.topic) || metadata.title || new URL(url).hostname;
   const platform = clean(input.platform) || detectPlatform(url);
-  const workflowId = await createWorkflow({ workflowType: "manual_link_to_approval", topic, payload: { ...input, url, platform, metadata } });
+  const contentDestination = normalizeContentDestination(input.contentDestination);
+  const destinationCategory = categoryFromDestination(contentDestination, input.contentType);
+  const workflowId = await createWorkflow({ workflowType: "manual_link_to_approval", topic, payload: { ...input, url, platform, metadata, contentDestination } });
 
   try {
     const manualLinkId = await saveManualLink({
@@ -60,11 +73,11 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 
     await setWorkflowStep(workflowId, "researching", "running");
     const research = await runTask("CWI Research AI", "manual_link_research", { url, topic, platform, metadata }, () =>
-      runResearchAgent({ topic, url, platform, notes: input.notes, metadata, category: categoryFromContentType(input.contentType) })
+      runResearchAgent({ topic, url, platform, notes: input.notes, metadata, category: destinationCategory })
     );
     const researchPackId = await saveResearchPack({
       topic: research.topic,
-      category: research.category || categoryFromContentType(input.contentType),
+      category: research.category || destinationCategory,
       summary: research.summary,
       sources: research.sources,
       whatHappened: research.whatHappened,
@@ -137,7 +150,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 
     const approvalQueueId = await saveApprovalItem({
       topic: article.title,
-      itemType: "Manual Link Workflow",
+      itemType: `Manual Link Workflow / ${contentDestination}`,
       summary: article.summary,
       researchPackId,
       verificationReportId,
@@ -149,7 +162,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       riskLevel: verification.riskLevel,
       sourceCount: research.sourceCount,
       status: "waiting_for_approval",
-      adminNotes: `Human approval required. Verification gate: ${verificationGate.status}, quality readiness: ${quality.publishReadinessScore}/100.`
+      adminNotes: `Human approval required. Destination: ${contentDestination}. Verification gate: ${verificationGate.status}, quality readiness: ${quality.publishReadinessScore}/100.`
     });
     await rememberApprovalItem({ id: approvalQueueId, topic: article.title, summary: article.summary, status: "waiting_for_approval", verification_status: verification.verificationStatus, risk_level: verification.riskLevel, source_count: research.sourceCount });
     await markWorkflowAwaitingApproval({ workflowId, approvalQueueId, articleDraftId, output: { approvalQueueId, quality, verificationGate } });
@@ -166,7 +179,8 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
       approvalQueueId,
       verificationGate,
       quality,
-      status: "waiting_for_approval"
+      status: "waiting_for_approval",
+      contentDestination
     };
   } catch (error) {
     await failWorkflow(workflowId, error instanceof Error ? error.message : "Manual workflow failed.");
@@ -180,7 +194,8 @@ export async function runTopicToArticle(input: TopicToArticleInput) {
     topic: input.topic,
     platform: "Manual Topic",
     notes: input.sourceNotes,
-    contentType: input.category || "Live Newsroom"
+    contentType: input.category || "Live Newsroom",
+    contentDestination: "live_newsroom"
   });
 }
 
@@ -363,11 +378,17 @@ function detectPlatform(url: string) {
   return "Website";
 }
 
-function categoryFromContentType(value?: string) {
-  const lower = clean(value).toLowerCase();
-  if (lower.includes("unanswered")) return "India Unanswered Files";
-  if (lower.includes("advisory")) return "Public Advisory";
-  if (lower.includes("social")) return "Social Pack";
+function normalizeContentDestination(value?: string): ContentDestination {
+  const normalized = clean(value).toLowerCase().replace(/[\s-]+/g, "_");
+  return allowedContentDestinations.has(normalized as ContentDestination) ? (normalized as ContentDestination) : "live_newsroom";
+}
+
+function categoryFromDestination(destination: ContentDestination, contentType?: string) {
+  const lower = clean(contentType).toLowerCase();
+  if (destination === "india_unanswered_files" || lower.includes("unanswered")) return "India Unanswered Files";
+  if (destination === "public_advisory" || lower.includes("advisory")) return "Public Advisory";
+  if (destination === "social_only" || lower.includes("social")) return "Social Pack";
+  if (destination === "archive") return "Archive";
   return "Live Newsroom";
 }
 

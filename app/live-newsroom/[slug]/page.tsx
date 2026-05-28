@@ -101,14 +101,14 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
   }
 
   const statusColors: Record<string, { bg: string; text: string }> = {
-    "Source-backed": { bg: "bg-green-50", text: "text-green-700" },
-    "Verified": { bg: "bg-green-50", text: "text-green-700" },
-    "Developing": { bg: "bg-amber-50", text: "text-amber-700" },
+    "Source-backed": { bg: "bg-cwi-green/10", text: "text-cwi-green" },
+    "Verified": { bg: "bg-cwi-green/10", text: "text-cwi-green" },
+    "Developing": { bg: "bg-cwi-saffron/12", text: "text-cwi-brown" },
     "Reported": { bg: "bg-cwi-cream", text: "text-cwi-brown" },
-    "Public Advisory": { bg: "bg-cwi-saffron/10", text: "text-cwi-brown" },
+    "Public Advisory": { bg: "bg-cwi-saffron/12", text: "text-cwi-brown" },
     "Needs Source": { bg: "bg-cwi-cream", text: "text-cwi-brown" },
-    "Blocked": { bg: "bg-red-50", text: "text-red-700" },
-    "Correction": { bg: "bg-cwi-saffron/10", text: "text-cwi-brown" }
+    "Blocked": { bg: "bg-cwi-brown/10", text: "text-cwi-brown" },
+    "Correction": { bg: "bg-cwi-saffron/12", text: "text-cwi-brown" }
   };
 
   const status = statusColors[item.status] || statusColors["Reported"];
@@ -141,12 +141,12 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
               {item.category}
             </span>
             {item.sourceTrail.length > 0 && (
-              <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium bg-green-50 text-green-700">
+              <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium bg-cwi-green/10 text-cwi-green">
                 {item.sourceTrail.length} source{item.sourceTrail.length !== 1 ? "s" : ""}
               </span>
             )}
             {item.isLeadStory && (
-              <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium bg-purple-50 text-purple-700">
+              <span className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium bg-cwi-saffron/10 text-cwi-brown">
                 Lead Story
               </span>
             )}
@@ -191,23 +191,24 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Main content */}
-        <article className="prose prose-lg max-w-none mb-12">
-          <p className="text-lg leading-relaxed text-cwi-ink/80">{item.content}</p>
-        </article>
+        {/* Short answer */}
+        <section className="mb-12 rounded-lg border border-cwi-brown/18 bg-white/78 p-6 shadow-sm">
+          <h2 className="font-display text-2xl font-black uppercase leading-tight text-cwi-ink">Short answer</h2>
+          <p className="mt-4 text-lg leading-relaxed text-cwi-ink/80">{item.content}</p>
+        </section>
 
         {/* What/Know/Don't Know boxes */}
         <div className="grid gap-6 md:grid-cols-3 mb-12">
-          <div className="rounded-lg border-2 border-green-200 bg-green-50/50 p-6">
-            <h3 className="font-display font-bold text-green-700 text-lg mb-3">What Changed</h3>
+          <div className="rounded-lg border border-cwi-green/18 bg-cwi-green/10 p-6">
+            <h3 className="font-display font-bold text-cwi-green text-lg mb-3">What Changed</h3>
             <p className="text-cwi-ink/80">{item.whatChanged}</p>
           </div>
           <div className="rounded-lg border-2 border-cwi-green/20 bg-cwi-cream/70 p-6">
-            <h3 className="font-display font-bold text-cwi-green text-lg mb-3">What We Know</h3>
+            <h3 className="font-display font-bold text-cwi-green text-lg mb-3">What CWI knows</h3>
             <p className="text-cwi-ink/80">{item.whatWeKnow}</p>
           </div>
-          <div className="rounded-lg border-2 border-amber-200 bg-amber-50/50 p-6">
-            <h3 className="font-display font-bold text-amber-700 text-lg mb-3">Still Unclear</h3>
+          <div className="rounded-lg border border-cwi-saffron/22 bg-cwi-saffron/10 p-6">
+            <h3 className="font-display font-bold text-cwi-brown text-lg mb-3">What CWI does not know</h3>
             <p className="text-cwi-ink/80">{item.whatWeDontKnow}</p>
           </div>
         </div>
@@ -266,6 +267,14 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
             </div>
           </div>
         )}
+
+        {/* Before sharing */}
+        <section className="mb-12 rounded-lg border border-cwi-brown/18 bg-cwi-cream p-6 shadow-sm">
+          <h2 className="font-display text-2xl font-black uppercase leading-tight text-cwi-ink">Before you share</h2>
+          <p className="mt-4 leading-7 text-cwi-ink/72">Check the update time, source trail, and what remains unclear. Do not treat developing, reported, or needs-source labels as final proof.</p>
+          <p className="mt-3 text-sm font-bold leading-6 text-cwi-ink/62">CWI is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform. This record is not a legal finding or official party statement.</p>
+        </section>
+
 
         {/* Footer CTA */}
         <div className="rounded-lg border-2 border-cwi-green/30 bg-cwi-green/5 p-8 text-center">

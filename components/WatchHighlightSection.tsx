@@ -31,23 +31,23 @@ export function WatchHighlightSection() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-saffron opacity-75" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-saffron" />
             </span>
-            The Watch is Live
+            Live Newsroom is current
           </p>
           <h2 className="font-display text-4xl font-black uppercase leading-none tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-            The Watch is Live
+            Live Newsroom is current
           </h2>
           <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/78">
-            Track public issues, viral claims, civic updates, creator credit requests, and source-backed Archive articles in one place.
+            Track public issues, viral claims, civic updates, creator credit requests, and archived context in one place.
           </p>
           <p className="mt-5 max-w-3xl leading-8 text-white/64">
-            The Watch never sleeps. CWI tracks public issues, viral claims, creator credit requests, source-backed articles, and youth voice before they disappear from the feed.
+            CWI tracks public issues, viral claims, creator credit requests, and youth voice with labels before amplification.
           </p>
           <p className="mt-5 max-w-3xl leading-8 text-white/64">
-            CWI watches what the feed forgets. Every report, claim, creator post, and public issue is reviewed with context before amplification.
+            CWI keeps current updates in the Live Newsroom and older context in the Archive.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild variant="saffron">
-              <Link href="/watch">Enter The Watch <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/live-newsroom">Enter Live Newsroom <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="outline" className="border-white/25 bg-white/10 text-white hover:bg-white hover:text-ink">
               <Link href="/submit">Submit a Report <Send className="h-4 w-4" /></Link>
@@ -58,7 +58,7 @@ export function WatchHighlightSection() {
             CWI reviews submissions before publishing. Unverified claims are labelled clearly. Creator credit matters.
           </p>
           <p className="mt-5 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">
-            Seen something important? Submit it to the Watch.
+            Seen something important? Send CWI a source or correction.
           </p>
         </motion.div>
 

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Cockroach Watch India Document Verify Amplify social preview";
+export const alt = "Cockroach Watch India Live Newsroom social preview";
 export const size = {
   width: 1200,
   height: 630
@@ -18,48 +18,47 @@ export default function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "linear-gradient(135deg, #0B1220 0%, #102A63 52%, #0B5CFF 100%)",
-          color: "white",
-          padding: "70px",
-          fontFamily: "Arial, sans-serif"
+          background: "#F5E8D0",
+          color: "#1D120A",
+          padding: "64px",
+          fontFamily: "Arial, sans-serif",
+          border: "18px solid #1F5A24"
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div
             style={{
               display: "flex",
-              padding: "16px 24px",
-              borderRadius: "999px",
-              background: "#FFD23F",
-              color: "#0B1220",
-              fontSize: 28,
+              padding: "14px 22px",
+              borderRadius: "10px",
+              background: "#1F5A24",
+              color: "#F5E8D0",
+              fontSize: 24,
               fontWeight: 900,
               letterSpacing: 3
             }}
           >
-            CWI CIVIC WATCH
+            CWI LIVE NEWSROOM
           </div>
-          <div style={{ fontSize: 26, fontWeight: 800, color: "#D8E8FF" }}>India is watching</div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: "#7A4A22" }}>Source trail. Corrections open.</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 88, lineHeight: 0.95, fontWeight: 900, letterSpacing: -4 }}>
+          <div style={{ fontSize: 84, lineHeight: 0.95, fontWeight: 900, letterSpacing: -2 }}>
             Cockroach Watch India
           </div>
-          <div style={{ marginTop: 30, fontSize: 44, fontWeight: 900, color: "#FFD23F" }}>
-            Document. Verify. Amplify.
-          </div>
-          <div style={{ marginTop: 22, fontSize: 32, lineHeight: 1.25, color: "#DCEBFF", maxWidth: 940 }}>
-            The youth are not silent. India is watching.
+          <div style={{ marginTop: 28, width: 210, height: 10, background: "#D97918" }} />
+          <div style={{ marginTop: 24, fontSize: 34, lineHeight: 1.25, color: "#3A2415", maxWidth: 940 }}>
+            What changed today. What is verified. What still needs answers.
           </div>
         </div>
-        <div style={{ display: "flex", gap: 18, fontSize: 24, fontWeight: 800, color: "#BFD7FF" }}>
-          <span>Youth voice</span>
-          <span>•</span>
-          <span>Public issues</span>
-          <span>•</span>
-          <span>Civic satire</span>
-          <span>•</span>
-          <span>Creator credit</span>
+        <div style={{ display: "flex", gap: 18, fontSize: 24, fontWeight: 900, color: "#1F5A24" }}>
+          <span>Live Newsroom</span>
+          <span>|</span>
+          <span>India Unanswered Files</span>
+          <span>|</span>
+          <span>Archive</span>
+          <span>|</span>
+          <span>Submit Source</span>
         </div>
       </div>
     ),

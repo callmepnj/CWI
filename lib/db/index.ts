@@ -705,9 +705,11 @@ export async function ensureAdminOsTables() {
         monthly_budget_usage_inr numeric(10,2) not null default 0,
         daily_ai_usage_inr numeric(10,2) not null default 0,
         pending_approvals integer not null default 0,
+        issue_details jsonb not null default '[]'::jsonb,
         created_at timestamptz not null default now()
       );
 
+      alter table system_health_logs add column if not exists issue_details jsonb not null default '[]'::jsonb;
       create table if not exists cost_usage_logs (
         id uuid primary key default gen_random_uuid(),
         agent_id text references agents(id) on delete set null,

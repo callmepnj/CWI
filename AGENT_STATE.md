@@ -282,3 +282,15 @@ Next steps:
 - Support page now auto-uses `public/images/support/cwi-support-qr.png` when present and shows a safe QR fallback when missing; no fake supporter notes, totals, corrections, or counters are shown.
 - Generated a clean sitemap/robots set for canonical public pages only and expanded System Health checks for old Watch Desk links, preview URLs, internal/debug wording, fake counters, and placeholder text.
 - Verification passed: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run build`, public text/URL scans, sitemap scan, and local smoke checks on port 3001 for main pages plus legacy redirects.
+
+2026-05-28 support QR follow-up:
+- User pointed to `C:\Users\praka\Downloads\CWI`; found `Support qr.jpeg` there.
+- Converted it into `public/images/support/cwi-support-qr.png`, the path already wired by the support page.
+- Verified `npm run build` passes and the built support route includes `/images/support/cwi-support-qr.png`.
+
+2026-05-28 final prompt recheck and reapply:
+- Rechecked the full prompt stack for missing CWI newsroom requirements after the QR follow-up.
+- Added the final missing pieces: default AI workflow `contentDestination = live_newsroom`, allowed destination set, homepage/footer Watchlist coming-soon CTA, CWI-colored OG image, live article sections for Short answer/What CWI knows/What remains unclear/Before you share, and `/manipur-investigation` redirect.
+- Expanded System Health to store and display exact issue details with severity for old Watch Desk links/text, preview/local URLs, public backend/mock/draft wording, metadata/canonical gaps, sitemap/robots exclusions, large images, and fake counters/supporter notes.
+- Re-ran cleanup scans for old Watch Desk/Watch More/preview/mock/backend phrases outside the scanner, sitemap old-route entries, and built public HTML; no blocked public matches remained.
+- Verification passed after reapply: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run build`, main public route smoke checks, legacy redirect smoke checks, and support QR render check.

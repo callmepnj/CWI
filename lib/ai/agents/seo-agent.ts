@@ -27,7 +27,7 @@ export async function runSEOAgent(input: { articleDraftId?: string; articleDraft
     payload: { articleDraft, topic: title },
     instruction: `
 Prepare a Google-ready SEO pack for this CWI article.
-Use only ${site.url} for canonical URLs. No legacy Vercel or localhost URLs.
+Use only ${site.url} for canonical URLs. No legacy preview or local development URLs.
 Return exactly:
 seoTitle, metaDescription, canonicalUrl, ogTitle, ogDescription, ogImage, twitterTitle, twitterDescription, schemaJson, internalLinks, altText, slug.
 SEO title should include CWI Live Newsroom or Cockroach Watch India.

@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     notes?: string;
     priority?: string;
     contentType?: string;
+    contentDestination?: string;
   } | null;
 
   if (!body?.url) {

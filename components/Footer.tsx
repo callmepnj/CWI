@@ -60,6 +60,18 @@ export function Footer() {
           <p className="mt-6 max-w-3xl rounded-lg border border-cwi-cream/12 bg-cwi-cream/6 p-4 text-xs font-bold uppercase leading-6 tracking-[0.08em] text-cwi-cream/72">
             {site.disclaimer}
           </p>
+          <div className="mt-5 max-w-xl rounded-lg border border-cwi-cream/12 bg-cwi-cream/6 p-4">
+            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join the Watchlist</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-cwi-cream/70">Watchlist signup coming soon. It will ask only for email and consent.</p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+              <input disabled type="email" placeholder="Email signup coming soon" className="min-h-11 rounded-lg border border-cwi-cream/12 bg-cwi-cream/10 px-3 text-sm font-bold text-cwi-cream placeholder:text-cwi-cream/45" />
+              <button disabled type="button" className="min-h-11 rounded-lg border border-cwi-saffron/30 bg-cwi-saffron/20 px-4 font-mono text-xs font-black uppercase tracking-[0.12em] text-cwi-saffron opacity-80">Coming soon</button>
+            </div>
+            <label className="mt-3 flex gap-2 text-xs font-bold leading-5 text-cwi-cream/62">
+              <input disabled type="checkbox" className="mt-0.5 h-4 w-4 rounded border-cwi-cream/30" />
+              Consent checkbox will be required when signup opens.
+            </label>
+          </div>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-3">

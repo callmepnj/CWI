@@ -1108,9 +1108,9 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     "Cockroach Watch India avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
   ];
   const closingParagraphs = [
-    "What happens next depends on how creators, students, first-time voters, civic observers, and local communities continue to use the language. The youth are not silent. India is watching.",
-    "The next phase will be shaped by correction, repetition, creator credit, and whether the conversation stays attached to real public issues. Not just content. Public memory.",
-    "Readers should follow the source trail, compare claims, and treat viral certainty with caution. The Watch never sleeps, but it also does not outrun evidence."
+    "What happens next depends on how creators, students, first-time voters, civic observers, and local communities continue to connect the language to real public issues.",
+    "The next phase will be shaped by correction, repetition, creator credit, and whether the conversation stays attached to real public issues.",
+    "Readers should follow the source trail, compare claims, and treat viral certainty with caution. CWI should not outrun evidence."
   ];
   const sections = [
     {
@@ -1151,7 +1151,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
       paragraphs: [
         "Cockroach Watch India is tracking this topic as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. Public-interest conversations need context, creator credit, and source attribution.",
         pick(cwiMethodParagraphs, index),
-        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. More source-backed archive updates are available at https://www.cockroachwatchindia.online/watch-desk."
+        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Older context remains in the Archive, while current updates live at https://www.cockroachwatchindia.online/live-newsroom."
       ]
     },
     {

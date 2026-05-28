@@ -963,6 +963,7 @@ function DailyBriefingSection({ data, pending, runAction }: { data: AdminData; p
 
 function SystemHealthSection({ data, pending, runAction }: { data: AdminData; pending: string; runAction: (action: string) => Promise<void> }) {
   const health = data.health;
+  const issueDetails = parseIssueDetails(health.issue_details);
   return (
     <>
       <Card>
@@ -974,14 +975,30 @@ function SystemHealthSection({ data, pending, runAction }: { data: AdminData; pe
           <MiniMetric label="Robots" value={text(health.robots_status)} />
           <MiniMetric label="Old URL check" value={text(health.old_url_check)} />
           <MiniMetric label="Pending approvals" value={text(health.pending_approvals)} />
-          <MiniMetric label="Daily AI usage" value={`₹${number(Number(health.daily_ai_usage_inr ?? 0))}`} />
-          <MiniMetric label="Monthly usage" value={`₹${number(Number(health.monthly_budget_usage_inr ?? data.budget.estimatedMonthlyCost))}`} />
+          <MiniMetric label="Daily AI usage" value={`Rs ${number(Number(health.daily_ai_usage_inr ?? 0))}`} />
+          <MiniMetric label="Monthly usage" value={`Rs ${number(Number(health.monthly_budget_usage_inr ?? data.budget.estimatedMonthlyCost))}`} />
           <MiniMetric label="Failed tasks" value={text(health.failed_tasks)} />
         </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <Button type="button" disabled={pending === "seo-check"} onClick={() => runAction("seo-check")}>Run SEO Check</Button>
           <Button type="button" variant="outline" disabled={pending === "stop-non-essential"} onClick={() => runAction("stop-non-essential")}>Stop Non-Essential Tasks</Button>
         </div>
+      </Card>
+      <Card>
+        <CardLabel>Exact issues</CardLabel>
+        {issueDetails.length === 0 ? (
+          <p className="font-bold leading-7 text-ink/64">No static scanner issues are recorded in the latest system-health row.</p>
+        ) : (
+          <div className="grid gap-3">
+            {issueDetails.slice(0, 20).map((issue, index) => (
+              <div key={`${issue.page}-${issue.issue}-${index}`} className="rounded-2xl border border-line bg-paper p-4">
+                <p className="font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">{issue.severity}</p>
+                <h3 className="mt-2 font-display text-lg font-black uppercase text-ink">{issue.page}</h3>
+                <p className="mt-2 text-sm font-semibold leading-6 text-ink/68">{issue.issue}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </>
   );
@@ -1187,6 +1204,23 @@ function formatDate(value: unknown) {
   return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 }
 
+function parseIssueDetails(value: unknown): Array<{ severity: string; page: string; issue: string }> {
+  const parsed = typeof value === "string" ? safeJson(value) : value;
+  if (!Array.isArray(parsed)) return [];
+  return parsed
+    .map((item) => (item && typeof item === "object" ? item as Record<string, unknown> : undefined))
+    .filter((item): item is Record<string, unknown> => Boolean(item))
+    .map((item) => ({ severity: text(item.severity), page: text(item.page), issue: text(item.issue) }))
+    .filter((item) => item.page !== "-" && item.issue !== "-");
+}
+
+function safeJson(value: string) {
+  try {
+    return JSON.parse(value) as unknown;
+  } catch {
+    return [];
+  }
+}
 function text(value: unknown) {
   return formatValue(value);
 }

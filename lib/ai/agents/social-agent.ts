@@ -27,12 +27,12 @@ export async function runSocialAgent(input: { articleDraftId?: string; articleDr
 Create approval-ready social captions for this CWI topic.
 No claim should be overstated. Include source/creator credit reminders where relevant.
 Return exactly: instagramCaption, facebookCaption, xCaption, redditTitle, redditBody, youtubeTitle, youtubeDescription, blueskyCaption, discordMessage, hashtags.
-Use the ending "Document. Verify. Amplify. The youth are not silent. India is watching. Website: ${site.url}" where suitable.
+Use a short CWI Live Newsroom website line where suitable. Avoid repeating slogans.
     `.trim()
   });
 
   return {
-    instagramCaption: asText(data.instagramCaption, `${topic}\n\nDocument. Verify. Amplify.\nWebsite: ${site.url}`),
+    instagramCaption: asText(data.instagramCaption, `${topic}\n\nCWI Live Newsroom record.\nWebsite: ${site.url}`),
     facebookCaption: asText(data.facebookCaption, `${topic}\n\nCockroach Watch India is tracking this with context.\n${site.url}`),
     xCaption: asText(data.xCaption, `${topic}\nCWI Live Newsroom: ${site.url}`),
     redditTitle: asText(data.redditTitle, `${topic} - what verified context should CWI add?`),

@@ -288,7 +288,7 @@ function publicAiConfig() {
     productionReady: config.provider === "openai" || config.provider === "gemini",
     message: config.configured
       ? config.provider === "mock"
-        ? "Mock mode is active. Use only for local testing, not real editorial output."
+        ? "Local AI fallback is active. Use only for local testing, not real editorial output."
         : "Real AI provider is configured."
       : config.error
   };
@@ -595,7 +595,7 @@ async function createSeoAuditPack() {
         website_status, database_status, sitemap_status, robots_status, old_url_check,
         broken_links, missing_metadata, missing_alt_text, failed_tasks, monthly_budget_usage_inr, daily_ai_usage_inr, pending_approvals
       )
-      values ('online', 'connected', $1, 'ok', 'no old Vercel URL detected in generated public SEO files', 0, 0, 0, 0, $2, 0, (select count(*) from approval_queue where status like '%Approval%'))
+      values ('online', 'connected', $1, 'ok', 'no old production URL detected in generated public SEO files', 0, 0, 0, 0, $2, 0, (select count(*) from approval_queue where status like '%Approval%'))
       returning id;
     `,
     [sitemapOk ? "ok" : "needs review", await getMonthCost()]
@@ -768,7 +768,7 @@ async function createSeoPack(articleDraftId: string | null, topic: string, slug:
       JSON.stringify({ card: "summary_large_image", site: "@CWatchIndia" }),
       JSON.stringify({ "@type": "NewsArticle", headline: topic, url: canonicalUrl, publisher: "Cockroach Watch India" }),
       JSON.stringify({ "@type": "BreadcrumbList", items: ["Home", "CWI Live Newsroom", topic] }),
-      JSON.stringify(["/", "/watch", "/archive", "/india-unanswered-files", "/submit"]),
+      JSON.stringify(["/", "/live-newsroom", "/archive", "/india-unanswered-files", "/submit"]),
       JSON.stringify([`Cockroach Watch India CWI Live Newsroom visual on ${topic}.`]),
       JSON.stringify(["Check canonical", "Check OG image", "Check sitemap after approval", "Inspect URL in Google Search Console"])
     ]
@@ -778,7 +778,7 @@ async function createSeoPack(articleDraftId: string | null, topic: string, slug:
 }
 
 async function createSocialPack(articleDraftId: string | null, topic: string, url: string) {
-  const ending = `Document. Verify. Amplify.\nThe youth are not silent. India is watching.\nWebsite: ${site.url}`;
+  const ending = `CWI Live Newsroom record.\nWebsite: ${site.url}`;
   const result = await getPool().query<{ id: string }>(
     `
       insert into social_packs (
@@ -948,7 +948,7 @@ function buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost }: { pendi
     database_status: "connected",
     sitemap_status: "ok",
     robots_status: "ok",
-    old_url_check: "no old Vercel URL expected",
+    old_url_check: "no old production URL expected",
     broken_links: 0,
     missing_metadata: 0,
     missing_alt_text: 0,
@@ -956,6 +956,7 @@ function buildHealthSnapshot({ pendingApprovals, estimatedMonthlyCost }: { pendi
     monthly_budget_usage_inr: estimatedMonthlyCost,
     daily_ai_usage_inr: 0,
     pending_approvals: pendingApprovals,
+    issue_details: [],
     created_at: new Date().toISOString()
   };
 }
