@@ -15,8 +15,6 @@ export function HeroSection() {
   return (
     <section className="relative isolate overflow-hidden bg-white">
       <div className="absolute inset-0 -z-10 cwi-grid opacity-80" />
-      <div className="absolute -right-28 top-16 -z-10 h-80 w-80 rounded-full bg-royal/15 blur-3xl" />
-      <div className="absolute -left-28 bottom-4 -z-10 h-72 w-72 rounded-full bg-saffron/25 blur-3xl" />
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
         <div className="flex flex-col justify-center">
           <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-royal px-4 py-2 font-mono text-[0.7rem] font-black uppercase tracking-[0.18em] text-white shadow-[0_14px_30px_rgba(11,92,255,0.22)]">
@@ -37,7 +35,7 @@ export function HeroSection() {
               <Link href="/submit">Submit a civic report to CWI <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="green">
-              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
+              <Link href="/watch-desk">Read the CWI Archive</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/join">Join the CWI Watch</Link>
@@ -66,15 +64,12 @@ export function HeroSection() {
           </p>
         </div>
         <div className="relative">
-          <div className="absolute -right-2 top-6 z-10 hidden rounded-2xl bg-saffron px-4 py-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-ink shadow-soft sm:block">
-            Document. Verify. Amplify.
-          </div>
           <div className="rounded-[2rem] border border-line bg-white p-4 shadow-soft">
             <div className="rounded-[1.5rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.22em] text-saffron">
-                    CWI Watch Desk
+                    CWI Archive
                   </p>
                   <p className="mt-3 font-display text-4xl font-black uppercase leading-none">Public Memory Command</p>
                 </div>
@@ -84,9 +79,9 @@ export function HeroSection() {
               </div>
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 {[
-                  ["Document", FileCheck2],
-                  ["Youth Voice", UsersRound],
-                  ["Civic Alert", Siren]
+                  ["Live Newsroom", FileCheck2],
+                  ["India Files", UsersRound],
+                  ["Submit Evidence", Siren]
                 ].map(([label, Icon]) => (
                   <div key={label as string} className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/15">
                     <Icon className="h-6 w-6 text-saffron" />

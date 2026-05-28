@@ -165,7 +165,16 @@ function imagePath(slug: string, image: UnansweredFileImage | undefined) {
     return "";
   }
 
-  return `${unansweredFileImageRoot}/${folder}/${image.filename}`;
+  return publicImagePath(unansweredFileImageRoot, folder, image.filename);
+}
+
+function publicImagePath(root: string, folder: string, filename: string) {
+  const encodedFolder = folder
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+
+  return `${root}/${encodedFolder}/${encodeURIComponent(filename)}`;
 }
 
 function buildDateWiseTimeline(file: UnansweredFileSeed): FileTimelineItem[] {
@@ -1118,7 +1127,7 @@ export function getFileVisuals(file: UnansweredFile): FileVisual[] {
   }
 
   return images.map((image) => ({
-    src: `${unansweredFileImageRoot}/${folder}/${image.filename}`,
+    src: publicImagePath(unansweredFileImageRoot, folder, image.filename),
     alt: image.altText || `${file.title} - ${image.caption}`,
     caption: image.caption,
     credit: image.source,
@@ -1127,7 +1136,7 @@ export function getFileVisuals(file: UnansweredFile): FileVisual[] {
     filename: image.filename,
     type: image.type,
     source: image.source,
-    sourceUrl: image.sourceUrl,
+    sourceUrl: publicImagePath(unansweredFileImageRoot, folder, image.filename),
     photographer: image.photographer,
     license: image.license,
     date: image.date,

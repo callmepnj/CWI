@@ -7,9 +7,9 @@ import { site } from "@/lib/site";
 export const metadata = createMetadata({
   title: "Terms - Cockroach Watch India",
   description:
-    "Read the Cockroach Watch India terms for use of CWI Watch Desk articles, India Unanswered Files, comments, submissions, creator credit, and public-interest content.",
+    "Read the Cockroach Watch India terms for use of CWI Archive articles, India Unanswered Files, comments, submissions, creator credit, and public-interest content.",
   path: "/terms",
-  keywords: ["Cockroach Watch India terms", "CWI terms", "CWI Watch Desk usage"]
+  keywords: ["Cockroach Watch India terms", "CWI terms", "CWI Archive usage"]
 });
 
 const terms = [
@@ -45,7 +45,7 @@ export default function TermsPage() {
       eyebrow="Terms"
       title="Terms"
       titleAs="h1"
-      subtitle="Terms for using Cockroach Watch India — CWI Watch Desk, CWI India Unanswered Files, submissions, comments, and public-interest archive content."
+      subtitle="Terms for using Cockroach Watch India — CWI Archive, CWI India Unanswered Files, submissions, comments, and public-interest archive content."
     >
       <Card>
         <CardLabel>CWI terms note</CardLabel>

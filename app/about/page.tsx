@@ -1,22 +1,30 @@
 import Link from "next/link";
-import { Archive, Eye, FileCheck, Megaphone, Newspaper, ShieldCheck } from "lucide-react";
+import { Archive, Eye, FileCheck, Megaphone, Newspaper, ShieldCheck, UserRound } from "lucide-react";
 import { Section } from "@/components/Section";
 import { Card, CardLabel } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
+import { site } from "@/lib/site";
 
 export const metadata = createMetadata({
-  title: "About Cockroach Watch India — CWI",
+  title: "About Cockroach Watch India - CWI",
   description:
-    "Learn about Cockroach Watch India, a founder-led civic watch and commentary platform documenting youth voice, public issues, creator credit, and the Cockroach wave.",
+    "Learn about Cockroach Watch India, a founder-led civic watch and commentary platform documenting youth voice, public issues, creator credit, and India's unanswered files.",
   path: "/about",
-  keywords: ["About Cockroach Watch India", "What is CWI", "CWI Watch Desk", "CWI India Unanswered Files"]
+  keywords: ["About Cockroach Watch India", "What is CWI", "CWI founder", "India Unanswered Files", "civic watch India"]
 });
 
-const facts = ["Founded by CWI", "India-focused", "Youth-first", "Independent", "Serious civic commentary", "Satire with responsibility"];
+const facts = [
+  `Founder/editor: ${site.editorialLead}`,
+  "India-focused",
+  "Youth-first",
+  "Independent",
+  "Source-backed civic commentary",
+  "Satire labelled with responsibility"
+];
 
 const missions = [
-  ["Track the movement", Eye],
+  ["Track public issues", Eye],
   ["Verify before posting", FileCheck],
   ["Credit creators", ShieldCheck],
   ["Archive public memory", Archive],
@@ -28,27 +36,27 @@ const aboutFaqs = [
   {
     question: "What is Cockroach Watch India?",
     answer:
-      "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform documenting youth voice, public issues, creator credit, viral claims, and civic memory."
+      "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, commentary, and public archive platform documenting youth voice, public issues, creator credit, viral claims, and civic memory."
   },
   {
-    question: "What is CWI Watch Desk?",
+    question: "Who is responsible for CWI?",
     answer:
-      "The CWI Watch Desk is the source-backed article and update section of Cockroach Watch India. It documents CJP updates, the Cockroach wave, youth voice, civic satire, public issues, and creator-credit questions."
+      `CWI is founder-led. The public editorial lead listed for the platform is ${site.editorialLead}. Published work may still be signed by the CWI Editorial Desk when multiple review steps are involved.`
   },
   {
-    question: "What is CWI India Unanswered Files?",
+    question: "What is India Unanswered Files?",
     answer:
-      "CWI India Unanswered Files is an archive of public issues and unanswered civic questions across India, with timelines, source cards, official responses, and related public-interest context."
+      "India Unanswered Files is CWI's source-backed archive of public issues and unanswered civic questions across India, with timelines, source cards, official responses, and related public-interest context."
   },
   {
     question: "Is CWI a political party?",
     answer:
-      "No. Cockroach Watch India is not a political party. It is an independent civic watch, satire, commentary, and public archive platform."
+      "No. Cockroach Watch India is not a political party and is not the official website of Cockroach Janta Party. CWI documents public-interest conversations with independent editorial distance."
   },
   {
     question: "How can someone submit reports to CWI?",
     answer:
-      "Readers can submit public issues, viral claims, creator credit requests, corrections, and youth stories through the Submit Report page or by contacting Cockroach Watch India by email."
+      "Readers can submit public issues, viral claims, creator credit requests, corrections, and youth stories through the Submit Report page or by contacting CWI by email."
   }
 ];
 
@@ -74,9 +82,14 @@ const aboutJsonLd = {
     "About Cockroach Watch India, also known as CWI, an independent civic watch, satire, commentary, and public archive platform.",
   about: {
     "@type": "Organization",
-    name: "Cockroach Watch India",
-    alternateName: "CWI",
-    url: absoluteUrl("/")
+    name: site.name,
+    alternateName: site.shortName,
+    url: absoluteUrl("/"),
+    founder: {
+      "@type": "Person",
+      name: site.founderName,
+      alternateName: site.founderHandle
+    }
   }
 };
 
@@ -85,47 +98,64 @@ export default function AboutPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <Section eyebrow="About CWI" title="About Cockroach Watch India" titleAs="h1" subtitle="Cockroach Watch India — CWI is a founder-led independent civic watch, satire, commentary, and public archive platform.">
-        <Card>
-          <CardLabel>What is CWI?</CardLabel>
-          <div className="space-y-5 text-lg leading-8 text-ink/70">
-            <p>
-              Cockroach Watch India, also known as CWI, documents youth voice, public issues, civic satire, creator credit, viral claims, and public memory across India.
-            </p>
-            <p>
-              CWI is for young citizens, creators, students, public-interest readers, local reporters, civic volunteers, and quiet watchers who want source-backed context instead of noise.
-            </p>
-            <p>
-              The CWI Watch Desk publishes Cockroach Watch India articles, explainers, public reactions, correction notes, and source-backed updates. CWI India Unanswered Files tracks public issues and civic questions that still need answers.
-            </p>
-            <p>
-              We are here to document the moment, verify claims, credit creators, and preserve the public memory of what young India is saying. Document. Verify. Amplify. The youth are not silent. India is watching.
-            </p>
-          </div>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {facts.map((fact) => (
-              <p key={fact} className="rounded-2xl border border-line bg-paper p-4 font-black uppercase tracking-[0.08em]">
-                {fact}
+      <Section eyebrow="About CWI" title="About Cockroach Watch India" titleAs="h1" subtitle="A founder-led independent civic watch, satire, commentary, and public archive platform.">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <Card>
+            <CardLabel>What is CWI?</CardLabel>
+            <div className="space-y-5 text-lg leading-8 text-ink/72">
+              <p>
+                Cockroach Watch India, also known as CWI, documents youth voice, public issues, civic satire, creator credit, viral claims, and public memory across India. The platform exists for readers who want public-interest context without confusing commentary, satire, reporting, and official claims.
               </p>
-            ))}
+              <p>
+                CWI was built around a simple editorial need: fast-moving internet conversations should not become public memory without source trails. When a claim travels through posts, clips, screenshots, creator explainers, or local reports, CWI tries to separate what is verified, what is reported, what remains unclear, and what should not be amplified yet.
+              </p>
+              <p>
+                The platform is founder-led by {site.editorialLead}. Public articles may be signed by the CWI Editorial Desk when they depend on shared review, source checks, image review, corrections, or public submissions. That desk label is an accountability label, not a way to hide that CWI has a named person responsible for the platform.
+              </p>
+              <p>
+                CWI is independent from political parties and organizations unless officially declared. It may cover Cockroach Janta Party, the Cockroach wave, youth-led satire, civic anger, or public institutions, but coverage does not make CWI a spokesperson, campaign office, or official political website.
+              </p>
+              <p>
+                The strongest part of CWI is India Unanswered Files: source-backed case files where public records, official responses, court timelines, human impact, and unanswered questions are kept together. The goal is not to manufacture certainty. The goal is to preserve a readable record that citizens, students, creators, local reporters, and public-interest readers can check.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="/live-newsroom">Enter Live Newsroom</Link>
+              </Button>
+              <Button asChild variant="green">
+                <Link href="/india-unanswered-files">Open India Unanswered Files</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/submit">Submit a report</Link>
+              </Button>
+            </div>
+          </Card>
+
+          <div className="grid gap-6">
+            <Card>
+              <CardLabel>Founder and editor</CardLabel>
+              <UserRound className="h-8 w-8 text-royal" />
+              <h2 className="mt-5 font-display text-3xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">
+                {site.editorialLead}
+              </h2>
+              <p className="mt-4 leading-8 text-ink/70">
+                The founder/editor is responsible for CWI&apos;s public positioning, independence statement, correction path, and source-led publishing standard. As the team grows, this page should add named editors, reviewers, contributors, and advisory roles.
+              </p>
+            </Card>
+            <Card>
+              <CardLabel>Platform facts</CardLabel>
+              <div className="grid gap-3">
+                {facts.map((fact) => (
+                  <p key={fact} className="rounded-2xl border border-line bg-paper p-4 font-black uppercase tracking-[0.08em]">
+                    {fact}
+                  </p>
+                ))}
+              </div>
+            </Card>
           </div>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild>
-              <Link href="/watch-desk">Read the CWI Watch Desk</Link>
-            </Button>
-            <Button asChild variant="green">
-              <Link href="/india-unanswered-files">Open CWI India Unanswered Files</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/submit">Submit a report to CWI</Link>
-            </Button>
-          </div>
-        </Card>
-        <div className="mt-8">
-          <Link href="/charter" className="font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
-            Read the CWI Watch Charter
-          </Link>
         </div>
+
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {missions.map(([mission, Icon]) => (
             <Card key={mission}>
@@ -134,6 +164,7 @@ export default function AboutPage() {
             </Card>
           ))}
         </div>
+
         <div className="mt-12">
           <p className="mb-6 font-mono text-xs font-black uppercase tracking-[0.2em] text-royal">CWI FAQ</p>
           <div className="grid gap-6 md:grid-cols-2">

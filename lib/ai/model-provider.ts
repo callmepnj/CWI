@@ -220,7 +220,7 @@ function estimateCost(input: GenerateAITextInput, usdPerThousandTokens: number) 
 
 function buildMockText(taskName: string, userPrompt: string) {
   const topic = extractTopic(userPrompt);
-  const notice = "Mock mode active - no real AI call.";
+  const notice = "Local draft placeholder - human review required.";
 
   if (taskName.includes("Research")) {
     return JSON.stringify({
@@ -292,7 +292,7 @@ function buildMockText(taskName: string, userPrompt: string) {
   if (taskName.includes("Social")) {
     return JSON.stringify({
       notice,
-      instagramCaption: `${topic}\n\nMock mode active - no real AI call.\n\nDocument. Verify. Amplify.`,
+      instagramCaption: `${topic}\n\nLocal draft placeholder - human review required.\n\nDocument. Verify. Amplify.`,
       facebookCaption: `${topic}\n\nCWI is reviewing this topic with source attribution.`,
       xCaption: `${topic}\nCWI Watch Desk review queued. https://www.cockroachwatchindia.online`,
       redditTitle: `${topic} - what verified context should CWI add?`,

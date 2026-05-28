@@ -100,7 +100,7 @@ const sourceLibrary = {
     outlet: "Cockroach Watch India",
     url: "https://www.cockroachwatchindia.online",
     type: "Official source",
-    note: "Used for CWI's own identity, editorial disclaimer, Watch Desk positioning, correction path, and independent civic-watch role."
+    note: "Used for CWI's own identity, editorial disclaimer, Archive positioning, correction path, and independent civic-watch role."
   },
   economicTimesOverview: {
     name: "Cockroach Janta Party explodes on social media",
@@ -896,7 +896,7 @@ function limitText(text: string, maxLength: number) {
 }
 
 function metaTitle(title: string) {
-  const suffix = " - CWI Watch Desk | Cockroach Watch India";
+  const suffix = " | CWI Archive - Cockroach Watch India";
   const maxTitleLength = 74 - suffix.length;
   return `${limitText(title, maxTitleLength)}${suffix}`;
 }
@@ -908,14 +908,14 @@ function pick<T>(items: T[], index: number) {
 function socialPack(seed: ArticleSeed, summary: string): SocialPack {
   return {
     xThread: [
-      `${seed.title}: a CWI Watch Desk brief from Cockroach Watch India.`,
+      `${seed.title}: a Cockroach Watch India archive brief.`,
       "Cockroach Watch India is tracking the public conversation around Cockroach Janta Party, the Cockroach wave, creator commentary, and civic satire with context.",
       "Read the article at https://www.cockroachwatchindia.online, check the labels, and send corrections or creator-credit notes when context is missing."
     ],
-    instagramCaption: `${seed.title}. Cockroach Watch India explains the public context on the CWI Watch Desk. Document. Verify. Amplify. The youth are not silent. India is watching.`,
-    redditPost: `${summary} This CWI Watch Desk post from Cockroach Watch India is meant for source-checking, public-interest discussion, and responsible context around the Cockroach wave.`,
-    youtubeShortsDescription: `${seed.title} - Cockroach Watch India explains the Cockroach wave, CJP discussion, Gen Z politics, civic satire, and creator culture in India on the CWI Watch Desk.`,
-    seoSummary: `Cockroach Watch India CWI Watch Desk summary: ${summary}`
+    instagramCaption: `${seed.title}. Cockroach Watch India explains the public context with source labels, correction paths, and independent editorial distance.`,
+    redditPost: `${summary} This Cockroach Watch India archive post is meant for source-checking, public-interest discussion, and responsible context around the Cockroach wave.`,
+    youtubeShortsDescription: `${seed.title} - Cockroach Watch India explains the Cockroach wave, CJP discussion, Gen Z politics, civic satire, and creator culture in India.`,
+    seoSummary: `Cockroach Watch India summary: ${summary}`
   };
 }
 
@@ -1015,10 +1015,67 @@ function datesFor(seed: ArticleSeed, index: number) {
   return { publishedAt, updatedAt };
 }
 
+function unclearParagraphs(seed: ArticleSeed) {
+  const title = `${seed.title} ${seed.slug} ${seed.tags.join(" ")}`.toLowerCase();
+
+  if (title.includes("x account") || title.includes("withheld") || title.includes("on x")) {
+    return [
+      "CWI has not seen a complete public order, platform notice, or court record that settles every reason behind the X account action. The most careful wording remains withheld in India unless a source is being quoted directly.",
+      "The next useful update would be the platform notice, a legal filing, an official clarification, or a dated statement from CJP explaining whether the restriction is being contested."
+    ];
+  }
+
+  if (title.includes("abhijeet") || title.includes("founder") || title.includes("threat")) {
+    return [
+      "Founder and family details are based on named media reports and public statements. CWI has not independently verified private family conversations, direct-message screenshots, or threat metadata.",
+      "The open question is whether any safety complaint, police action, or formal response has been placed on record after the reported threats and family concerns."
+    ];
+  }
+
+  if (title.includes("follower") || title.includes("bot") || title.includes("social media")) {
+    return [
+      "Follower counts and sign-up numbers move quickly and should be read as date-specific reported figures, not permanent totals. CWI has not seen platform-level data that verifies the active-versus-inactive split.",
+      "Bot or foreign-origin allegations remain allegations unless supported by transparent methodology, platform data, or independent technical analysis."
+    ];
+  }
+
+  if (title.includes("main bhi")) {
+    return [
+      "CWI has not found a single official source proving whether the phrase is centrally coordinated, formally adopted, or mainly community-generated.",
+      "The useful question is how the phrase is being used by creators and readers, not whether every use has the same political meaning."
+    ];
+  }
+
+  if (seed.category === "Creator Spotlight") {
+    return [
+      "CWI still needs stronger source trails for some creator-origin claims, especially first upload dates, repost chains, and permission or credit disputes.",
+      "Creator participation should not be treated as endorsement of every claim attached to the trend unless the creator has said so directly."
+    ];
+  }
+
+  if (seed.category === "Youth Voice") {
+    return [
+      "CWI cannot reduce youth response to one mood or ideology. The visible reaction includes frustration, satire, curiosity, anger, and identity language in different proportions.",
+      "More ground-level student and first-time voter sources would help separate online performance from durable civic concern."
+    ];
+  }
+
+  if (title.includes("satire") || title.includes("meme") || title.includes("movement")) {
+    return [
+      "The line between meme, satire, and movement language remains interpretive. CWI can document public use, but it cannot claim every share has the same intent.",
+      "The unanswered part is whether online identity language turns into sustained civic organization, correction work, or offline public action."
+    ];
+  }
+
+  return [
+    `For this topic, CWI has not independently verified every detail around ${seed.focus}. The article should be read as public-interest context, not as an official declaration.`,
+    "The next update should depend on named sources, official responses, creator statements, court records, or platform-level evidence rather than viral certainty."
+  ];
+}
 function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "relatedSlugs"> {
-  const summary = limitText(`CWI Watch Desk: ${seed.angle}`, 190);
+  const summary = limitText(seed.angle, 190);
   const metaDescription = limitText(
-    `Cockroach Watch India explains ${seed.focus}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this public-interest update.`,
+    `Cockroach Watch India explains ${seed.focus}, what is known, what remains unclear, and why this public-interest archive is tracking the update.`,
     155
   );
   const readingMinutes = 4 + (index % 4);
@@ -1036,9 +1093,9 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     index
   );
   const articleOpeners = [
-    `${seed.title} is about ${seed.focus}. Cockroach Watch India is tracking it through the CWI Watch Desk because the subject connects public reporting, online reaction, civic satire, and the Cockroach wave.`,
+    `${seed.title} is about ${seed.focus}. Cockroach Watch India is tracking it because the subject connects public reporting, online reaction, civic satire, and the Cockroach wave.`,
     `The short answer: this article explains ${seed.focus} using public sources, cautious labels, and CWI's independent editorial distance from Cockroach Janta Party.`,
-    `At issue is ${seed.focus}. The CWI Watch Desk treats this as a source-backed public-interest explainer, not as an official statement from CJP or any political organization.`
+    `At issue is ${seed.focus}. CWI treats this as a source-backed public-interest explainer, not as an official statement from CJP or any political organization.`
   ];
   const contextParagraphs = [
     "The discussion is moving through posts, edits, short videos, comment sections, and creator-led explainers. That visibility matters, but visibility alone does not verify a claim.",
@@ -1047,8 +1104,8 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
   ];
   const cwiMethodParagraphs = [
     "Cockroach Watch India uses careful labels for developing material: reportedly, publicly circulating, online discussion, internet reaction, viral trend, and public commentary. The aim is clarity, not exaggeration.",
-    "CWI's editorial standard is simple: Document. Verify. Amplify. The Watch Desk documents the moment, checks the source trail where possible, credits creators, and explains public-interest context without impersonating Cockroach Janta Party.",
-    "The Cockroach Watch India Watch Desk avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
+    "CWI checks the source trail where possible, credits creators, and explains public-interest context without impersonating Cockroach Janta Party.",
+    "Cockroach Watch India avoids presenting unverified allegations as fact. When a claim is unclear, the responsible label is reported, developing, alleged, or requires verification."
   ];
   const closingParagraphs = [
     "What happens next depends on how creators, students, first-time voters, civic observers, and local communities continue to use the language. The youth are not silent. India is watching.",
@@ -1060,7 +1117,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
       heading: "Short answer",
       paragraphs: [
         `${pick(articleOpeners, index)} Read more source-backed updates at https://www.cockroachwatchindia.online.`,
-        "This is a Cockroach Watch India Watch Desk article. CWI is not the official website of Cockroach Janta Party; it is an independent civic watch, satire, and commentary platform."
+        "This is a Cockroach Watch India archive article. CWI is not the official website of Cockroach Janta Party; it is an independent civic watch, satire, and commentary platform."
       ]
     },
     {
@@ -1080,10 +1137,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     },
     {
       heading: "What remains unclear",
-      paragraphs: [
-        "Some details remain time-sensitive, especially follower counts, sign-up claims, platform actions, threat screenshots, bot allegations, and the exact reasons behind any account restrictions. CWI treats those as reported or developing unless a reliable source clearly confirms them.",
-        "The timing of online events has led to public speculation, but no official reason should be assumed where a platform, court, government body, named institution, or reliable outlet has not clearly confirmed it."
-      ]
+      paragraphs: unclearParagraphs(seed)
     },
     {
       heading: "Why it matters",
@@ -1095,15 +1149,15 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     {
       heading: "CWI context",
       paragraphs: [
-        "Cockroach Watch India - CWI is tracking this topic through the CWI Watch Desk as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. CWI's method is Document. Verify. Amplify. That means public-interest conversations need context and source attribution.",
+        "Cockroach Watch India is tracking this topic as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. Public-interest conversations need context, creator credit, and source attribution.",
         pick(cwiMethodParagraphs, index),
-        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Follow more source-backed updates on the CWI Watch Desk at https://www.cockroachwatchindia.online/watch-desk."
+        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. More source-backed archive updates are available at https://www.cockroachwatchindia.online/watch-desk."
       ]
     },
     {
       heading: "CWI Note",
       paragraphs: [
-        "The CWI Watch Desk documents public-interest updates with context, source attribution, and editorial caution. The youth are not silent. India is watching. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
+        "CWI documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
         pick(closingParagraphs, index),
         `Primary reference for this version: ${primarySource.outlet} - ${primarySource.name}. Additional sources are listed below for readers who want to check the reporting trail.`,
         coreDisclaimer
@@ -1124,7 +1178,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     summary,
     content,
     sections,
-    sourceLabel: "CWI Watch Desk",
+    sourceLabel: "CWI Editorial Archive",
     sourceUrl: primarySource.url,
     sources,
     verificationStatus: seed.verificationStatus ?? "Reported",
@@ -1137,7 +1191,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     seoTitle: metaTitle(seed.title),
     seoDescription: metaDescription,
     ogImage: "https://www.cockroachwatchindia.online/opengraph-image",
-    imageAlt: `${seed.title} - Cockroach Watch India Watch Desk article graphic`,
+    imageAlt: `${seed.title} - Cockroach Watch India article graphic`,
     pullQuote,
     relatedArticles: [],
     social: socialPack(seed, summary)

@@ -3,15 +3,18 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const baseUrl = "https://www.cockroachwatchindia.online";
-const lastModified = "2026-05-24";
+const lastModified = "2026-05-28";
 
 const staticRoutes = [
   "/",
   "/about",
   "/contact",
+  "/corrections",
+  "/support",
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
+  "/live-newsroom",
   "/india-unanswered-files",
   "/watch-desk",
   "/issues",
@@ -55,6 +58,9 @@ const postsSource = readFileSync(join(root, "data", "posts.ts"), "utf8");
 const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 const unansweredFilesSource = readFileSync(join(root, "data", "unanswered-files.ts"), "utf8");
 const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
+const liveNewsroomSource = readFileSync(join(root, "data", "live-newsroom.ts"), "utf8");
+const liveNewsroomBlock = liveNewsroomSource.match(/export const liveNewsroomItems:[\s\S]*?export const publicAdvisories/)?.[0] ?? "";
+const liveNewsroomSlugs = Array.from(liveNewsroomBlock.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 const tagBlocks = Array.from(postsSource.matchAll(/tags:\s*\[([^\]]+)\]/g), (match) => match[1]);
 const tags = Array.from(
   new Set(tagBlocks.flatMap((block) => Array.from(block.matchAll(/"([^"]+)"/g), (match) => match[1])))
@@ -64,6 +70,7 @@ const routes = [
   ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
   ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
   ...postSlugs.map((slug) => `/watch-desk/${slug}`),
+  ...liveNewsroomSlugs.map((slug) => `/live-newsroom/${slug}`),
   ...unansweredFileSlugs.map((slug) => `/india-unanswered-files/${slug}`)
 ];
 
@@ -99,6 +106,7 @@ ${routes
 
 const robots = `User-agent: *
 Allow: /
+Disallow: /archive/cwi-priority-public-interest-update
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;

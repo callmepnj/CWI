@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
+import { AdminLiveNewsroom } from "@/components/AdminLiveNewsroom";
 
 type AdminRecord = Record<string, unknown>;
 
@@ -71,6 +72,7 @@ type AdminData = {
 
 const sections = [
   ["overview", "Overview", Activity],
+  ["live-newsroom", "Live Newsroom", Newspaper],
   ["agents", "Agent Control Center", Bot],
   ["workflows", "Workflows", Activity],
   ["approval", "Approval Queue", ClipboardCheck],
@@ -535,6 +537,7 @@ function AdminSection({
   generateArticleForApproval: (item: AdminRecord) => Promise<void>;
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
+  if (section === "live-newsroom") return <AdminLiveNewsroom section={section} />;
   if (section === "agents") return <AgentsSection data={data} pending={pending} runAction={runAction} />;
   if (section === "workflows") {
     return (

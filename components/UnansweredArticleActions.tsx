@@ -155,6 +155,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
         <button
           type="button"
           onClick={toggleLike}
+          aria-label={`Like ${title}`}
           disabled={pendingAction === "like"}
           className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.12em] ring-1 transition ${
             liked ? "bg-urgent/10 text-urgent ring-urgent/25" : "bg-white text-ink/58 ring-line hover:bg-skywash hover:text-royal"
@@ -166,6 +167,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
         <button
           type="button"
           onClick={toggleBookmark}
+          aria-label={`${bookmarked ? "Remove saved case" : "Save case"}: ${title}`}
           disabled={pendingAction === "bookmark"}
           className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.12em] ring-1 transition ${
             bookmarked ? "bg-saffron/25 text-[#8A5B00] ring-saffron/35" : "bg-white text-ink/58 ring-line hover:bg-skywash hover:text-royal"
@@ -191,6 +193,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
         <button
           type="button"
           onClick={toggleLike}
+          aria-label={`Like ${title}`}
           disabled={pendingAction === "like"}
           className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.12em] ring-1 transition ${
             liked ? "bg-urgent/10 text-urgent ring-urgent/25" : "bg-white text-ink ring-line hover:bg-skywash hover:text-royal"
@@ -202,6 +205,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
         <button
           type="button"
           onClick={toggleBookmark}
+          aria-label={`${bookmarked ? "Remove saved case" : "Save case"}: ${title}`}
           disabled={pendingAction === "bookmark"}
           className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.12em] ring-1 transition ${
             bookmarked ? "bg-saffron/25 text-[#8A5B00] ring-saffron/35" : "bg-white text-ink ring-line hover:bg-skywash hover:text-royal"

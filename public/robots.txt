@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /archive/cwi-priority-public-interest-update
 
 Sitemap: https://www.cockroachwatchindia.online/sitemap.xml

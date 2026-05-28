@@ -24,6 +24,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
+
+  if (url.pathname === "/about-cockroach-watch-india" || url.pathname === "/cockroach-watch-india") {
+    url.pathname = "/about";
+    if (host && redirectHosts.has(host)) {
+      url.protocol = "https:";
+      url.hostname = officialHost;
+      url.port = "";
+    }
+    return NextResponse.redirect(url, 308);
+  }
   if (!host || !redirectHosts.has(host)) {
     return NextResponse.next();
   }

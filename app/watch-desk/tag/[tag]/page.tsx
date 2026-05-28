@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!entry) {
     return createMetadata({
-      title: "Watch Desk Tag - CWI",
-      description: "Browse Cockroach Watch India Watch Desk tag archives.",
+      title: "Archive Tag - CWI",
+      description: "Browse Cockroach Watch India Archive tag archives.",
       path: "/watch-desk"
     });
   }
@@ -48,7 +48,7 @@ export default async function WatchDeskTagPage({ params }: Props) {
 
   return (
     <Section
-      eyebrow="Watch Desk Topic"
+      eyebrow="Archive Topic"
       title={entry.label}
       titleAs="h1"
       subtitle={`CWI topic archive for ${entry.label}: a public-interest cluster around Cockroach Watch India, CWI, Cockroach Janta Party, the Cockroach wave, and digital civic culture.`}

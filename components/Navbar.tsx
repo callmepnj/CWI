@@ -10,19 +10,22 @@ import { cn } from "@/lib/utils";
 
 const primaryItems = [
   { label: "Home", href: "/" },
-  { label: "Watch", href: "/watch" },
-  { label: "Watch Desk", href: "/watch-desk" },
-  { label: "Issues", href: "/issues" },
-  { label: "Submit", href: "/submit" }
+  { label: "Live Newsroom", href: "/live-newsroom" },
+  { label: "Archive", href: "/watch-desk" },
+  { label: "Unanswered Files", href: "/india-unanswered-files" },
+  { label: "Submit", href: "/submit" },
+  { label: "Support CWI", href: "/support" }
 ];
 
 const moreItems = [
-  { label: "Unanswered Files", href: "/india-unanswered-files" },
+  { label: "Issues", href: "/issues" },
+  { label: "Corrections", href: "/corrections" },
   { label: "About", href: "/about" },
+  { label: "Editorial Policy", href: "/editorial-policy" },
+  { label: "Credit Policy", href: "/credit-policy" },
   { label: "Charter", href: "/charter" },
   { label: "Youth Voice", href: "/youth-voice" },
   { label: "Media Bank", href: "/media-bank" },
-  { label: "Credit Policy", href: "/credit-policy" },
   { label: "Contact", href: "/contact" }
 ];
 
@@ -103,7 +106,7 @@ export function Navbar() {
 
         <div className="hidden lg:block">
           <Button asChild size="sm">
-            <Link href="/submit">Submit Report</Link>
+            <Link href="/support">Support CWI</Link>
           </Button>
         </div>
 

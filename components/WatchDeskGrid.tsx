@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WatchDeskCard } from "@/components/WatchDeskCard";
 import { postCategories, trendingTopics, type WatchPost } from "@/data/posts";
 import { cn } from "@/lib/utils";
@@ -25,11 +25,13 @@ const sortOptions = [
 ] as const;
 
 type SortValue = (typeof sortOptions)[number]["value"];
+const postsPerPage = 18;
 
 export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
   const [active, setActive] = useState<(typeof filters)[number]>("All");
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortValue>("newest");
+  const [page, setPage] = useState(1);
   const normalizedQuery = query.trim().toLowerCase();
   const visiblePosts = posts
     .filter((post) => {
@@ -47,7 +49,14 @@ export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
       return categoryMatch && queryMatch;
     })
     .sort((first, second) => sortPosts(first, second, sortBy));
-  const groupedPosts = groupPostsByDate(visiblePosts);
+  const pageCount = Math.max(1, Math.ceil(visiblePosts.length / postsPerPage));
+  const currentPage = Math.min(page, pageCount);
+  const paginatedPosts = visiblePosts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage);
+  const groupedPosts = groupPostsByDate(paginatedPosts);
+
+  useEffect(() => {
+    setPage(1);
+  }, [active, query, sortBy]);
 
   return (
     <>
@@ -111,7 +120,7 @@ export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
       </div>
 
       <p className="mb-5 font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/50">
-        Showing {visiblePosts.length} Watch Desk article{visiblePosts.length === 1 ? "" : "s"} / sorted by {sortOptions.find((option) => option.value === sortBy)?.label}
+        Showing {paginatedPosts.length} of {visiblePosts.length} Archive article{visiblePosts.length === 1 ? "" : "s"} / page {currentPage} of {pageCount} / sorted by {sortOptions.find((option) => option.value === sortBy)?.label}
       </p>
 
       <div className="grid gap-9">
@@ -135,9 +144,33 @@ export function WatchDeskGrid({ posts }: { posts: WatchPost[] }) {
         ))}
       </div>
 
+
+      {visiblePosts.length > postsPerPage ? (
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-line bg-white p-4 shadow-card">
+          <button
+            type="button"
+            onClick={() => setPage((value) => Math.max(1, value - 1))}
+            disabled={currentPage === 1}
+            className="rounded-full border border-line bg-paper px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span className="font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/55">
+            Page {currentPage} of {pageCount}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((value) => Math.min(pageCount, value + 1))}
+            disabled={currentPage === pageCount}
+            className="rounded-full border border-line bg-paper px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      ) : null}
       {visiblePosts.length === 0 ? (
         <div className="rounded-3xl border border-line bg-white p-8 text-center shadow-card">
-          <p className="font-display text-3xl font-black uppercase text-ink">No Watch Desk notes found</p>
+          <p className="font-display text-3xl font-black uppercase text-ink">No Archive notes found</p>
           <p className="mt-3 text-ink/65">Try a broader search term or switch the category filter back to All.</p>
         </div>
       ) : null}

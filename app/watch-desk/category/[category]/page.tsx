@@ -20,14 +20,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!entry) {
     return createMetadata({
-      title: "Watch Desk Category - CWI",
-      description: "Browse Cockroach Watch India Watch Desk category archives.",
+      title: "Archive Category - CWI",
+      description: "Browse Cockroach Watch India Archive category archives.",
       path: "/watch-desk"
     });
   }
 
   return createMetadata({
-    title: `${entry.label} - CWI Watch Desk`,
+    title: `${entry.label} - CWI Archive`,
     description: `Read Cockroach Watch India ${entry.label} articles on CJP, the Cockroach wave, youth voice, civic satire, and digital public culture.`,
     path: `/watch-desk/category/${entry.slug}`,
     keywords: [entry.label]
@@ -48,7 +48,7 @@ export default async function WatchDeskCategoryPage({ params }: Props) {
 
   return (
     <Section
-      eyebrow="Watch Desk Category"
+      eyebrow="Archive Category"
       title={entry.label}
       titleAs="h1"
       subtitle={`CWI category archive for ${entry.label}: Cockroach Janta Party, Cockroach wave, Gen Z politics, public reaction, civic satire, and youth voice coverage.`}

@@ -50,7 +50,7 @@ export default function PrivacyPolicyPage() {
       <Card>
         <CardLabel>CWI privacy note</CardLabel>
         <p className="text-lg leading-8 text-ink/72">
-          CWI is a civic watch, satire, commentary, and public archive platform. This policy explains how submitted information may be used when readers interact with the CWI Watch Desk, CWI India Unanswered Files, report forms, and comment sections.
+          CWI is a civic watch, satire, commentary, and public archive platform. This policy explains how submitted information may be used when readers interact with the CWI Archive, CWI India Unanswered Files, report forms, and comment sections.
         </p>
       </Card>
       <div className="mt-8 grid gap-6 md:grid-cols-2">

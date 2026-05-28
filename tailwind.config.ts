@@ -19,7 +19,15 @@ const config: Config = {
         urgent: "#FF6B35",
         royal: "#0B5CFF",
         skywash: "#EAF2FF",
-        line: "#DCE5F2"
+        line: "#DCE5F2",
+        // CWI Newsroom Colors
+        "cwi-cream": "#FDF8F3",
+        "cwi-ink": "#1A1410",
+        "cwi-green": "#1B5E20",
+        "cwi-saffron": "#F57C00",
+        "cwi-brown": "#5D4037",
+        "cwi-muted": "#E8DCC8",
+        "cwi-border": "#D7CCC8"
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],

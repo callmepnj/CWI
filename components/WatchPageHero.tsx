@@ -25,7 +25,7 @@ export function WatchPageHero() {
             <Link href="/submit">Submit Report <Send className="h-4 w-4" /></Link>
           </Button>
           <Button asChild className="bg-white text-ink hover:bg-skywash">
-            <Link href="/watch-desk">Read Watch Desk <FileText className="h-4 w-4" /></Link>
+            <Link href="/watch-desk">Read Archive <FileText className="h-4 w-4" /></Link>
           </Button>
           <Button asChild variant="outline" className="border-white/25 bg-white/10 text-white hover:bg-white hover:text-ink">
             <a href="#advisories">View Advisories <ArrowRight className="h-4 w-4" /></a>

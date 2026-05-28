@@ -29,6 +29,8 @@ const validTypes = new Set([
   "Other"
 ]);
 
+const submissionAttempts = new Map<string, { count: number; resetAt: number }>();
+
 export async function POST(request: Request) {
   const parsed = await parseReportRequest(request);
 
@@ -37,6 +39,14 @@ export async function POST(request: Request) {
   }
 
   const { body, evidenceFiles } = parsed;
+
+  if (!rateLimit(clientKey(request))) {
+    return NextResponse.json({ ok: false, error: "Too many submissions. Please wait before trying again." }, { status: 429 });
+  }
+
+  if (typeof body.website === "string" && body.website.trim().length > 0) {
+    return NextResponse.json({ ok: true });
+  }
 
   if (typeof body.name !== "string" || body.name.trim().length < 1) {
     return NextResponse.json({ ok: false, error: "Name or handle is required." }, { status: 400 });
@@ -115,7 +125,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       id: reportId,
-      message: "Report submitted successfully. The Watch Desk will review it before taking further action."
+      message: "Report submitted successfully. The Archive will review it before taking further action."
     });
   } catch (error) {
     console.error("CWI report submission failed", error);
@@ -221,4 +231,24 @@ function isValidUrl(value: string) {
   } catch {
     return false;
   }
+}
+
+function clientKey(request: Request) {
+  return (request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown").split(",")[0].trim();
+}
+
+function rateLimit(key: string) {
+  const now = Date.now();
+  const current = submissionAttempts.get(key);
+  if (!current || current.resetAt < now) {
+    submissionAttempts.set(key, { count: 1, resetAt: now + 10 * 60 * 1000 });
+    return true;
+  }
+
+  if (current.count >= 5) {
+    return false;
+  }
+
+  current.count += 1;
+  return true;
 }

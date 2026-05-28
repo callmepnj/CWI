@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) {
     return createMetadata({
-      title: "Watch Desk Post - Cockroach Watch India",
+      title: "Archive Post - Cockroach Watch India",
       description: site.description,
       path: "/watch-desk"
     });
@@ -134,7 +134,7 @@ function jsonLdForPost(post: (typeof posts)[number]) {
         {
           "@type": "ListItem",
           position: 2,
-          name: "Watch Desk",
+          name: "Archive",
           item: absoluteUrl("/watch-desk")
         },
         {
@@ -178,7 +178,7 @@ export default async function WatchPostPage({ params }: Props) {
         <div className="mb-6 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-ink/55">
           <Link href="/" className="hover:text-royal">Home</Link>
           <span>/</span>
-          <Link href="/watch-desk" className="hover:text-royal">Watch Desk</Link>
+          <Link href="/watch-desk" className="hover:text-royal">Archive</Link>
           <span>/</span>
           <span>{post.category}</span>
         </div>
@@ -195,11 +195,11 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
 
               <h1 className="mt-6 font-display text-4xl font-black uppercase leading-[0.95] tracking-[-0.05em] text-ink sm:text-6xl">
-                {post.title} - CWI Watch Desk
+                {post.title} - CWI Archive
               </h1>
               <p className="mt-6 max-w-4xl text-xl font-semibold leading-9 text-ink/75">{post.summary}</p>
               <p className="mt-5 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
-                By {post.author} / Published on CWI Watch Desk / Cockroach Watch India
+                By {post.author} / Published in CWI Archive / Cockroach Watch India
               </p>
 
               <div className="mt-7 grid gap-3 border-y border-line py-5 text-sm font-bold uppercase tracking-[0.08em] text-ink/55 sm:grid-cols-3">
@@ -218,7 +218,7 @@ export default async function WatchPostPage({ params }: Props) {
               </div>
 
               <div className="mt-8 rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
-                <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-saffron">Watch Desk Pull Quote</p>
+                <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-saffron">Archive Pull Quote</p>
                 <p className="mt-4 font-display text-3xl font-black uppercase leading-tight tracking-[-0.03em]">{post.pullQuote}</p>
               </div>
 
@@ -272,7 +272,7 @@ export default async function WatchPostPage({ params }: Props) {
               <div className="mt-8 rounded-[2rem] border border-royal/15 bg-skywash p-6">
                 <p className="font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">CWI Note</p>
                 <p className="mt-3 leading-8 text-ink/74">
-                  The CWI Watch Desk documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through{" "}
+                  The CWI Archive documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through{" "}
                   <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">
                     Cockroach Watch India
                   </Link>
@@ -312,7 +312,7 @@ export default async function WatchPostPage({ params }: Props) {
             {relatedPosts.length > 0 ? (
               <section className="mt-10">
                 <div className="mb-5 flex items-center justify-between gap-4">
-                  <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Watch Desk articles</h2>
+                  <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Archive articles</h2>
                   <Link href="/watch-desk" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
                     View all <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -351,7 +351,7 @@ export default async function WatchPostPage({ params }: Props) {
                 {[
                   ["Cockroach Watch India", "/"],
                   ["The Watch", "/watch"],
-                  ["CWI Watch Desk", "/watch-desk"],
+                  ["CWI Archive", "/watch-desk"],
                   ["CWI India Unanswered Files", "/india-unanswered-files"],
                   ["Submit Report", "/submit"],
                   ["Issue Watch", "/issues"],
@@ -393,7 +393,7 @@ function buildWatchDiscussionPrompts(post: (typeof posts)[number]) {
 
 function buildWatchReaderQuestions(post: (typeof posts)[number]) {
   return [
-    `What does the CWI Watch Desk clearly know about ${post.title}?`,
+    `What does the CWI Archive clearly know about ${post.title}?`,
     "Which claim in this article needs the strongest source before it is amplified further?",
     "What should Cockroach Watch India follow next: public reaction, creator credit, official response, or correction?",
     "Does this update affect youth voice, public issues, civic satire, or digital rights in a way CWI should archive?"

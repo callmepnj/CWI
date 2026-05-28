@@ -12,7 +12,7 @@ export const metadata = createMetadata({
 export default function SubmitPage() {
   return (
     <Section
-      eyebrow="Watch Desk Intake"
+      eyebrow="Archive Intake"
       title="Submit a Report"
       titleAs="h1"
       subtitle="Send CWI a public issue, viral claim, creator credit request, correction, or youth story for review."

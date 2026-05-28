@@ -102,7 +102,7 @@ export const metadata = createMetadata({
   keywords: [
     "Cockroach Watch India",
     "CWI",
-    "CWI Watch Desk",
+    "CWI Archive",
     "CWI articles",
     "India Unanswered Files",
     "public issues India",
@@ -115,8 +115,6 @@ export const metadata = createMetadata({
 export default function HomePage() {
   const dateSortedPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date));
   const featuredPost = dateSortedPosts[0];
-  const latestIssuePost = dateSortedPosts.find((post) => post.category === "Civic Issue") ?? dateSortedPosts[0];
-  const latestYouthPost = dateSortedPosts.find((post) => post.category === "Youth Voice") ?? dateSortedPosts[1];
 
   return (
     <>
@@ -191,16 +189,16 @@ export default function HomePage() {
           <Link href="/issues">Explore public issues tracked by CWI</Link>
         </Button>
       </Section>
-      <Section eyebrow="Watch Desk" title="Latest from CWI Watch Desk" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from Cockroach Watch India articles.">
+      <Section eyebrow="Archive" title="Latest from CWI Archive" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from Cockroach Watch India articles.">
         <div className="mb-6 rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
-          <CardLabel className="bg-white/12 text-saffron ring-white/15">Source-backed Watch Desk</CardLabel>
+          <CardLabel className="bg-white/12 text-saffron ring-white/15">Source-backed Archive</CardLabel>
           <h3 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">{featuredPost.title}</h3>
           <p className="mt-4 max-w-3xl leading-8 text-white/76">{featuredPost.summary}</p>
           <p className="mt-3 font-mono text-xs font-black uppercase tracking-[0.12em] text-saffron">
             {featuredPost.sources.length} public sources / comments now open / corrections welcome
           </p>
           <Button asChild className="mt-6" variant="saffron">
-            <Link href={`/watch-desk/${featuredPost.slug}`}>Read featured Watch Desk article</Link>
+            <Link href={`/watch-desk/${featuredPost.slug}`}>Read featured Archive article</Link>
           </Button>
         </div>
 
@@ -270,14 +268,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </Section>
-      <Section eyebrow="Latest Signals" title="Latest public issue and youth voice">
-        <div className="grid gap-6 lg:grid-cols-2">
-          <WatchDeskCard post={latestIssuePost} />
-          <WatchDeskCard post={latestYouthPost} />
-        </div>
-      </Section>
-      <Section eyebrow="Agenda Explainer" title="Five-point agenda, with context." subtitle="CWI explains the viral agenda as public-interest commentary, not official endorsement.">
+      </Section>      <Section eyebrow="Agenda Explainer" title="Five-point agenda, with context." subtitle="CWI explains the viral agenda as public-interest commentary, not official endorsement.">
         <div className="grid gap-6">
           {agendaItems.slice(0, 2).map((item, index) => (
             <AgendaCard key={item.title} index={index + 1} {...item} />
@@ -312,7 +303,7 @@ export default function HomePage() {
       <Section title="Submit a Report" subtitle="Send a public issue, viral post, correction, creator credit request, or civic story to Cockroach Watch India.">
         <div className="rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-8 text-white shadow-soft">
           <Send className="h-9 w-9 text-saffron" />
-          <h3 className="mt-5 font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">The Watch Desk is open.</h3>
+          <h3 className="mt-5 font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">The Archive is open.</h3>
           <p className="mt-4 max-w-3xl text-white/76">
             Submit public evidence, source links, issue details, and creator credit requests. Do not submit private data, threats, hate, or unverified allegations as fact.
           </p>

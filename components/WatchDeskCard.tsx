@@ -33,7 +33,7 @@ export function WatchDeskCard({ post }: { post: WatchPost }) {
         Source/Credit: {post.sourceLabel} / {post.credit}
       </p>
       <Link href={`/watch-desk/${post.slug}`} className="mt-6 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.16em] text-royal">
-        Read on CWI Watch Desk <ArrowRight className="h-4 w-4" />
+        Read article <ArrowRight className="h-4 w-4" />
       </Link>
     </Card>
   );

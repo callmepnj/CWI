@@ -215,3 +215,53 @@ Next steps:
 - Admin dashboard now exposes Workflows, Source Memory, Trend Radar, and Quality Scores sections, plus Sync Memory and Run Trend Radar actions.
 - Verification after implementation: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run env:check:vercel`, `npm run build`, and `git diff --check` pass.
 - Remaining environment blocker: `npm run db:check` still fails `28P01`, meaning the local `.env.local` Postgres credentials are still rejected. The new AI architecture needs valid Supabase/Vercel `DATABASE_URL` to create/read the new memory, workflow, verification, quality, and radar tables in production.
+
+2026-05-28 audit remediation pass:
+- User supplied a full website audit and requested fixing all issues toward a 100/100 score.
+- Implemented critical SEO/public-trust fixes in the Next.js App Router codebase:
+  - Added `/archive` redirect to `/watch-desk` and `/archive/[slug]` route that returns HTTP 410 plus `X-Robots-Tag: noindex, nofollow` for `cwi-priority-public-interest-update`; DB-published articles with that slug are filtered out in `lib/db/articles.ts`.
+  - Removed the public-facing "Mock mode active" phrase from AI mock output defaults so it cannot appear in approved drafts by default.
+  - Added article-grade metadata for `/live-newsroom/[slug]`: canonical, OG/Twitter image, article type, published/modified times, keywords, and NewsArticle/Breadcrumb JSON-LD.
+  - Added dynamic OG image route at `/live-newsroom/[slug]/opengraph-image`.
+  - Added the audited NEET live newsroom slug as a source-backed student advisory in `data/live-newsroom.ts`.
+  - Regenerated `public/sitemap.xml` and `public/robots.txt`; sitemap now includes `/support`, `/corrections`, `/live-newsroom`, and live article URLs; robots disallows the removed mock archive slug.
+- Added missing public routes/pages:
+  - `/support` with UPI copy/deeplink logic using `NEXT_PUBLIC_CWI_UPI_ID`, `NEXT_PUBLIC_CWI_UPI_NAME`, and optional `NEXT_PUBLIC_CWI_UPI_QR_PATH`.
+  - `/corrections` with public correction workflow and sample correction format.
+  - `/api/contact` and `ContactForm` for structured contact submissions.
+- Important blocker: no real UPI ID was provided by the user. Support page is wired and production-safe, but production env must set `NEXT_PUBLIC_CWI_UPI_ID` and ideally `NEXT_PUBLIC_CWI_UPI_QR_PATH` before promotion.
+- Expanded trust/content surfaces:
+  - About page now lists founder/editor as `PNJ / callmepnj` from repo owner context and explains platform responsibility, independence, and India Unanswered Files.
+  - Editorial Policy expanded with verification process, labels, corrections timeline, creator credit/takedown review, satire vs news, privacy, independence, and human approval standards.
+  - Today's Brief now includes editor byline.
+- Reduced AI/template signals:
+  - Removed generated `CWI Watch Desk:` style summary prefix from generated posts.
+  - Replaced the repeated boilerplate "Some details remain time-sensitive..." section with topic-specific `unclearParagraphs()` text.
+  - Public-facing "Watch Desk" wording was changed to "CWI Archive" in the main public archive pages/components while keeping `/watch-desk` route paths intact.
+- UX/navigation/performance changes:
+  - Footer now uses grouped navigation instead of 30+ flat links.
+  - Navbar includes Support CWI, Corrections is under More, and old `/cockroach-watch-india` plus `/about-cockroach-watch-india` redirect to `/about` in middleware.
+  - Archive grid now paginates client-side at 18 articles per page.
+  - India Unanswered Files image paths are URL-encoded segment-by-segment to avoid raw spaces in image URLs.
+  - Submit and contact forms include a honeypot and server-side rate limiting.
+  - `.env.example` was scrubbed to placeholders and now documents support UPI env variables.
+- Verification passed after this pass: `npm run seo:generate`, `npm run typecheck`, `npm run lint`, and `npm run build`.
+- Build output confirms the NEET live article route is statically generated and its built HTML contains canonical, OG article metadata, Twitter card metadata, article published/modified times, and NewsArticle JSON-LD.
+
+2026-05-28 Live Newsroom redesign in progress:
+- Current user request: redesign `/live-newsroom` as the main daily CWI newsroom homepage with exact section order and stronger daily command-center UX.
+- User supplied a PDF research file at `C:\Users\praka\Downloads\Do a deep reasearch for my CWI news room news from.pdf`; extractable text covers NEET-UG 2026, CBSE OSM, CJI/CJP context, and source links for 26-28 May 2026.
+- Verified official/source trail before edits: NTA NEET public notices, CBSE latest/circular pages, CBSE/Pariksha Sangam post-result links, Tele-MANAS, Indian Express NEET probe report, NDTV CBSE OSM clarification report, and CJI clarification media coverage.
+- Implementation approach: replace old repeated Watch Brief/Live Rail/Source-Backed Reports/Claim Tracker/Research Timeline homepage flow, remove placeholder fake sources from public newsroom data, keep CWI warm cream/dark ink/deep green/saffron/brown identity, and keep daily labels data-driven only.
+
+2026-05-28 Live Newsroom redesign progress update:
+- Replaced `data/live-newsroom.ts` with approved daily records for NEET/NTA notices, CBSE OSM claims, student official-link advisory, and CJI/CJP quote-card source request. Old placeholder example.com/platform sample sources are no longer exposed through `getPublicLiveNewsroomItems()`.
+- Rebuilt `app/live-newsroom/page.tsx` in the requested order with masthead, ticker, Top 3, What Changed Today, Lead Story, tabbed Latest Updates, Verification Desk, Public Advisory Board, India Unanswered Files, Source Ledger, Corrections, Submit CTA, and Archive Preview.
+- Added `components/LiveNewsroomFeed.tsx` for the tabbed feed, refreshed Lead Story/Verification/Advisory/Source Ledger/Corrections/Submit components, and updated `/admin/live-newsroom` with daily controls plus approval-only publish guard.
+
+2026-05-28 Live Newsroom redesign complete:
+- `/live-newsroom` now follows the requested product order: Daily Newsroom Masthead, Live Ticker, Today's Top 3, What Changed Today, Lead Story, Latest Updates Feed, Verification Desk, Public Advisory Board, India Unanswered Files, Source Ledger, Corrections & Clarifications, Submit CTA, and From the Archive.
+- Added `components/LiveNewsroomFeed.tsx` for client-side feed tabs and updated Lead Story, Verification Desk, Public Advisory Board, Source Ledger, Corrections, Submit CTA, and admin newsroom components to the warm CWI newsroom visual system.
+- `/admin/live-newsroom` now exposes daily controls for Top 3, Lead Story, What Changed Today, live updates, verification claims, public advisories, India Unanswered File priority, Source Ledger entries, corrections, labels, hide, approval queue, and approval-only publishing guard.
+- SEO/build status: `npm run typecheck`, `npm run lint`, and `npm run build` pass. Build regenerated `public/sitemap.xml` with 261 URLs including the new live newsroom slugs. Local smoke checks pass for `/live-newsroom`, the NEET lead detail route, and `/admin/live-newsroom` redirecting to login when unauthenticated.
+- Dev server is running at `http://localhost:3000`; review URL is `http://localhost:3000/live-newsroom`.

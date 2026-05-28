@@ -1,5 +1,12 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { site } from "@/lib/site";
+
+type SeoImage = {
+  url: string;
+  width?: number;
+  height?: number;
+  alt?: string;
+};
 
 type SeoInput = {
   title: string;
@@ -8,23 +15,28 @@ type SeoInput = {
   keywords?: string[];
   type?: "website" | "article";
   publishedTime?: string;
+  modifiedTime?: string;
+  image?: SeoImage;
+  index?: boolean;
 };
 
 export const ogImage = {
   url: `${site.url}/opengraph-image`,
   width: 1200,
   height: 630,
-  alt: "Cockroach Watch India Document Verify Amplify social preview"
+  alt: "Cockroach Watch India civic newsroom social preview"
 };
 
 export const importantRoutes = [
   "/",
   "/about",
-  "/what-is-cwi",
   "/contact",
+  "/corrections",
+  "/support",
   "/charter",
   "/watch",
   "/watch/manipur-crisis",
+  "/live-newsroom",
   "/india-unanswered-files",
   "/watch-desk",
   "/issues",
@@ -44,23 +56,34 @@ export function absoluteUrl(path = "/") {
   return new URL(normalizedPath, site.url).toString();
 }
 
-export function createMetadata({ title, description, path = "/", keywords = [], type = "website", publishedTime }: SeoInput): Metadata {
+export function createMetadata({
+  title,
+  description,
+  path = "/",
+  keywords = [],
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  image,
+  index = true
+}: SeoInput): Metadata {
   const url = absoluteUrl(path);
-  const mergedKeywords = Array.from(new Set([...site.keywords, ...keywords]));
+  const metadataKeywords = Array.from(new Set(keywords.length > 0 ? keywords : site.keywords));
+  const socialImage = normalizeSeoImage(image ?? ogImage);
 
   return {
     title,
     description,
-    keywords: mergedKeywords,
+    keywords: metadataKeywords,
     alternates: {
       canonical: url
     },
     robots: {
-      index: true,
-      follow: true,
+      index,
+      follow: index,
       googleBot: {
-        index: true,
-        follow: true,
+        index,
+        follow: index,
         "max-image-preview": "large",
         "max-snippet": -1,
         "max-video-preview": -1
@@ -71,18 +94,30 @@ export function createMetadata({ title, description, path = "/", keywords = [], 
       description,
       url,
       siteName: site.name,
-      images: [ogImage],
+      images: [socialImage],
       locale: "en_IN",
       type,
-      ...(publishedTime ? { publishedTime } : {})
+      ...(publishedTime ? { publishedTime } : {}),
+      ...(modifiedTime ? { modifiedTime } : {})
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [ogImage.url],
+      images: [socialImage.url],
       creator: "@CWatchIndia",
       site: "@CWatchIndia"
     }
+  };
+}
+
+function normalizeSeoImage(image: SeoImage) {
+  const url = image.url.startsWith("http://") || image.url.startsWith("https://") ? image.url : absoluteUrl(image.url);
+
+  return {
+    url,
+    width: image.width ?? 1200,
+    height: image.height ?? 630,
+    alt: image.alt ?? ogImage.alt
   };
 }

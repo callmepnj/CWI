@@ -11,16 +11,16 @@ import { createMetadata } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 const newsroomStats = [
-  { label: "Watch Desk Articles", value: `${posts.length}+`, Icon: Newspaper },
+  { label: "Archive Articles", value: `${posts.length}+`, Icon: Newspaper },
   { label: "Trending Topics", value: `${trendingTopics.length}`, Icon: TrendingUp },
   { label: "Archive Mode", value: "Active", Icon: RadioTower },
   { label: "Most Discussed", value: "CJP / Cockroach wave", Icon: Flame }
 ];
 
 export const metadata = createMetadata({
-  title: "CWI Watch Desk - Cockroach Watch India Articles, Updates & Explainers",
+  title: "CWI Archive - Cockroach Watch India Articles, Updates & Explainers",
   description:
-    "Read source-backed articles from Cockroach Watch India. The CWI Watch Desk tracks CJP updates, Cockroach wave developments, youth voice, civic satire, viral claims, and public issues across India.",
+    "Read source-backed articles from Cockroach Watch India. The CWI Archive tracks CJP updates, Cockroach wave developments, youth voice, civic satire, viral claims, and public issues across India.",
   path: "/watch-desk"
 });
 
@@ -34,9 +34,9 @@ export default async function WatchDeskPage() {
     <>
       <Section
         eyebrow="CWI Digital Newsroom"
-        title="CWI Watch Desk"
+        title="CWI Archive"
         titleAs="h1"
-        subtitle="The CWI Watch Desk is the editorial archive of Cockroach Watch India. We document, verify, and amplify source-backed updates on the Cockroach wave, youth voice, public issues, civic satire, creator credit, and digital public memory."
+        subtitle="The CWI Archive keeps source-backed explainers, public reactions, corrections, and background notes on the Cockroach wave, youth voice, public issues, civic satire, creator credit, and digital public memory."
       >
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="bg-gradient-to-br from-ink via-[#102a63] to-royal text-white">
@@ -67,7 +67,7 @@ export default async function WatchDeskPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Watch Desk Highlights" title="Editor-selected newsroom notes">
+      <Section eyebrow="Archive Highlights" title="Editor-selected newsroom notes">
         <div className="grid gap-6 md:grid-cols-3">
           {highlights.map((post) => (
             <WatchDeskCard key={post.slug} post={post} />
@@ -75,7 +75,7 @@ export default async function WatchDeskPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Archive Search" title="All Watch Desk articles" subtitle="Filter by category, search topic clusters, and read CWI's public-interest archive of the Cockroach wave.">
+      <Section eyebrow="Archive Search" title="All Archive articles" subtitle="Filter by category, search topic clusters, and read CWI's public-interest archive of the Cockroach wave.">
         <WatchDeskGrid posts={dateSortedPosts} />
       </Section>
     </>

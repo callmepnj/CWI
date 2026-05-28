@@ -37,7 +37,7 @@ export function WatchHighlightSection() {
             The Watch is Live
           </h2>
           <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-white/78">
-            Track public issues, viral claims, civic updates, creator credit requests, and source-backed Watch Desk articles in one place.
+            Track public issues, viral claims, civic updates, creator credit requests, and source-backed Archive articles in one place.
           </p>
           <p className="mt-5 max-w-3xl leading-8 text-white/64">
             The Watch never sleeps. CWI tracks public issues, viral claims, creator credit requests, source-backed articles, and youth voice before they disappear from the feed.

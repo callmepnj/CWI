@@ -86,6 +86,7 @@ export function SubmitForm() {
       onSubmit={onSubmit}
       className="grid gap-7 rounded-[2rem] border border-line bg-white p-5 shadow-soft sm:p-8"
     >
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
       <div className="grid gap-4 rounded-3xl border border-amber/35 bg-amber/10 p-5">
         <p className="text-base leading-7 text-ink/72">
           Use this form to submit public issues, civic concerns, viral posts, creator credit requests, corrections, or
@@ -187,7 +188,7 @@ export function SubmitForm() {
         </div>
       </FormGroup>
 
-      <FormGroup title="Consent and Safety" description="These confirmations are required before the Watch Desk reviews a report.">
+      <FormGroup title="Consent and Safety" description="These confirmations are required before the Archive reviews a report.">
         <div className="grid gap-3">
           <label className="flex gap-3 rounded-2xl border border-line bg-paper p-4 text-sm font-bold leading-6">
             <input name="consent" type="checkbox" required className="mt-1 h-4 w-4 accent-royal" />
@@ -220,7 +221,7 @@ export function SubmitForm() {
 
       {status === "success" ? (
         <p className="rounded-2xl border border-leaf/25 bg-leaf/10 p-4 font-bold leading-6 text-[#047766]">
-          Report submitted successfully. The Watch Desk will review it before taking further action.
+          Report submitted successfully. The Archive will review it before taking further action.
         </p>
       ) : null}
       {status === "error" ? (
