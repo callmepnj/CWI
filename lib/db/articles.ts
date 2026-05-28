@@ -277,7 +277,7 @@ function publishedRowToWatchPost(row: PublishedArticleRow): WatchPost {
     seoTitle: row.seo_title || `${row.title} | CWI Archive`,
     seoDescription: row.meta_description || summary.slice(0, 155),
     ogImage: row.open_graph_image || `${site.url}/opengraph-image`,
-    imageAlt: `${row.title} - Cockroach Watch India Watch Desk article`,
+    imageAlt: `${row.title} - Cockroach Watch India Archive article`,
     pullQuote: "Approved CWI drafts become public only after human approval and Publish AI.",
     relatedSlugs: [],
     relatedArticles: [],

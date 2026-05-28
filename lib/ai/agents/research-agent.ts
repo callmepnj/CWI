@@ -47,7 +47,7 @@ Sources must contain title, publisher/source, url, date if known, and reliabilit
     timeline: Array.isArray(data.timeline) ? data.timeline : [],
     keyFacts: Array.isArray(data.keyFacts) ? data.keyFacts : [],
     riskNotes: Array.isArray(data.riskNotes) ? data.riskNotes : [],
-    category: data.category || input.category || "Watch Desk",
+    category: data.category || input.category || "Live Newsroom",
     _meta: { estimatedCost, provider, model }
   };
 }

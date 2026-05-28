@@ -119,7 +119,7 @@ export async function syncStaticPublicMemory() {
       label: post.title,
       slug: post.slug,
       summary: post.summary,
-      sourceUrl: `/watch-desk/${post.slug}`,
+      sourceUrl: `/archive/${post.slug}`,
       sourceCount: post.sources.length,
       confidenceScore: confidenceFromSourceCount(post.sources.length),
       metadata: { category: post.category, tags: post.tags, date: post.date }

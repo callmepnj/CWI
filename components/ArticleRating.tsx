@@ -5,7 +5,7 @@ import { Star } from "lucide-react";
 import { Card, CardLabel } from "@/components/ui/card";
 
 type ArticleRatingProps = {
-  articleType: "watch-desk" | "unanswered-files";
+  articleType: "archive" | "unanswered-files";
   articleSlug: string;
 };
 

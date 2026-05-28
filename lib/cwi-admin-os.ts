@@ -23,7 +23,7 @@ const agentDefinitions = [
   ["command-ai", "CWI Command AI", "Main controller, editor-in-chief, and daily operations manager."],
   ["research-ai", "CWI Research AI", "Finds and extracts authentic information from low-cost sources."],
   ["verify-ai", "CWI Verify AI", "Checks accuracy, legal risk, safety, labels, and source gaps."],
-  ["article-ai", "CWI Article AI", "Writes approval-ready Watch Desk and India Unanswered Files drafts."],
+  ["article-ai", "CWI Article AI", "Writes approval-ready Live Newsroom and India Unanswered Files drafts."],
   ["seo-ai", "CWI SEO AI", "Prepares metadata, schema, links, sitemap notes, and Search Console checklist."],
   ["social-ai", "CWI Social AI", "Creates platform-specific captions and distribution packs."],
   ["image-ai", "CWI Image AI", "Maps approved images, alt text, thumbnails, OG assets, and source notes."],
@@ -48,7 +48,7 @@ const defaultSources = [
 const defaultKeywords = [
   ["Cockroach Watch India", "CWI", 1],
   ["CWI", "CWI", 1],
-  ["CWI Watch Desk", "CWI", 1],
+  ["CWI Live Newsroom", "CWI", 1],
   ["CWI India Unanswered Files", "CWI", 1],
   ["Document Verify Amplify", "CWI", 2],
   ["India is watching", "CWI", 2],
@@ -204,7 +204,7 @@ async function buildAdminDashboardData() {
       limit 30;
     `).catch(() => ({ rows: [] })),
     pool.query(`
-      select id::text, article_slug as article, name, comment, status, created_at, 'Watch Desk' as source
+      select id::text, article_slug as article, name, comment, status, created_at, 'Live Newsroom' as source
       from cwi_article_comments
       order by created_at desc
       limit 40;
@@ -272,8 +272,8 @@ async function buildAdminDashboardData() {
     trendRadarItems: trendRadarItems.rows,
     comments: [...watchComments.rows, ...unansweredComments.rows].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
     latestPublicArticles: mergeAdminArticles([
-      ...dbPublishedPosts.map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category })),
-      ...posts.slice(0, 8).map((post) => ({ title: post.title, href: `/watch-desk/${post.slug}`, category: post.category }))
+      ...dbPublishedPosts.map((post) => ({ title: post.title, href: `/archive/${post.slug}`, category: post.category })),
+      ...posts.slice(0, 8).map((post) => ({ title: post.title, href: `/archive/${post.slug}`, category: post.category }))
     ]).slice(0, 6),
     latestUnansweredFiles: unansweredFiles.slice(0, 6).map((file) => ({ title: file.title, href: `/india-unanswered-files/${file.slug}`, category: file.category }))
   };
@@ -395,7 +395,7 @@ export async function createManualLinkWorkflow(input: {
 
   await logTask("research-ai", `Processed manual link: ${topic}`, "completed", 6);
   await logTask("verify-ai", `Created verification report: ${topic}`, "completed", 4, { verificationReportId: verification.id });
-  await logTask("article-ai", `Prepared draft shell: ${topic}`, "completed", 8);
+  await logTask("article-ai", `Prepared review draft: ${topic}`, "completed", 8);
   await logTask("seo-ai", `Prepared SEO pack: ${topic}`, "completed", 3);
   await logTask("social-ai", `Prepared social pack: ${topic}`, "completed", 3);
   invalidateAdminDashboardCache();
@@ -485,7 +485,7 @@ export async function updateCommentModeration(input: { source: string; id: strin
   const status = ["approved", "rejected", "spam", "pending"].includes(input.status) ? input.status : "pending";
   const commentId = requireUuid(input.id, "commentId");
 
-  if (input.source === "Watch Desk") {
+  if (input.source === "Live Newsroom") {
     await ensureCommentsTable();
     await getPool().query(`update cwi_article_comments set status = $2 where id = $1;`, [commentId, status]);
   } else if (input.source === "India Unanswered Files") {
@@ -518,7 +518,7 @@ async function createDailyBriefing() {
     [
       JSON.stringify(topTopics),
       JSON.stringify(data.approvals.slice(0, 5).map((item) => item.topic)),
-      JSON.stringify(["Review pending manual links", "Update source-backed Watch Desk items", "Check top India Unanswered Files pages"]),
+      JSON.stringify(["Review pending manual links", "Update source-backed Live Newsroom items", "Check top India Unanswered Files pages"]),
       JSON.stringify(["Prepare captions only for approved topics", "Avoid unverified breaking claims"]),
       JSON.stringify(["Check topic-specific OG images", "Avoid repeated unrelated visuals"]),
       JSON.stringify(["Confirm sitemap is current", "Inspect top URLs in Search Console after approval"]),
@@ -619,7 +619,7 @@ async function createSeoAuditPack() {
 async function createUiuxAudit() {
   const audits = [
     ["Submit Report", "Confirm no developer-facing upload/backend wording is visible.", "High", "Keep upload instructions user-facing."],
-    ["Watch Desk articles", "Check mobile spacing around source cards and rating widget.", "Medium", "Keep CTA buttons tappable."],
+    ["Live Newsroom articles", "Check mobile spacing around source cards and rating widget.", "Medium", "Keep CTA buttons tappable."],
     ["India Unanswered Files", "Verify related cards use readable title overlays and relevant images.", "Medium", "Maintain CWI blue title treatment."]
   ];
 
@@ -650,7 +650,7 @@ async function createUiuxAudit() {
 
 async function createStandaloneSocialPack() {
   const post = posts[0];
-  const social = await createSocialPack(null, post.title, `${site.url}/watch-desk/${post.slug}`);
+  const social = await createSocialPack(null, post.title, `${site.url}/archive/${post.slug}`);
   await createApprovalQueueItem({
     topic: post.title,
     type: "Social Pack",
@@ -674,7 +674,7 @@ async function createStandaloneArticleDraft() {
   await createApprovalQueueItem({
     topic: post.title,
     type: "Article Draft",
-    summary: "CWI Article AI prepared a template-based draft shell for human review.",
+    summary: "CWI Article AI prepared a template-based review draft for human review.",
     verificationStatus: post.verificationStatus,
     riskLevel: "Medium",
     sourceCount: post.sources.length,
@@ -715,7 +715,7 @@ async function createVerificationReport(researchPackId: string, status: string, 
 async function createArticleDraft(researchPackId: string | null, topic: string, summary: string, sourceCount: number, verificationStatus: string) {
   const slug = slugify(topic);
   const draft = {
-    h1: `${topic} - CWI Watch Desk`,
+    h1: `${topic} - CWI Live Newsroom`,
     shortAnswer: summary || `${topic} is queued for CWI review with source attribution required before publishing.`,
     sections: [
       { heading: "What happened", body: "This section must be completed only from verified source links in the research pack." },
@@ -725,7 +725,7 @@ async function createArticleDraft(researchPackId: string | null, topic: string, 
       {
         heading: "CWI context",
         body:
-          "Cockroach Watch India - CWI is tracking this topic through the CWI Watch Desk as part of its public archive on youth voice, civic satire, creator-led commentary, public issues, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest conversations with context and source attribution."
+          "Cockroach Watch India - CWI is tracking this topic through the CWI Live Newsroom as part of its public archive on youth voice, civic satire, creator-led commentary, public issues, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest conversations with context and source attribution."
       }
     ],
     disclaimer:
@@ -736,7 +736,7 @@ async function createArticleDraft(researchPackId: string | null, topic: string, 
   const result = await getPool().query<{ id: string; slug: string }>(
     `
       insert into article_drafts (research_pack_id, title, slug, category, draft, verification_status, source_count)
-      values ($1, $2, $3, 'Watch Desk', $4, $5, $6)
+      values ($1, $2, $3, 'Live Newsroom', $4, $5, $6)
       returning id, slug;
     `,
     [optionalUuid(researchPackId), topic, slug, JSON.stringify(draft), verificationStatus, sourceCount]
@@ -746,7 +746,7 @@ async function createArticleDraft(researchPackId: string | null, topic: string, 
 }
 
 async function createSeoPack(articleDraftId: string | null, topic: string, slug: string) {
-  const canonicalUrl = `${site.url}/watch-desk/${slug}`;
+  const canonicalUrl = `${site.url}/archive/${slug}`;
   const result = await getPool().query<{ id: string }>(
     `
       insert into seo_packs (
@@ -760,16 +760,16 @@ async function createSeoPack(articleDraftId: string | null, topic: string, slug:
     `,
     [
       optionalUuid(articleDraftId),
-      `${topic} - CWI Watch Desk | Cockroach Watch India`,
-      `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this public-interest update.`,
+      `${topic} - CWI Live Newsroom | Cockroach Watch India`,
+      `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Live Newsroom is tracking this public-interest update.`,
       slug,
       canonicalUrl,
       `${site.url}/opengraph-image`,
       JSON.stringify({ card: "summary_large_image", site: "@CWatchIndia" }),
       JSON.stringify({ "@type": "NewsArticle", headline: topic, url: canonicalUrl, publisher: "Cockroach Watch India" }),
-      JSON.stringify({ "@type": "BreadcrumbList", items: ["Home", "CWI Watch Desk", topic] }),
-      JSON.stringify(["/", "/watch", "/watch-desk", "/india-unanswered-files", "/submit"]),
-      JSON.stringify([`Cockroach Watch India CWI Watch Desk visual on ${topic}.`]),
+      JSON.stringify({ "@type": "BreadcrumbList", items: ["Home", "CWI Live Newsroom", topic] }),
+      JSON.stringify(["/", "/watch", "/archive", "/india-unanswered-files", "/submit"]),
+      JSON.stringify([`Cockroach Watch India CWI Live Newsroom visual on ${topic}.`]),
       JSON.stringify(["Check canonical", "Check OG image", "Check sitemap after approval", "Inspect URL in Google Search Console"])
     ]
   );
@@ -796,7 +796,7 @@ async function createSocialPack(articleDraftId: string | null, topic: string, ur
       `${topic}\n\nCWI is tracking this with source labels and public-interest context.\n${site.url}\n#CWI #IndiaIsWatching`,
       `${topic} - what source-backed context should CWI add?`,
       `CWI is reviewing this topic. What verified source, official statement, or public-interest context should be added before publication?\n\n${site.url}`,
-      `${topic} | CWI Watch Desk`,
+      `${topic} | CWI Live Newsroom`,
       `Source-backed civic context from Cockroach Watch India. ${ending}`,
       `Read the source trail and submit corrections at ${site.url}/submit.`,
       `${topic}\nCWI is tracking this with context, source attribution, and public-interest caution. ${site.url}`,
@@ -817,7 +817,7 @@ async function createImagePack(topic: string) {
   const result = await getPool().query<{ id: string }>(
     `
       insert into image_library (topic, section, image_type, path, alt_text, credit, source_url, quality_status, approval_status, metadata)
-      values ($1, 'Watch Desk', 'hero/og/thumbnail candidate', $2, $3, $4, $5, 'Needs human review', 'Image Ready', $6)
+      values ($1, 'Live Newsroom', 'hero/og/thumbnail candidate', $2, $3, $4, $5, 'Needs human review', 'Image Ready', $6)
       returning id;
     `,
     [
@@ -981,7 +981,7 @@ function categoryFromContentType(value?: string) {
   if (normalized.includes("unanswered")) return "India Unanswered Files";
   if (normalized.includes("social")) return "Social Pack";
   if (normalized.includes("advisory")) return "Public Advisory";
-  return "Watch Desk";
+  return "Live Newsroom";
 }
 
 function detectPlatform(url: string) {

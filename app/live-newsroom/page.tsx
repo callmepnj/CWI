@@ -40,7 +40,7 @@ const newsroomDescription =
   "Follow CWI Live Newsroom for daily source-backed updates, developing claims, public advisories, verification notes, India Unanswered Files, corrections, and civic issue tracking.";
 
 export const metadata = createMetadata({
-  title: "CWI Live Newsroom â€” Daily Source-Backed Updates from Cockroach Watch India",
+  title: "CWI Live Newsroom - Daily Source-Backed Updates from Cockroach Watch India",
   description: newsroomDescription,
   path: "/live-newsroom",
   keywords: [
@@ -448,7 +448,7 @@ function ArchivePreview({ items }: { items: ArchivePreviewItem[] }) {
     <div>
       <div className="grid gap-4 md:grid-cols-3">
         {items.map((post) => (
-          <Link key={post.slug} href={`/watch-desk/${post.slug}`} className="group rounded-lg border border-cwi-brown/12 bg-white/80 p-5 shadow-sm transition hover:border-cwi-green/32 hover:bg-cwi-cream/60">
+          <Link key={post.slug} href={`/archive/${post.slug}`} className="group rounded-lg border border-cwi-brown/12 bg-white/80 p-5 shadow-sm transition hover:border-cwi-green/32 hover:bg-cwi-cream/60">
             <div className="mb-3 text-xs font-black uppercase tracking-wide text-cwi-green">{post.category}</div>
             <h3 className="font-display text-xl font-black leading-tight text-cwi-ink group-hover:text-cwi-green">{post.title}</h3>
             <p className="mt-2 line-clamp-3 text-sm leading-6 text-cwi-ink/68">{post.summary}</p>

@@ -265,3 +265,20 @@ Next steps:
 - `/admin/live-newsroom` now exposes daily controls for Top 3, Lead Story, What Changed Today, live updates, verification claims, public advisories, India Unanswered File priority, Source Ledger entries, corrections, labels, hide, approval queue, and approval-only publishing guard.
 - SEO/build status: `npm run typecheck`, `npm run lint`, and `npm run build` pass. Build regenerated `public/sitemap.xml` with 261 URLs including the new live newsroom slugs. Local smoke checks pass for `/live-newsroom`, the NEET lead detail route, and `/admin/live-newsroom` redirecting to login when unauthenticated.
 - Dev server is running at `http://localhost:3000`; review URL is `http://localhost:3000/live-newsroom`.
+
+2026-05-28 site-wide CWI newsroom unification in progress:
+- Current user request: apply the new Live Newsroom UI system across the whole website, simplify public IA, make Live Newsroom the main product, move Archive to `/archive`, redirect old/extra pages, update sitemap/robots/admin alignment, and push all changes.
+- User also requested using the support QR file if present. Search of `public/` and repo root did not find `public/images/support/cwi-support-qr.png` or any QR/support image yet; implementation should auto-use that path if the file appears, without faking a QR.
+- Required page audit was created before route behavior changes at `docs/page-audit-cwi-newsroom-unification.md` with KEEP/MERGE/ARCHIVE/REDIRECT/NOINDEX decisions.
+
+2026-05-28 site-wide CWI newsroom unification resumed:
+- User asked to complete the full cleanup after interruption.
+- Fixed direction to use Live Newsroom-first IA, simple public nav/footer, canonical `/archive`, old route redirects, source/correction submit flow, and support QR fallback.
+- Current risk to verify before final: TypeScript/build after large page rewrites, sitemap generation, public text scan, and push.
+
+2026-05-28 site-wide CWI newsroom unification complete:
+- Applied the Live Newsroom-first CWI UI system across public pages, simplified nav/footer, and made Home point users toward Live Newsroom, Submit, Support, Archive, and India Unanswered Files.
+- Added shared CWI design components/tokens, canonical Archive pages, old route redirects, cleaned Submit/Support/About/Policy/Corrections/Credit/Contact/Privacy/Terms pages, and rewired India Unanswered Files into the dossier/article layout.
+- Support page now auto-uses `public/images/support/cwi-support-qr.png` when present and shows a safe QR fallback when missing; no fake supporter notes, totals, corrections, or counters are shown.
+- Generated a clean sitemap/robots set for canonical public pages only and expanded System Health checks for old Watch Desk links, preview URLs, internal/debug wording, fake counters, and placeholder text.
+- Verification passed: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run build`, public text/URL scans, sitemap scan, and local smoke checks on port 3001 for main pages plus legacy redirects.

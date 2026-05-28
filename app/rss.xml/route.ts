@@ -19,7 +19,7 @@ export async function GET() {
   const items = feedPosts
     .slice(0, 50)
     .map((post) => {
-      const url = `${site.url}/watch-desk/${post.slug}`;
+      const url = `${site.url}/archive/${post.slug}`;
 
       return `    <item>
       <title>${escapeXml(post.title)}</title>
@@ -37,7 +37,7 @@ export async function GET() {
 <rss version="2.0">
   <channel>
     <title>${escapeXml(site.name)} Archive</title>
-    <link>${site.url}/watch-desk</link>
+    <link>${site.url}/archive</link>
     <description>${escapeXml(site.description)}</description>
     <language>en-IN</language>
     <lastBuildDate>${new Date(feedPosts[0]?.updatedDate ?? "2026-05-21").toUTCString()}</lastBuildDate>

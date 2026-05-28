@@ -73,6 +73,11 @@ type AdminData = {
 const sections = [
   ["overview", "Overview", Activity],
   ["live-newsroom", "Live Newsroom", Newspaper],
+  ["support", "Support", HeartHandshake],
+  ["submissions", "Submissions", FileText],
+  ["archive", "Archive", Newspaper],
+  ["unanswered-files", "Unanswered Files", FileSearch],
+  ["corrections", "Corrections", ClipboardCheck],
   ["agents", "Agent Control Center", Bot],
   ["workflows", "Workflows", Activity],
   ["approval", "Approval Queue", ClipboardCheck],
@@ -251,7 +256,7 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
   async function publishApproval(id: string) {
     setPending(`${id}:publish`);
-    startProgress("Publishing approved article", "Publish AI is saving the article and opening the public Watch Desk route.");
+    startProgress("Publishing approved article", "Publish AI is saving the item and opening the approved public route.");
     setMessage("");
     setError("");
 
@@ -266,14 +271,14 @@ export function AdminDashboard({ activeSection }: { activeSection: string }) {
 
     showPublishSuccess(json);
     markApprovalPublished(id);
-    finishProgress("Public Watch Desk route is ready.");
+    finishProgress("Public route is ready.");
     await loadDashboard(true);
   }
 
   async function approveAndPublish(item: AdminRecord) {
     const id = text(item.id);
     setPending(`${id}:approved`);
-    startProgress("Approving and publishing", "Saving approval, preparing any missing article draft, and opening the public Watch Desk route.");
+    startProgress("Approving and publishing", "Saving approval, preparing any missing draft, and opening the approved public route.");
     setMessage("");
     setError("");
 
@@ -538,6 +543,11 @@ function AdminSection({
   updateComment: (source: string, id: string, status: string) => Promise<void>;
 }) {
   if (section === "live-newsroom") return <AdminLiveNewsroom section={section} />;
+  if (section === "support") return <RecordList title="Support" records={[]} fields={["supporter", "status", "consent_to_display", "payment_verified", "created_at"]} empty="Approved, consented, verified supporter notes will appear here when the support system is connected." />;
+  if (section === "submissions") return <ReportsSection records={data.reports} />;
+  if (section === "archive") return <RecordList title="Archive" records={data.latestPublicArticles} fields={["title", "category", "href"]} />;
+  if (section === "unanswered-files") return <RecordList title="Unanswered Files" records={data.latestUnansweredFiles} fields={["title", "category", "href"]} />;
+  if (section === "corrections") return <RecordList title="Corrections" records={[]} fields={["article", "correction_date", "what_changed", "status"]} empty="Published corrections will appear here after editorial approval." />;
   if (section === "agents") return <AgentsSection data={data} pending={pending} runAction={runAction} />;
   if (section === "workflows") {
     return (
@@ -626,7 +636,7 @@ function OverviewSection({ data, pending, runAction }: { data: AdminData; pendin
         <PreviewList title="Trend radar" records={data.trendRadarItems} fields={["topic", "trend_type", "priority_score", "suggested_action"]} />
         <PreviewList title="Recent workflows" records={data.workflows} fields={["workflow_type", "topic", "status", "progress_percent"]} />
         <PreviewList title="Latest reports" records={data.reports} fields={["type", "city", "state", "message", "status"]} />
-        <PreviewList title="Latest Watch Desk articles" records={data.latestPublicArticles} fields={["title", "category", "href"]} />
+        <PreviewList title="Latest Archive articles" records={data.latestPublicArticles} fields={["title", "category", "href"]} />
         <PreviewList title="Latest Unanswered Files" records={data.latestUnansweredFiles} fields={["title", "category", "href"]} />
       </div>
     </>
@@ -708,7 +718,7 @@ function TrendRadarSection({ data, pending, runAction }: { data: AdminData; pend
             <CardLabel>CWI Radar</CardLabel>
             <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">Trend radar</h2>
             <p className="mt-3 leading-7 text-ink/70">
-              Manual links, reports, keywords, comments, Watch Desk posts, and Unanswered Files are ranked into daily topic leads.
+              Manual links, reports, keywords, comments, Archive records, and Unanswered Files are ranked into daily topic leads.
             </p>
           </div>
           <Button type="button" disabled={pending === "trend-radar"} onClick={() => runAction("trend-radar")}>
@@ -916,7 +926,7 @@ function ManualLinkSection({ onComplete }: { onComplete: () => Promise<void> }) 
           <AdminInput name="platform" label="Platform" placeholder="Instagram, X, YouTube, Reddit, news..." />
           <AdminInput name="creatorSource" label="Creator / source" placeholder="Source name or public handle" />
           <AdminSelect name="priority" label="Priority" options={["normal", "high", "urgent", "low"]} />
-          <AdminSelect name="contentType" label="Content type" options={["manual link", "Watch Desk", "Public Advisory", "Social Pack", "India Unanswered Files", "Civic Issue"]} />
+          <AdminSelect name="contentType" label="Content type" options={["manual link", "Live Newsroom", "Public Advisory", "Social Pack", "India Unanswered Files", "Civic Issue"]} />
         </div>
         <label className="grid gap-2 text-sm font-black uppercase tracking-[0.08em] text-ink/65">
           Notes
@@ -1260,7 +1270,13 @@ function normalizeApprovalStatus(value: string) {
 }
 
 function normalizeSection(value: string): SectionId {
-  const match = sections.find(([id]) => id === value)?.[0];
+  const aliases: Record<string, SectionId> = {
+    reports: "submissions",
+    articles: "archive",
+    comments: "corrections"
+  };
+  const normalized = aliases[value] ?? value;
+  const match = sections.find(([id]) => id === normalized)?.[0];
   return match ?? "overview";
 }
 

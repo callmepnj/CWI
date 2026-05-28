@@ -34,28 +34,28 @@ export async function runArticleAgent(input: {
     maxTokens: 2600,
     payload: { researchPack, verificationReport },
     instruction: `
-Write an approval-ready CWI Watch Desk article draft from the research and verification pack.
+Write an approval-ready CWI Live Newsroom article draft from the research and verification pack.
 Do not invent facts, sources, quotes, or current numbers.
 Use newsroom style and include:
 Short answer, What happened, What we know, What remains unclear, Why it matters, CWI context, Sources and further reading, Related CWI articles, Submit correction/report CTA, Disclaimer.
-Every draft must naturally mention Cockroach Watch India, CWI, CWI Watch Desk, Document. Verify. Amplify., The youth are not silent. India is watching., and ${site.url}.
+Every draft must naturally mention Cockroach Watch India, CWI, CWI Live Newsroom, Document. Verify. Amplify., The youth are not silent. India is watching., and ${site.url}.
 Return exactly: title, slug, category, summary, body, sources, disclaimer, relatedArticles.
     `.trim()
   });
 
-  const title = asText(data.title, asText((researchPack as { topic?: string }).topic, "CWI Watch Desk draft"));
+  const title = asText(data.title, asText((researchPack as { topic?: string }).topic, "CWI Live Newsroom draft"));
 
   return {
     title,
     slug: asText(data.slug, slugify(title)),
-    category: asText(data.category, "Watch Desk"),
-    summary: asText(data.summary, "CWI Watch Desk draft prepared for human review."),
+    category: asText(data.category, "Live Newsroom"),
+    summary: asText(data.summary, "CWI Live Newsroom draft prepared for human review."),
     body: Array.isArray(data.body) ? data.body : [],
     sources: Array.isArray(data.sources) ? data.sources : [],
     disclaimer:
       data.disclaimer ||
       "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Claims require attribution and human review.",
-    relatedArticles: Array.isArray(data.relatedArticles) ? data.relatedArticles : ["/watch-desk", "/india-unanswered-files", "/submit"],
+    relatedArticles: Array.isArray(data.relatedArticles) ? data.relatedArticles : ["/live-newsroom", "/india-unanswered-files", "/submit"],
     _meta: { estimatedCost, provider, model }
   };
 }

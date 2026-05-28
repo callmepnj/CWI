@@ -12,7 +12,7 @@ export type ImageAgentOutput = {
 };
 
 export async function runImageAgent(input: { topic?: string; articleDraftId?: string }) {
-  const topic = input.topic || "CWI Watch Desk update";
+  const topic = input.topic || "CWI Live Newsroom update";
   const file =
     unansweredFiles.find((item) => topic.toLowerCase().includes(item.title.toLowerCase().split(" ")[0])) ||
     unansweredFiles.find((item) => item.heroImage) ||

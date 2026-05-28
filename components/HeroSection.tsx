@@ -35,7 +35,7 @@ export function HeroSection() {
               <Link href="/submit">Submit a civic report to CWI <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="green">
-              <Link href="/watch-desk">Read the CWI Archive</Link>
+              <Link href="/archive">Read the CWI Archive</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/join">Join the CWI Watch</Link>

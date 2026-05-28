@@ -1,42 +1,56 @@
 import Link from "next/link";
-import { Section } from "@/components/Section";
+import { CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA } from "@/components/CwiDesignSystem";
 import { Card, CardLabel } from "@/components/ui/card";
 import { site } from "@/lib/site";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Creator Credit Policy — Cockroach Watch India",
-  description:
-    "Read the CWI creator credit, correction, and takedown policy for reposted, quoted, explained, or archived content.",
+  title: "Credit Policy - Creator Credit and Takedown - Cockroach Watch India",
+  description: "CWI creator credit, repost, watermark, correction, and takedown policy.",
   path: "/credit-policy"
 });
 
-const policies = [
-  "We do not remove watermarks.",
-  "We do not claim ownership of user-created content.",
-  "We credit original creators wherever visible.",
-  "We respond to correction and takedown requests.",
-  "We may use short clips for commentary, criticism, explanation, or public-interest discussion where legally allowed.",
-  "Permission is preferred for reposting full videos.",
-  "If content includes private individuals, minors, or safety concerns, CWI may blur, remove, or decline publication."
+const sections = [
+  ["Creator credit", "CWI credits original creators where visible and practical. Send the original link, public handle, and requested credit line if something needs updating."],
+  ["Repost rules", "Short clips, screenshots, or excerpts may be used for commentary, criticism, explanation, or public-interest context where legally allowed. Full reposts need stronger justification or permission."],
+  ["Watermark rules", "CWI does not remove watermarks or claim user-created content as its own."],
+  ["Takedown requests", "Send the page URL, proof of authorship or affected status, and the requested action. CWI may remove, blur, re-caption, credit, or retain content depending on public-interest and safety review."],
+  ["Correction requests", "Correction requests should include the page URL, the incorrect wording, the source link, and what should change."],
+  ["What to send CWI", "Send source links, dates, creator handles, context, permission notes, and any safety concern. Do not send private data that is not needed for review."],
+  ["Contact", `Use /submit or email ${site.email} for creator credit, repost, correction, or takedown review.`]
 ];
 
 export default function CreditPolicyPage() {
   return (
-    <Section eyebrow="Creator Rights" title="Creator Credit Policy" titleAs="h1" subtitle="CWI respects creators. If we use, repost, quote, explain, or archive your content, we will try to credit your public handle clearly. If you want content removed, corrected, or credited differently, contact us.">
-      <Card>
-        <CardLabel>Policy Desk</CardLabel>
-        <p className="text-lg font-black uppercase tracking-[0.08em] text-royal">
-          Email: <Link href={`mailto:${site.email}`} className="underline">{site.email}</Link>
-        </p>
-        <div className="mt-8 grid gap-3">
-          {policies.map((policy) => (
-            <p key={policy} className="rounded-2xl border border-line bg-paper p-4 font-bold leading-7">
-              {policy}
-            </p>
+    <CwiPageShell>
+      <CwiMasthead
+        label="Creator rights"
+        title="Credit Policy"
+        subtitle="Creator credit, repost, correction, and takedown rules for CWI."
+        primaryCta={{ href: "/submit", label: "Send credit request" }}
+        secondaryCta={{ href: "/editorial-policy", label: "Read editorial policy" }}
+        meta={["Watermarks respected", "Takedowns reviewed", "Corrections open", "No private data"]}
+      />
+
+      <section className="mt-10">
+        <CwiSectionHeader eyebrow="Policy desk" title="How CWI handles creator material" />
+        <div className="grid gap-5 md:grid-cols-2">
+          {sections.map(([title, body]) => (
+            <Card key={title}>
+              <CardLabel>Credit policy</CardLabel>
+              <h2 className="font-display text-2xl font-black uppercase leading-tight text-cwi-ink">{title}</h2>
+              <p className="mt-4 leading-8 text-cwi-ink/70">{body}</p>
+            </Card>
           ))}
         </div>
-      </Card>
-    </Section>
+      </section>
+
+      <section className="mt-10 rounded-lg border border-cwi-brown/18 bg-white/78 p-6">
+        <CwiSectionHeader eyebrow="Direct contact" title="Creator credit or takedown" />
+        <p className="leading-8 text-cwi-ink/70">Email <Link href={`mailto:${site.email}`} className="font-bold text-cwi-green underline-offset-4 hover:underline">{site.email}</Link> or use the submit form with links, dates, and the requested change.</p>
+      </section>
+
+      <div className="mt-10"><CwiSubmitCTA /></div>
+    </CwiPageShell>
   );
 }

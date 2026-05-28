@@ -1,358 +1,229 @@
-import Link from "next/link";
-import { ArrowRight, Eye, FileText, Flag, Newspaper, Send } from "lucide-react";
-import { AgendaCard } from "@/components/AgendaCard";
-import { ArchiveCard } from "@/components/ArchiveCard";
-import { CharterCard } from "@/components/CharterCard";
-import { FounderStatement } from "@/components/FounderStatement";
-import { HeroSection } from "@/components/HeroSection";
-import { IssueCard } from "@/components/IssueCard";
-import { PollCard } from "@/components/PollCard";
-import { RoleCard } from "@/components/RoleCard";
-import { Section } from "@/components/Section";
-import { SocialLinks } from "@/components/SocialLinks";
-import { WatchDeskCard } from "@/components/WatchDeskCard";
-import { WatchHighlightSection } from "@/components/WatchHighlightSection";
-import { WatchTicker } from "@/components/WatchTicker";
-import { Button } from "@/components/ui/button";
-import { Card, CardLabel } from "@/components/ui/card";
-import { agendaItems } from "@/data/agenda";
-import { charterPrinciples } from "@/data/charter";
-import { issues } from "@/data/issues";
-import { posts, trendingTopics } from "@/data/posts";
-import { roles } from "@/data/roles";
+import { CwiButtonLink, CwiDossierCard, CwiEditorialCard, CwiLeadCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTimeline, CwiTrustStrip } from "@/components/CwiDesignSystem";
+import { getLeadStory, getLiveUpdates, getTodaysTopItems, getWhatChangedToday, todaysBriefs } from "@/data/live-newsroom";
+import { posts } from "@/data/posts";
 import { unansweredFiles } from "@/data/unanswered-files";
-import { absoluteUrl, createMetadata } from "@/lib/seo";
+import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-const homepageFaqs = [
-  {
-    question: "What is Cockroach Watch India?",
-    answer:
-      "Cockroach Watch India, also known as CWI, is a founder-led civic watch, satire, and commentary platform documenting youth voice, public issues, viral civic moments, creator-led commentary, civic satire, creator credit, and the Cockroach wave across India."
-  },
-  {
-    question: "Is CWI the official Cockroach Janta Party website?",
-    answer:
-      "No. CWI is independent from Cockroach Janta Party unless officially declared otherwise. Cockroach Watch India does not impersonate any political party and exists as a public-interest civic watch, satire, and commentary platform."
-  },
-  {
-    question: "What does CWI document?",
-    answer:
-      "CWI documents public issues, youth reactions, civic satire, viral political and civic moments, correction requests, fact-check leads, creator-credit requests, local accountability stories, and movement archive material."
-  },
-  {
-    question: "How can someone submit a report to CWI?",
-    answer:
-      "Citizens can submit a public issue, viral post, source link, correction, creator credit request, or youth story through the Submit a Report page. CWI asks for evidence, context, consent, and responsible public-interest submissions."
-  },
-  {
-    question: "Why does creator credit matter to Cockroach Watch India?",
-    answer:
-      "Creator credit protects public memory and respects the people who record, explain, design, satirize, and document civic moments. CWI does not remove watermarks or claim ownership of user-created work."
-  }
-];
-
-const homepageFaqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: homepageFaqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer
-    }
-  }))
-};
-
-const homepageWebPageJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Cockroach Watch India - CWI Civic Watch Platform",
-  url: absoluteUrl("/"),
-  description: site.description,
-  isPartOf: {
-    "@type": "WebSite",
-    name: site.name,
-    url: site.url
-  },
-  about: [
-    "Cockroach Watch India",
-    "CWI",
-    "Cockroach wave",
-    "Youth voice India",
-    "Civic watch India",
-    "Political satire India",
-    "Public issues India",
-    "Creator credit"
-  ],
-  primaryImageOfPage: {
-    "@type": "ImageObject",
-    url: absoluteUrl("/opengraph-image"),
-    width: 1200,
-    height: 630
-  }
-};
+const description = "Cockroach Watch India is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform tracking public issues, viral claims, source trails, corrections, youth voice, and India Unanswered Files.";
 
 export const metadata = createMetadata({
-  title: "Cockroach Watch India — CWI Civic Watch Platform",
-  description:
-    "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform documenting youth voice, public issues, creator credit, viral claims, and India's unanswered files.",
+  title: "Cockroach Watch India - CWI Live Newsroom",
+  description,
   path: "/",
-  keywords: [
-    "Cockroach Watch India",
-    "CWI",
-    "CWI Archive",
-    "CWI articles",
-    "India Unanswered Files",
-    "public issues India",
-    "youth voice India",
-    "civic watch India",
-    "Document Verify Amplify"
-  ]
+  keywords: ["Cockroach Watch India", "CWI Live Newsroom", "India Unanswered Files", "Submit source correction", "CWI Archive"]
 });
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: site.name,
+  alternateName: site.shortName,
+  url: site.url,
+  email: site.email,
+  sameAs: [site.x, site.instagram, site.youtube, site.reddit, site.facebook, site.bluesky]
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: site.name,
+  url: site.url,
+  description,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${site.url}/live-newsroom?search={search_term_string}`,
+    "query-input": "required name=search_term_string"
+  }
+};
+
 export default function HomePage() {
-  const dateSortedPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date));
-  const featuredPost = dateSortedPosts[0];
+  const todaysTop = getTodaysTopItems(3);
+  const changedToday = getWhatChangedToday(4);
+  const leadStory = getLeadStory();
+  const latestUpdates = getLiveUpdates(3);
+  const archiveItems = [...posts].sort((first, second) => dateValue(second.updatedAt) - dateValue(first.updatedAt)).slice(0, 3);
+  const priorityFiles = unansweredFiles.slice(0, 3);
+  const todayBrief = todaysBriefs[0];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageWebPageJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaqJsonLd) }}
-      />
-      <HeroSection />
-      <WatchHighlightSection />
-      <WatchTicker />
-      <Section title="A Statement From The Founders">
-        <FounderStatement />
-      </Section>
-      <Section
-        eyebrow="What is CWI?"
-        title="What is Cockroach Watch India?"
-        subtitle="CWI tracks the Cockroach wave and the wider youth-led civic conversation around it: what is viral, what is ignored, what requires verification, and what should not disappear."
-      >
-        <div className="mb-8 rounded-3xl border border-line bg-white p-6 leading-8 text-ink/72 shadow-card">
-          <p>
-            Cockroach Watch India, also known as CWI, is a founder-led civic watch platform built around a simple public duty: Document. Verify. Amplify. The youth are not silent. India is watching.
-          </p>
-          <p className="mt-4">
-            We document youth voice, public issues, civic satire, creator credit, and the Cockroach wave with responsible context so searchers, citizens, creators, and reporters can understand the movement without confusing CWI with any political party.
-          </p>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-3">
-          {[
-            ["Document", "Public issues, viral moments, creator work, and civic reactions."],
-            ["Verify", "Source trails, correction requests, context notes, and careful labels."],
-            ["Amplify", "Youth voice, public-interest satire, and reports that deserve attention."]
-          ].map(([title, body]) => (
-            <Card key={title}>
-              <CardLabel>CWI Desk</CardLabel>
-              <h3 className="font-display text-3xl font-black uppercase">{title}</h3>
-              <p className="mt-4 leading-7 text-ink/70">{body}</p>
-            </Card>
-          ))}
-        </div>
-        <Button asChild className="mt-8" variant="green">
-          <Link href="/what-is-cwi">Read what CWI is <ArrowRight className="h-4 w-4" /></Link>
-        </Button>
-      </Section>
-      <Section eyebrow="Manifesto Preview" title="The CWI Watch Charter" subtitle="A serious charter for a generation that refuses to be ignored.">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {charterPrinciples.slice(0, 6).map((principle, index) => (
-            <CharterCard key={principle.title} index={index + 1} {...principle} />
-          ))}
-        </div>
-        <Button asChild className="mt-8">
-          <Link href="/charter">Read the CWI Watch Charter</Link>
-        </Button>
-      </Section>
-      <Section eyebrow="Join The Watch" title="Who are you in the Watch?" subtitle="You do not need power to watch power. You need a phone, a conscience, and proof.">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {roles.map((role) => (
-            <RoleCard key={role.title} {...role} />
-          ))}
-        </div>
-      </Section>
-      <Section eyebrow="Issue Watch" title="Issue Watch" subtitle="The problems people record when institutions stop listening. Local issues are national signals.">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {issues.slice(0, 6).map((issue) => (
-            <IssueCard key={issue.title} {...issue} />
-          ))}
-        </div>
-        <Button asChild className="mt-8" variant="outline">
-          <Link href="/issues">Explore public issues tracked by CWI</Link>
-        </Button>
-      </Section>
-      <Section eyebrow="Archive" title="Latest from CWI Archive" subtitle="Editorial notes, explainers, public reactions, corrections, and archive updates from Cockroach Watch India articles.">
-        <div className="mb-6 rounded-[2rem] border border-line bg-gradient-to-br from-ink via-[#102a63] to-royal p-6 text-white shadow-soft">
-          <CardLabel className="bg-white/12 text-saffron ring-white/15">Source-backed Archive</CardLabel>
-          <h3 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">{featuredPost.title}</h3>
-          <p className="mt-4 max-w-3xl leading-8 text-white/76">{featuredPost.summary}</p>
-          <p className="mt-3 font-mono text-xs font-black uppercase tracking-[0.12em] text-saffron">
-            {featuredPost.sources.length} public sources / comments now open / corrections welcome
-          </p>
-          <Button asChild className="mt-6" variant="saffron">
-            <Link href={`/watch-desk/${featuredPost.slug}`}>Read featured Archive article</Link>
-          </Button>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <CwiPageShell>
+        <CwiMasthead
+          label="CWI Live Newsroom is the main desk"
+          title="Cockroach Watch India - CWI"
+          subtitle="Document. Verify. Amplify."
+          body={description}
+          primaryCta={{ href: "/live-newsroom", label: "Enter Live Newsroom" }}
+          secondaryCta={{ href: "/submit", label: "Submit Source or Correction" }}
+          tertiaryCta={{ href: "/support", label: "Support CWI" }}
+          meta={["Independent", "Source-led", "Human approved", "Corrections open"]}
+        />
+
+        <div className="mt-6">
+          <CwiTrustStrip items={["What changed today", "What remains unclear", "Source trail visible", "Correction path open"]} />
         </div>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardLabel>What we know</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">CJP is publicly reported as a satirical online phenomenon</p>
-            <p className="mt-3 leading-7 text-ink/70">CWI uses Reuters, Economic Times, official CJP pages, Al Jazeera, AP, and other public sources where relevant.</p>
-          </Card>
-          <Card>
-            <CardLabel>What remains unclear</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">Fast-moving details need attribution</p>
-            <p className="mt-3 leading-7 text-ink/70">Follower counts, platform actions, and public claims are treated as date-specific and developing unless clearly confirmed.</p>
-          </Card>
-          <Card>
-            <CardLabel>Trending topics</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">CJP / Cockroach wave</p>
-            <p className="mt-3 leading-7 text-ink/70">{trendingTopics.slice(0, 5).join(", ")}</p>
-          </Card>
-          <Card>
-            <CardLabel>Corrections and discussion</CardLabel>
-            <p className="font-display text-3xl font-black uppercase leading-tight">Submit context</p>
-            <p className="mt-3 leading-7 text-ink/70">Every article now has moderated comments and visible source links for correction, context, and public-interest discussion.</p>
-            <Link href="/submit" className="mt-4 inline-flex font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">Submit correction</Link>
-          </Card>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {dateSortedPosts.slice(0, 8).map((post) => (
-            <WatchDeskCard key={post.slug} post={post} />
-          ))}
-        </div>
-      </Section>
-      <Section
-        eyebrow="CWI India Unanswered Files"
-        title="CWI India Unanswered Files"
-        subtitle="India Unanswered Files is a Cockroach Watch India archive tracking public issues, civic memory, and the questions that still need answers."
-      >
-        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <Card className="bg-gradient-to-br from-white via-skywash to-white">
-            <CardLabel>Public memory archive</CardLabel>
-            <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">
-              Source-backed files for unanswered civic questions.
-            </h2>
-            <p className="mt-4 leading-8 text-ink/70">
-              CWI India Unanswered Files documents public issues, civic memory, official responses, source archives, and unresolved stories across India. It links readers from Cockroach Watch India articles to deeper case timelines.
-            </p>
-            <Button asChild className="mt-7" variant="green">
-              <Link href="/india-unanswered-files">Explore CWI India Unanswered Files</Link>
-            </Button>
-          </Card>
-          <div className="grid gap-4">
-            {unansweredFiles.slice(0, 3).map((file) => (
-              <Link
-                key={file.slug}
-                href={`/india-unanswered-files/${file.slug}`}
-                className="group rounded-[1.5rem] border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-royal/35 hover:shadow-soft"
-              >
-                <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-royal">
-                  {file.category} / {file.sourceCount} sources
-                </p>
-                <h3 className="mt-2 font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">
-                  {file.title} - CWI India Unanswered Files
-                </h3>
-                <p className="mt-3 text-sm font-semibold leading-7 text-ink/66">{file.unansweredQuestion}</p>
-              </Link>
+        <section className="mt-12">
+          <CwiSectionHeader
+            eyebrow="Today from Live Newsroom"
+            title="What readers should check first"
+            subtitle={todayBrief?.whatChanged ?? "Current daily updates, developing claims, advisories, and verification notes live in the newsroom."}
+          />
+          <div className="grid gap-5 lg:grid-cols-3">
+            {todaysTop.map((item) => (
+              <CwiEditorialCard
+                key={item.id}
+                href={`/live-newsroom/${item.slug}`}
+                label={item.status}
+                title={item.title}
+                summary={item.summary}
+                meta={[item.changeType, `${item.sourceTrail.length} sources`, formatTime(item.lastUpdatedAt)]}
+              />
             ))}
           </div>
+        </section>
+
+        <section className="mt-12">
+          <CwiSectionHeader
+            eyebrow="Daily log"
+            title="What Changed Today preview"
+            subtitle="A short look at updates CWI added, corrected, or is still checking."
+          />
+          <CwiTimeline
+            items={changedToday.map((item) => ({
+              time: formatTime(item.lastUpdatedAt),
+              title: item.title,
+              body: item.whatChanged,
+              badge: item.changeType,
+              meta: `${item.status} / ${item.sourceTrail.length} sources`
+            }))}
+          />
+        </section>
+
+        {leadStory ? (
+          <section className="mt-12">
+            <CwiSectionHeader eyebrow="Lead Story" title="The main record right now" />
+            <CwiLeadCard
+              image={leadStory.displayImage?.startsWith("/") ? leadStory.displayImage : undefined}
+              alt={leadStory.displayImageAlt}
+              label={leadStory.status}
+              title={leadStory.title}
+              summary={leadStory.summary}
+              href={`/live-newsroom/${leadStory.slug}`}
+            >
+              <div className="grid gap-3 text-sm font-bold leading-6 text-cwi-ink/70 sm:grid-cols-2">
+                <p className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-3">What changed: {leadStory.whatChanged}</p>
+                <p className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-3">Still unclear: {leadStory.whatWeDontKnow}</p>
+              </div>
+            </CwiLeadCard>
+          </section>
+        ) : null}
+
+        <section className="mt-12">
+          <CwiSectionHeader eyebrow="Developing desk" title="Latest updates" subtitle="Compact newsroom feed from the current public record." />
+          <div className="divide-y divide-cwi-brown/12 overflow-hidden rounded-lg border border-cwi-brown/18 bg-white/78">
+            {latestUpdates.map((item) => (
+              <a key={item.id} href={`/live-newsroom/${item.slug}`} className="grid gap-2 p-4 transition hover:bg-cwi-cream sm:grid-cols-[1fr_auto] sm:items-center">
+                <div>
+                  <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-cwi-green">{item.status} / {item.category}</p>
+                  <h3 className="mt-1 font-display text-xl font-black uppercase leading-tight text-cwi-ink">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-cwi-ink/68">{item.summary}</p>
+                </div>
+                <span className="font-mono text-xs font-black uppercase tracking-[0.12em] text-cwi-brown/70">{formatTime(item.lastUpdatedAt)} / {item.sourceTrail.length} sources</span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <CwiSectionHeader
+            eyebrow="Public files"
+            title="India Unanswered Files preview"
+            subtitle="Priority files where records, responsibility, or official answers still need closer tracking."
+          />
+          <div className="grid gap-5 md:grid-cols-3">
+            {priorityFiles.map((file) => (
+              <CwiDossierCard
+                key={file.slug}
+                href={`/india-unanswered-files/${file.slug}`}
+                title={file.title}
+                question={file.unansweredQuestions[0] ?? file.summary}
+                meta={[file.category, `${file.sourceCount} sources`, file.status]}
+              />
+            ))}
+          </div>
+          <div className="mt-6">
+            <CwiButtonLink href="/india-unanswered-files" variant="secondary">View all files</CwiButtonLink>
+          </div>
+        </section>
+
+        <div className="mt-12">
+          <CwiSubmitCTA />
         </div>
-      </Section>      <Section eyebrow="Agenda Explainer" title="Five-point agenda, with context." subtitle="CWI explains the viral agenda as public-interest commentary, not official endorsement.">
-        <div className="grid gap-6">
-          {agendaItems.slice(0, 2).map((item, index) => (
-            <AgendaCard key={item.title} index={index + 1} {...item} />
-          ))}
-        </div>
-        <Button asChild className="mt-8" variant="green">
-          <Link href="/five-point-agenda">Read the five-point agenda explainer</Link>
-        </Button>
-      </Section>
-      <Section eyebrow="Youth Voice" title="Youth Voice">
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <PollCard />
-          <Card>
-            <CardLabel>Question of the week</CardLabel>
-            <h3 className="font-display text-4xl font-black uppercase leading-none">What issue should India&apos;s youth discuss first?</h3>
-            <p className="mt-5 leading-8 text-ink/70">
-              Youth voice is not background noise. CWI archives the questions young citizens are asking before the internet forgets them.
+
+        <section className="mt-12 grid gap-5 rounded-lg border border-cwi-brown/18 bg-white/72 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-green">Support CWI</p>
+            <h2 className="mt-2 font-display text-3xl font-black uppercase leading-tight text-cwi-ink">Keep the newsroom online.</h2>
+            <p className="mt-3 leading-7 text-cwi-ink/68">Support keeps CWI online. It does not buy coverage, influence, or membership.</p>
+          </div>
+          <CwiButtonLink href="/support" variant="saffron">Support CWI</CwiButtonLink>
+        </section>
+
+        <section className="mt-12">
+          <CwiSectionHeader eyebrow="From the Archive" title="Older explainers and context" subtitle="Archive is preserved context. Current updates live in Live Newsroom." />
+          <div className="grid gap-5 md:grid-cols-3">
+            {archiveItems.map((post) => (
+              <CwiEditorialCard
+                key={post.slug}
+                href={`/archive/${post.slug}`}
+                label="Archived context"
+                title={post.title}
+                summary={post.summary}
+                meta={[post.category, `${post.sources.length} sources`, formatDate(post.updatedAt)]}
+              />
+            ))}
+          </div>
+          <div className="mt-6">
+            <CwiButtonLink href="/archive" variant="secondary">Browse Archive</CwiButtonLink>
+          </div>
+        </section>
+
+        <section className="mt-12 grid gap-5 lg:grid-cols-[1fr_0.85fr]">
+          <div className="rounded-lg border border-cwi-brown/18 bg-white/78 p-6">
+            <CwiSectionHeader eyebrow="About CWI" title="Independent, direct, and correction-open" />
+            <p className="leading-8 text-cwi-ink/70">
+              CWI tracks public issues, viral claims, source trails, corrections, youth voice, and India Unanswered Files with editorial distance from political parties and organizations unless officially declared.
             </p>
-            <Button asChild className="mt-7" variant="outline">
-              <Link href="/youth-voice">Read CWI youth voice submissions</Link>
-            </Button>
-          </Card>
-        </div>
-      </Section>
-      <Section eyebrow="Media Bank" title="The visual archive of the movement.">
-        <div className="grid gap-6 md:grid-cols-3">
-          <ArchiveCard title="CWI Official Poster Set" kind="Posters" credit="Cockroach Watch India" platform="CWI" permission="Official asset" />
-          <ArchiveCard title="Public Reaction Clip Log" kind="Clips" credit="Community-submitted" platform="Public platforms" permission="Requires review" />
-          <ArchiveCard title="Explainer Graphic Archive" kind="Graphics" credit="Creator credited where visible" platform="Instagram / X" permission="Commentary archive" />
-        </div>
-      </Section>
-      <Section title="Submit a Report" subtitle="Send a public issue, viral post, correction, creator credit request, or civic story to Cockroach Watch India.">
-        <div className="rounded-[2rem] bg-gradient-to-br from-ink via-[#102a63] to-royal p-8 text-white shadow-soft">
-          <Send className="h-9 w-9 text-saffron" />
-          <h3 className="mt-5 font-display text-4xl font-black uppercase leading-tight tracking-[-0.04em]">The Archive is open.</h3>
-          <p className="mt-4 max-w-3xl text-white/76">
-            Submit public evidence, source links, issue details, and creator credit requests. Do not submit private data, threats, hate, or unverified allegations as fact.
-          </p>
-          <Button asChild className="mt-7" variant="saffron">
-            <Link href="/submit">Submit a civic report to CWI</Link>
-          </Button>
-        </div>
-      </Section>
-      <Section
-        eyebrow="Public Questions"
-        title="Cockroach Watch India FAQ"
-        subtitle="Clear answers for searchers, creators, citizens, and readers trying to understand CWI without confusing it with any political party."
-      >
-        <div className="grid gap-6 md:grid-cols-2">
-          {homepageFaqs.map((faq) => (
-            <Card key={faq.question}>
-              <CardLabel>CWI FAQ</CardLabel>
-              <h3 className="font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em]">{faq.question}</h3>
-              <p className="mt-4 leading-7 text-ink/72">{faq.answer}</p>
-            </Card>
-          ))}
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href="/about">Learn about Cockroach Watch India</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/credit-policy">Read the creator credit policy</Link>
-          </Button>
-          <Button asChild variant="green">
-            <Link href="/submit">Submit a public issue to CWI</Link>
-          </Button>
-        </div>
-      </Section>
-      <Section eyebrow="Follow CWI" title="Follow CWI">
-        <SocialLinks />
-      </Section>
-      <div className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="grid gap-4 rounded-3xl border border-line bg-white p-5 font-mono text-xs font-black uppercase tracking-[0.14em] shadow-card sm:grid-cols-4">
-          <span><Eye className="mb-2 h-5 w-5 text-royal" /> Civic watch</span>
-          <span><FileText className="mb-2 h-5 w-5 text-royal" /> Creator credit</span>
-          <span><Newspaper className="mb-2 h-5 w-5 text-royal" /> Public archive</span>
-          <span><Flag className="mb-2 h-5 w-5 text-royal" /> India-focused</span>
-        </div>
-      </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <CwiButtonLink href="/about" variant="secondary">About CWI</CwiButtonLink>
+              <CwiButtonLink href="/editorial-policy" variant="secondary">Editorial Policy</CwiButtonLink>
+              <CwiButtonLink href="/corrections" variant="secondary">Corrections</CwiButtonLink>
+            </div>
+          </div>
+          <div className="rounded-lg border border-cwi-green bg-cwi-green p-6 text-cwi-cream">
+            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join Watchlist</p>
+            <h2 className="mt-3 font-display text-3xl font-black uppercase leading-tight">Send sources. Follow the record.</h2>
+            <p className="mt-4 leading-7 text-cwi-cream/78">Use the submit desk for source links, corrections, creator credit, missing context, or public issue leads. CWI reviews before publishing.</p>
+            <CwiButtonLink href="/submit" variant="saffron" className="mt-6">Send source or correction</CwiButtonLink>
+          </div>
+        </section>
+      </CwiPageShell>
     </>
   );
 }
 
 function dateValue(value: string) {
   return new Date(`${value}T00:00:00+05:30`).getTime();
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${value}T00:00:00+05:30`));
+}
+
+function formatTime(value: string) {
+  return new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).format(new Date(value));
 }

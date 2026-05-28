@@ -52,7 +52,7 @@ export function getAIProviderConfig() {
     provider: provider || "not_configured",
     model: model || "not_configured",
     configured: false,
-    error: "AI_PROVIDER is not configured. Use openai, gemini, or explicit mock mode for local testing."
+    error: "AI_PROVIDER is not configured. Use openai, gemini, or explicit local fallback for local testing."
   };
 }
 
@@ -230,12 +230,12 @@ function buildMockText(taskName: string, userPrompt: string) {
       sources: [{ title: "Admin supplied source", url: "", publisher: "Manual input", reliability: "Needs review" }],
       sourceCount: 1,
       whatHappened: "Admin supplied a topic or link for CWI review.",
-      whatWeKnow: "Only the submitted context is available in mock mode.",
+      whatWeKnow: "Only the submitted context is available in local fallback.",
       whatRemainsUnclear: "All factual claims require source-backed verification.",
       timeline: [{ date: new Date().toISOString().slice(0, 10), title: "Queued for review", description: "CWI admin initiated a research workflow." }],
       keyFacts: ["Human review required", "Sources required", "No auto-publish"],
       riskNotes: ["Mock output must not be published as reporting."],
-      suggestedAngle: `Source-backed CWI Watch Desk review of ${topic}.`
+      suggestedAngle: `Source-backed CWI Live Newsroom review of ${topic}.`
     });
   }
 
@@ -254,12 +254,12 @@ function buildMockText(taskName: string, userPrompt: string) {
   if (taskName.includes("Article")) {
     return JSON.stringify({
       notice,
-      title: `${topic} - CWI Watch Desk`,
+      title: `${topic} - CWI Live Newsroom`,
       slug: slugify(topic),
-      category: "Watch Desk",
-      summary: `${notice} Article draft shell for ${topic}.`,
+      category: "Live Newsroom",
+      summary: `${notice} Article review draft for ${topic}.`,
       body: [
-        { heading: "Short answer", body: "This is a mock-mode draft shell. Verified reporting is required before publication." },
+        { heading: "Short answer", body: "This is a local review draft. Verified reporting is required before publication." },
         { heading: "What happened", body: "Use source-backed details from the research pack here." },
         { heading: "What we know", body: "List verified or attributed facts only." },
         { heading: "What remains unclear", body: "Separate claims, rumours, and developing details." },
@@ -267,7 +267,7 @@ function buildMockText(taskName: string, userPrompt: string) {
       ],
       sources: [],
       disclaimer: "Cockroach Watch India is an independent civic watch, satire, and commentary platform. Claims require attribution and human review.",
-      relatedArticles: ["/watch-desk", "/india-unanswered-files", "/submit"]
+      relatedArticles: ["/live-newsroom", "/india-unanswered-files", "/submit"]
     });
   }
 
@@ -275,17 +275,17 @@ function buildMockText(taskName: string, userPrompt: string) {
     const slug = slugify(topic);
     return JSON.stringify({
       notice,
-      seoTitle: `${topic} - CWI Watch Desk | Cockroach Watch India`,
-      metaDescription: `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Watch Desk is tracking this update.`,
-      canonicalUrl: `https://www.cockroachwatchindia.online/watch-desk/${slug}`,
-      ogTitle: `${topic} - CWI Watch Desk`,
-      ogDescription: `CWI Watch Desk context for ${topic}.`,
+      seoTitle: `${topic} - CWI Live Newsroom | Cockroach Watch India`,
+      metaDescription: `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Live Newsroom is tracking this update.`,
+      canonicalUrl: `https://www.cockroachwatchindia.online/live-newsroom/${slug}`,
+      ogTitle: `${topic} - CWI Live Newsroom`,
+      ogDescription: `CWI Live Newsroom context for ${topic}.`,
       ogImage: "https://www.cockroachwatchindia.online/opengraph-image",
       twitterTitle: `${topic} - Cockroach Watch India`,
-      twitterDescription: `CWI Watch Desk context for ${topic}.`,
+      twitterDescription: `CWI Live Newsroom context for ${topic}.`,
       schemaJson: { "@type": "NewsArticle", headline: topic },
-      internalLinks: ["/", "/watch", "/watch-desk", "/submit"],
-      altText: [`Cockroach Watch India CWI Watch Desk visual on ${topic}.`]
+      internalLinks: ["/", "/watch", "/live-newsroom", "/submit"],
+      altText: [`Cockroach Watch India CWI Live Newsroom visual on ${topic}.`]
     });
   }
 
@@ -294,10 +294,10 @@ function buildMockText(taskName: string, userPrompt: string) {
       notice,
       instagramCaption: `${topic}\n\nLocal draft placeholder - human review required.\n\nDocument. Verify. Amplify.`,
       facebookCaption: `${topic}\n\nCWI is reviewing this topic with source attribution.`,
-      xCaption: `${topic}\nCWI Watch Desk review queued. https://www.cockroachwatchindia.online`,
+      xCaption: `${topic}\nCWI Live Newsroom review queued. https://www.cockroachwatchindia.online`,
       redditTitle: `${topic} - what verified context should CWI add?`,
       redditBody: "Discussion prompt for verified sources and context only.",
-      youtubeTitle: `${topic} | CWI Watch Desk`,
+      youtubeTitle: `${topic} | CWI Live Newsroom`,
       youtubeDescription: "Mock mode social description. Human approval required.",
       blueskyCaption: `${topic} - CWI is tracking with context.`,
       discordMessage: `CWI topic queued: ${topic}`,

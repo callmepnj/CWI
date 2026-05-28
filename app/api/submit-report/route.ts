@@ -17,15 +17,13 @@ const allowedEvidenceTypes = new Set([
 ]);
 
 const validTypes = new Set([
-  "Public Issue",
-  "Student / Youth Concern",
-  "Viral Claim",
-  "Civic Issue",
-  "Creator Credit Request",
-  "Correction Request",
-  "Fact-check Request",
-  "Local News Tip",
-  "Collaboration",
+  "Source",
+  "Correction",
+  "Creator credit",
+  "Takedown request",
+  "Public issue",
+  "News tip",
+  "India Unanswered File suggestion",
   "Other"
 ]);
 
@@ -47,11 +45,6 @@ export async function POST(request: Request) {
   if (typeof body.website === "string" && body.website.trim().length > 0) {
     return NextResponse.json({ ok: true });
   }
-
-  if (typeof body.name !== "string" || body.name.trim().length < 1) {
-    return NextResponse.json({ ok: false, error: "Name or handle is required." }, { status: 400 });
-  }
-
   if (typeof body.type !== "string" || !validTypes.has(body.type)) {
     return NextResponse.json({ ok: false, error: "Please select a submission type." }, { status: 400 });
   }
@@ -61,7 +54,7 @@ export async function POST(request: Request) {
   }
 
   if (typeof body.message !== "string" || body.message.trim().length < 10) {
-    return NextResponse.json({ ok: false, error: "Please describe the issue." }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "Please describe the source, correction, or issue." }, { status: 400 });
   }
 
   if (body.consent !== "on" || body.safety !== "on" || body.editorialPolicy !== "on") {
@@ -125,7 +118,8 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       id: reportId,
-      message: "Report submitted successfully. The Archive will review it before taking further action."
+      trackingId: reportId ? `CWI-${String(reportId).padStart(6, "0")}` : "CWI-REVIEW",
+      message: "Submission received. CWI will review it before taking further action."
     });
   } catch (error) {
     console.error("CWI report submission failed", error);
@@ -134,7 +128,7 @@ export async function POST(request: Request) {
       {
         ok: false,
         error:
-          "Something went wrong while submitting your report. Please try again or contact cockroachwatchindia@gmail.com."
+          "Something went wrong while submitting. Please try again or contact cockroachwatchindia@gmail.com."
       },
       { status: 500 }
     );

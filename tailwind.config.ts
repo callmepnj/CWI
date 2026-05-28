@@ -10,16 +10,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#F8FAFC",
-        ink: "#0B1220",
-        soot: "#050A14",
-        saffron: "#FFD23F",
-        leaf: "#00C2A8",
-        clay: "#155EEF",
-        urgent: "#FF6B35",
-        royal: "#0B5CFF",
-        skywash: "#EAF2FF",
-        line: "#DCE5F2",
+        paper: "#FDF8F3",
+        ink: "#1A1410",
+        soot: "#0F0A07",
+        saffron: "#F57C00",
+        leaf: "#1B5E20",
+        clay: "#5D4037",
+        urgent: "#B85C2A",
+        royal: "#1B5E20",
+        skywash: "#E8DCC8",
+        line: "#D7CCC8",
         // CWI Newsroom Colors
         "cwi-cream": "#FDF8F3",
         "cwi-ink": "#1A1410",
@@ -40,8 +40,7 @@ const config: Config = {
         card: "0 14px 36px rgba(11, 18, 32, 0.08)"
       },
       backgroundImage: {
-        "paper-grain":
-          "radial-gradient(circle at 1px 1px, rgba(11,92,255,0.05) 1px, transparent 0)"
+        "paper-grain": "radial-gradient(circle at 1px 1px, rgba(93,64,55,0.08) 1px, transparent 0)"
       },
       keyframes: {
         ticker: {

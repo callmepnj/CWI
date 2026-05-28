@@ -113,7 +113,7 @@ export function improveArticleDraft(article: ArticleDraftLike, score: QualitySco
 
   return {
     ...article,
-    summary: article.summary || "CWI Watch Desk draft prepared with source checks, verification notes, and human approval required.",
+    summary: article.summary || "CWI Live Newsroom draft prepared with source checks, verification notes, and human approval required.",
     body,
     disclaimer:
       article.disclaimer ||

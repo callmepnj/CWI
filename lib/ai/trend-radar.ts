@@ -64,7 +64,7 @@ export async function runTrendRadar() {
     ...posts.slice(0, 12).map((post) => ({
       topic: post.title,
       trendType: "watch_desk_followup",
-      url: `/watch-desk/${post.slug}`,
+      url: `/archive/${post.slug}`,
       evidence: post.summary
     })),
     ...unansweredFiles.slice(0, 8).map((file) => ({
@@ -158,7 +158,7 @@ function scoreTrend(trendType: string, evidenceCount: number, priority: number, 
 }
 
 function suggestedAction(trendType: string, score: number) {
-  if (score >= 80) return "Assign Research AI today and prepare a verification-first Watch Desk draft.";
+  if (score >= 80) return "Assign Research AI today and prepare a verification-first Live Newsroom draft.";
   if (trendType.includes("unanswered")) return "Check source freshness and consider an India Unanswered Files update.";
   if (trendType.includes("reader")) return "Review comments for corrections, missing context, or follow-up questions.";
   return "Queue for CWI Research AI and source-memory enrichment.";
@@ -168,7 +168,7 @@ function whyItMatters(trendType: string, topic: string) {
   if (trendType.includes("report")) return `${topic} came from public intake and may need CWI verification or follow-up.`;
   if (trendType.includes("keyword")) return `${topic} is part of CWI's active keyword watch list.`;
   if (trendType.includes("unanswered")) return `${topic} belongs to the public-memory archive and needs periodic source checks.`;
-  return `${topic} may be relevant to CWI Watch Desk coverage, source checks, or civic context.`;
+  return `${topic} may be relevant to CWI Live Newsroom coverage, source checks, or civic context.`;
 }
 
 function topicFromText(value: string) {

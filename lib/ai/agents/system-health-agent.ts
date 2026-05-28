@@ -82,7 +82,20 @@ async function checkEndpoint(url: string) {
 }
 
 async function scanForOldUrls(root: string) {
-  const banned = ["cwi-ten" + ".vercel.app", "localhost" + ":3000"];
+  const banned = [
+    "cwi-ten" + ".vercel.app",
+    "localhost" + ":3000",
+    "Watch More",
+    "Read Watch Desk",
+    "CWI Watch Desk",
+    "Supabase backend",
+    "mock mode",
+    "no real AI call",
+    "draft shell",
+    "AI generated placeholder",
+    "admin/debug",
+    "fake source"
+  ];
   const ignored = new Set(["node_modules", ".next", ".git", "out"]);
   const hits: string[] = [];
 

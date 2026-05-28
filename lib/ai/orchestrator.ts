@@ -176,11 +176,11 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 
 export async function runTopicToArticle(input: TopicToArticleInput) {
   return runManualLinkToApproval({
-    url: input.url || "https://www.cockroachwatchindia.online/watch-desk",
+    url: input.url || "https://www.cockroachwatchindia.online/live-newsroom",
     topic: input.topic,
     platform: "Manual Topic",
     notes: input.sourceNotes,
-    contentType: input.category || "Watch Desk"
+    contentType: input.category || "Live Newsroom"
   });
 }
 
@@ -368,7 +368,7 @@ function categoryFromContentType(value?: string) {
   if (lower.includes("unanswered")) return "India Unanswered Files";
   if (lower.includes("advisory")) return "Public Advisory";
   if (lower.includes("social")) return "Social Pack";
-  return "Watch Desk";
+  return "Live Newsroom";
 }
 
 function clean(value?: unknown) {

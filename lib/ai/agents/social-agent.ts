@@ -17,7 +17,7 @@ export type SocialAgentOutput = {
 
 export async function runSocialAgent(input: { articleDraftId?: string; articleDraft?: unknown; topic?: string }) {
   const articleDraft = input.articleDraft ?? (input.articleDraftId ? await getArticleDraft(input.articleDraftId) : null);
-  const topic = asText((articleDraft as { title?: string } | null)?.title, input.topic || "CWI Watch Desk update");
+  const topic = asText((articleDraft as { title?: string } | null)?.title, input.topic || "CWI Live Newsroom update");
 
   const { data, estimatedCost, provider, model } = await runJsonAgent<SocialAgentOutput>({
     agentName: "CWI Social AI",
@@ -34,10 +34,10 @@ Use the ending "Document. Verify. Amplify. The youth are not silent. India is wa
   return {
     instagramCaption: asText(data.instagramCaption, `${topic}\n\nDocument. Verify. Amplify.\nWebsite: ${site.url}`),
     facebookCaption: asText(data.facebookCaption, `${topic}\n\nCockroach Watch India is tracking this with context.\n${site.url}`),
-    xCaption: asText(data.xCaption, `${topic}\nCWI Watch Desk: ${site.url}`),
+    xCaption: asText(data.xCaption, `${topic}\nCWI Live Newsroom: ${site.url}`),
     redditTitle: asText(data.redditTitle, `${topic} - what verified context should CWI add?`),
     redditBody: asText(data.redditBody, `CWI is looking for verified source context on ${topic}.`),
-    youtubeTitle: asText(data.youtubeTitle, `${topic} | CWI Watch Desk`),
+    youtubeTitle: asText(data.youtubeTitle, `${topic} | CWI Live Newsroom`),
     youtubeDescription: asText(data.youtubeDescription, `Source-backed civic context from Cockroach Watch India. ${site.url}`),
     blueskyCaption: asText(data.blueskyCaption, `${topic} - CWI is tracking this with context. ${site.url}`),
     discordMessage: asText(data.discordMessage, `CWI update queued for review: ${topic}`),

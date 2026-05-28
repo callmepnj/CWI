@@ -7,92 +7,45 @@ const lastModified = "2026-05-28";
 
 const staticRoutes = [
   "/",
-  "/about",
-  "/contact",
-  "/corrections",
-  "/support",
-  "/charter",
-  "/watch",
-  "/watch/manipur-crisis",
   "/live-newsroom",
   "/india-unanswered-files",
-  "/watch-desk",
-  "/issues",
-  "/join",
+  "/archive",
   "/submit",
-  "/five-point-agenda",
-  "/youth-voice",
-  "/media-bank",
-  "/credit-policy",
+  "/support",
+  "/about",
   "/editorial-policy",
+  "/corrections",
+  "/credit-policy",
+  "/contact",
   "/privacy-policy",
-  "/terms",
-  "/what-is-cwi",
-  "/rss.xml"
+  "/terms"
 ];
-
-const categories = [
-  "Movement Update",
-  "Explainer",
-  "Public Reaction",
-  "Youth Voice",
-  "Meme Watch",
-  "Fact Check",
-  "Creator Spotlight",
-  "Civic Issue",
-  "Digital Culture",
-  "Opinion",
-  "Archive"
-];
-
-function slugifyTopic(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 const postsSource = readFileSync(join(root, "data", "posts.ts"), "utf8");
-const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
+const removedPostSlugs = new Set(["cwi-priority-public-interest-update"]);
+const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]).filter((slug) => !removedPostSlugs.has(slug));
 const unansweredFilesSource = readFileSync(join(root, "data", "unanswered-files.ts"), "utf8");
 const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 const liveNewsroomSource = readFileSync(join(root, "data", "live-newsroom.ts"), "utf8");
 const liveNewsroomBlock = liveNewsroomSource.match(/export const liveNewsroomItems:[\s\S]*?export const publicAdvisories/)?.[0] ?? "";
 const liveNewsroomSlugs = Array.from(liveNewsroomBlock.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
-const tagBlocks = Array.from(postsSource.matchAll(/tags:\s*\[([^\]]+)\]/g), (match) => match[1]);
-const tags = Array.from(
-  new Set(tagBlocks.flatMap((block) => Array.from(block.matchAll(/"([^"]+)"/g), (match) => match[1])))
-);
-const routes = [
+
+const routes = Array.from(new Set([
   ...staticRoutes,
-  ...categories.map((category) => `/watch-desk/category/${slugifyTopic(category)}`),
-  ...tags.map((tag) => `/watch-desk/tag/${slugifyTopic(tag)}`),
-  ...postSlugs.map((slug) => `/watch-desk/${slug}`),
   ...liveNewsroomSlugs.map((slug) => `/live-newsroom/${slug}`),
-  ...unansweredFileSlugs.map((slug) => `/india-unanswered-files/${slug}`)
-];
+  ...unansweredFileSlugs.map((slug) => `/india-unanswered-files/${slug}`),
+  ...postSlugs.map((slug) => `/archive/${slug}`)
+]));
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${routes
   .map((route) => {
     const isHome = route === "/";
-    const isWatchDeskArticle = route.startsWith("/watch-desk/") && !route.startsWith("/watch-desk/category/") && !route.startsWith("/watch-desk/tag/");
-    const isUnansweredArticle = route.startsWith("/india-unanswered-files/");
-    const isTaxonomy = route.startsWith("/watch-desk/category/") || route.startsWith("/watch-desk/tag/");
-    const changefreq = isHome ? "daily" : isWatchDeskArticle || isUnansweredArticle ? "monthly" : isTaxonomy ? "weekly" : "weekly";
-    const priority = isHome
-      ? "1.0"
-      : ["/watch", "/watch-desk", "/india-unanswered-files"].includes(route)
-        ? "0.9"
-        : isWatchDeskArticle || isUnansweredArticle
-          ? "0.8"
-          : isTaxonomy
-            ? "0.6"
-            : "0.8";
-
+    const isLive = route === "/live-newsroom" || route.startsWith("/live-newsroom/");
+    const isArticle = route.startsWith("/live-newsroom/") || route.startsWith("/india-unanswered-files/") || route.startsWith("/archive/");
+    const changefreq = isHome || isLive ? "daily" : isArticle ? "monthly" : "weekly";
+    const priority = isHome ? "1.0" : route === "/live-newsroom" ? "0.95" : ["/india-unanswered-files", "/archive", "/submit", "/support"].includes(route) ? "0.85" : isArticle ? "0.75" : "0.7";
     return `  <url>
     <loc>${baseUrl}${route}</loc>
     <lastmod>${lastModified}</lastmod>
@@ -106,6 +59,11 @@ ${routes
 
 const robots = `User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/admin
+Disallow: /drafts
+Disallow: /test
 Disallow: /archive/cwi-priority-public-interest-update
 
 Sitemap: ${baseUrl}/sitemap.xml

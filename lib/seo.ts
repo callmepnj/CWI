@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { site } from "@/lib/site";
 
 type SeoImage = {
@@ -29,24 +29,16 @@ export const ogImage = {
 
 export const importantRoutes = [
   "/",
-  "/about",
-  "/contact",
-  "/corrections",
-  "/support",
-  "/charter",
-  "/watch",
-  "/watch/manipur-crisis",
   "/live-newsroom",
   "/india-unanswered-files",
-  "/watch-desk",
-  "/issues",
-  "/join",
+  "/archive",
   "/submit",
-  "/five-point-agenda",
-  "/youth-voice",
-  "/media-bank",
-  "/credit-policy",
+  "/support",
+  "/about",
   "/editorial-policy",
+  "/corrections",
+  "/credit-policy",
+  "/contact",
   "/privacy-policy",
   "/terms"
 ] as const;

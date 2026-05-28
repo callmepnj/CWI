@@ -7,15 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea, inputClass } from "@/components/ui/input";
 
 const submissionTypes = [
-  "Public Issue",
-  "Student / Youth Concern",
-  "Viral Claim",
-  "Civic Issue",
-  "Creator Credit Request",
-  "Correction Request",
-  "Fact-check Request",
-  "Local News Tip",
-  "Collaboration",
+  "Source",
+  "Correction",
+  "Creator credit",
+  "Takedown request",
+  "Public issue",
+  "News tip",
+  "India Unanswered File suggestion",
   "Other"
 ];
 
@@ -25,6 +23,7 @@ const maxEvidenceBytes = 4 * 1024 * 1024;
 export function SubmitForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState("");
+  const [trackingId, setTrackingId] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -32,6 +31,7 @@ export function SubmitForm() {
     const form = event.currentTarget;
     setStatus("submitting");
     setError("");
+    setTrackingId("");
 
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
@@ -56,22 +56,21 @@ export function SubmitForm() {
         body: formData
       });
 
-      const data = (await response.json()) as { ok?: boolean; error?: string };
+      const data = (await response.json()) as { ok?: boolean; error?: string; id?: number; trackingId?: string };
       if (!response.ok || !data.ok) {
-        throw new Error(
-          data.error || "Something went wrong while submitting your report. Please try again or contact cockroachwatchindia@gmail.com."
-        );
+        throw new Error(data.error || "Something went wrong while submitting. Please try again or contact cockroachwatchindia@gmail.com.");
       }
 
       form.reset();
       setSelectedFiles([]);
+      setTrackingId(data.trackingId ?? (data.id ? `CWI-${String(data.id).padStart(6, "0")}` : "CWI-REVIEW"));
       setStatus("success");
     } catch (submitError) {
       setStatus("error");
       setError(
         submitError instanceof Error
           ? submitError.message
-          : "Something went wrong while submitting your report. Please try again or contact cockroachwatchindia@gmail.com."
+          : "Something went wrong while submitting. Please try again or contact cockroachwatchindia@gmail.com."
       );
     }
   }
@@ -81,85 +80,62 @@ export function SubmitForm() {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={onSubmit}
-      className="grid gap-7 rounded-[2rem] border border-line bg-white p-5 shadow-soft sm:p-8"
-    >
+    <form noValidate onSubmit={onSubmit} className="grid gap-7 rounded-lg border border-cwi-brown/18 bg-white/78 p-5 shadow-[0_16px_44px_rgba(29,18,10,0.08)] sm:p-8">
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-      <div className="grid gap-4 rounded-3xl border border-amber/35 bg-amber/10 p-5">
-        <p className="text-base leading-7 text-ink/72">
-          Use this form to submit public issues, civic concerns, viral posts, creator credit requests, corrections, or
-          youth stories. CWI reviews submissions before publishing or amplifying them.
+
+      <div id="what-to-submit" className="grid gap-4 rounded-lg border border-cwi-saffron/30 bg-cwi-saffron/10 p-5">
+        <p className="text-base leading-7 text-cwi-ink/72">
+          Use this form to send source links, corrections, creator credit requests, takedown requests, public issues, news tips, or missing context. CWI reviews submissions before publishing or amplifying them.
         </p>
-        <p className="rounded-2xl border border-warning/25 bg-white p-4 text-sm font-bold leading-6 text-ink/78">
-          Please do not submit private personal data, threats, hate speech, or unverified allegations as confirmed facts.
-          Share evidence, links, and context wherever possible.
+        <p className="rounded-lg border border-cwi-brown/18 bg-white/80 p-4 text-sm font-bold leading-6 text-cwi-ink/78">
+          Do not submit private data, threats, hate, or unverified allegations as fact. Add dates and source links where possible.
         </p>
       </div>
 
-      <FormGroup title="Your Details" description="Tell us how to identify or contact you if clarification is needed.">
+      <FormGroup title="Your Details" description="Name and contact are optional. Share only what CWI needs for clarification.">
         <div className="grid gap-5 md:grid-cols-2">
-          <Field label="Name or Public Handle" helper="Use a public handle if you do not want to share your full name.">
-            <Input name="name" required placeholder="@yourhandle or name" />
+          <Field label="Name or public handle" helper="Optional. Use a public handle if preferred.">
+            <Input name="name" placeholder="@yourhandle or name" />
           </Field>
-          <Field
-            label="Email or WhatsApp"
-            helper="This is optional and will only be used if we need clarification."
-          >
-            <Input name="contact" placeholder="Optional contact for follow-up" />
-          </Field>
-          <Field label="City / District">
-            <Input name="city" placeholder="City or district" />
-          </Field>
-          <Field label="State / UT">
-            <Input name="state" placeholder="State or Union Territory" />
+          <Field label="Email" helper="Optional. Used only if CWI needs clarification.">
+            <Input name="contact" type="email" placeholder="you@example.com" />
           </Field>
         </div>
       </FormGroup>
 
-      <FormGroup
-        title="Report Details"
-        description="Send links, evidence, screenshots, documents, or context that help us verify the report."
-      >
+      <FormGroup title="Source or Correction Details" description="Send links, dates, evidence, screenshots, documents, or context that help CWI verify the record.">
         <div className="grid gap-5">
-          <Field label="Submission Type">
+          <Field label="Submission type">
             <select name="type" required className={inputClass} defaultValue="">
-              <option value="" disabled>
-                Select a submission type
-              </option>
-              {submissionTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              <option value="" disabled>Select a submission type</option>
+              {submissionTypes.map((type) => <option key={type} value={type}>{type}</option>)}
             </select>
           </Field>
-          <Field
-            label="Link to Post, Video, or Source"
-            helper="Add the original post, video, article, document, or source link if available."
-          >
-            <Input name="sourceUrl" type="url" placeholder="https://..." />
-          </Field>
 
-          <Field
-            label="Upload Evidence"
-            helper="Accepted formats: JPG, PNG, PDF, MP4, WebM, MOV, DOC, or DOCX. You can add up to 3 files with a combined size under 4 MB. For larger videos, paste the source link above."
-          >
-            <div className="grid gap-4 rounded-2xl border border-dashed border-royal/30 bg-royal/5 p-5">
-              <p className="font-bold text-ink">Upload screenshots, images, documents, or supporting files</p>
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Link or source URL" helper="Add the original post, article, document, or source link if available.">
+              <Input name="sourceUrl" type="url" placeholder="https://..." />
+            </Field>
+            <Field label="Date of source/event" helper="Optional. Add the date if known.">
+              <Input name="sourceDate" type="date" />
+            </Field>
+          </div>
+
+          <Field label="Upload evidence" helper="Optional. Add up to 3 files, total under 4 MB. For larger videos, paste the source link above.">
+            <div className="grid gap-4 rounded-lg border border-dashed border-cwi-green/30 bg-cwi-green/5 p-5">
+              <p className="font-bold text-cwi-ink">Screenshots, images, documents, or supporting files</p>
               <input
                 name="evidenceFiles"
                 type="file"
                 multiple
                 accept=".jpg,.jpeg,.png,.pdf,.mp4,.webm,.mov,.doc,.docx,image/jpeg,image/png,application/pdf,video/mp4,video/webm,video/quicktime,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 onChange={onEvidenceChange}
-                className="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm font-bold text-ink file:mr-4 file:rounded-full file:border-0 file:bg-ink file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-[0.12em] file:text-white"
+                className="w-full rounded-lg border border-cwi-brown/18 bg-white px-4 py-3 text-sm font-bold text-cwi-ink file:mr-4 file:rounded-full file:border-0 file:bg-cwi-ink file:px-4 file:py-2 file:text-xs file:font-black file:uppercase file:tracking-[0.12em] file:text-white"
               />
               {selectedFiles.length > 0 ? (
-                <ul className="grid gap-2 text-xs font-bold leading-5 text-ink/62">
+                <ul className="grid gap-2 text-xs font-bold leading-5 text-cwi-ink/62">
                   {selectedFiles.map((file) => (
-                    <li key={`${file.name}-${file.size}`} className="rounded-xl bg-white px-3 py-2">
+                    <li key={`${file.name}-${file.size}`} className="rounded-lg bg-white px-3 py-2">
                       {file.name} - {formatBytes(file.size)}
                     </li>
                   ))}
@@ -168,74 +144,61 @@ export function SubmitForm() {
             </div>
           </Field>
 
-          <Field
-            label="Describe the Issue"
-            helper='Use words like "reported," "claimed," "alleged," or "requires verification" where proof is incomplete.'
-          >
-            <Textarea
-              name="message"
-              required
-              placeholder="Explain what happened, where it happened, when it happened, and why it matters."
-            />
+          <Field label="Message" helper='Use words like "reported," "claimed," or "requires verification" where proof is incomplete.'>
+            <Textarea name="message" required placeholder="Explain what changed, what needs correction, what the source shows, and what remains unclear." />
           </Field>
-          <Field label="Should we credit you publicly?">
-            <select name="creditPreference" className={inputClass} defaultValue="Yes, with my name/handle">
-              <option>Yes, with my name/handle</option>
-              <option>Yes, but keep me anonymous</option>
-              <option>No, use internally only</option>
+
+          <Field label="Public credit preference">
+            <select name="creditPreference" className={inputClass} defaultValue="Use internally only">
+              <option>Use internally only</option>
+              <option>Credit my name/handle if published</option>
+              <option>Credit anonymously if published</option>
             </select>
           </Field>
         </div>
       </FormGroup>
 
-      <FormGroup title="Consent and Safety" description="These confirmations are required before the Archive reviews a report.">
-        <div className="grid gap-3">
-          <label className="flex gap-3 rounded-2xl border border-line bg-paper p-4 text-sm font-bold leading-6">
-            <input name="consent" type="checkbox" required className="mt-1 h-4 w-4 accent-royal" />
-            <span>I confirm this submission is truthful to the best of my knowledge and I have permission to share any content submitted.</span>
+      <FormGroup title="Consent and Safety" description="These confirmations are required before CWI reviews a submission.">
+        <div id="how-to-contribute" className="grid gap-3">
+          <label className="flex gap-3 rounded-lg border border-cwi-brown/18 bg-cwi-cream p-4 text-sm font-bold leading-6">
+            <input name="consent" type="checkbox" required className="mt-1 h-4 w-4 accent-cwi-green" />
+            <span>I confirm I have permission to share this material with CWI for review.</span>
           </label>
-          <label className="flex gap-3 rounded-2xl border border-line bg-paper p-4 text-sm font-bold leading-6">
-            <input name="safety" type="checkbox" required className="mt-1 h-4 w-4 accent-royal" />
-            <span>I understand CWI does not publish private personal data, threats, hate speech, or unverified allegations as confirmed facts.</span>
+          <label className="flex gap-3 rounded-lg border border-cwi-brown/18 bg-cwi-cream p-4 text-sm font-bold leading-6">
+            <input name="safety" type="checkbox" required className="mt-1 h-4 w-4 accent-cwi-green" />
+            <span>I understand CWI does not publish private data, threats, hate, or unsupported allegations as facts.</span>
           </label>
-          <label className="flex gap-3 rounded-2xl border border-line bg-paper p-4 text-sm font-bold leading-6">
-            <input name="editorialPolicy" type="checkbox" required className="mt-1 h-4 w-4 accent-royal" />
-            <span>I understand comments, reports, and submitted materials may be reviewed, edited for clarity, or declined based on CWI&apos;s editorial policy.</span>
+          <label className="flex gap-3 rounded-lg border border-cwi-brown/18 bg-cwi-cream p-4 text-sm font-bold leading-6">
+            <input name="editorialPolicy" type="checkbox" required className="mt-1 h-4 w-4 accent-cwi-green" />
+            <span>I understand submissions may be reviewed, edited for clarity, declined, or held until more sources are available.</span>
           </label>
         </div>
       </FormGroup>
 
-      <div className="grid gap-4">
-        <p className="text-sm leading-6 text-ink/66">Have feedback, corrections, or ideas for CWI? You can submit them here too.</p>
-        <p className="text-sm leading-6 text-ink/66">
-          For urgent corrections or creator credit requests, email:{" "}
-          <a className="font-bold text-royal underline-offset-4 hover:underline" href="mailto:cockroachwatchindia@gmail.com">
-            cockroachwatchindia@gmail.com
-          </a>
+      <div id="youth-voice" className="grid gap-4">
+        <p className="text-sm leading-6 text-cwi-ink/66">Student and youth public-interest tips are welcome when they include dates, context, and verifiable source trails.</p>
+        <p className="text-sm leading-6 text-cwi-ink/66">
+          Urgent corrections or creator credit requests can also be emailed to {" "}
+          <a className="font-bold text-cwi-green underline-offset-4 hover:underline" href="mailto:cockroachwatchindia@gmail.com">cockroachwatchindia@gmail.com</a>.
         </p>
         <Button type="submit" disabled={status === "submitting"} className="min-h-12 w-full px-6 sm:w-fit">
           <Send className="h-4 w-4" />
-          {status === "submitting" ? "Submitting Report..." : "Submit Report to CWI"}
+          {status === "submitting" ? "Sending..." : "Send source or correction"}
         </Button>
       </div>
 
       {status === "success" ? (
-        <p className="rounded-2xl border border-leaf/25 bg-leaf/10 p-4 font-bold leading-6 text-[#047766]">
-          Report submitted successfully. The Archive will review it before taking further action.
-        </p>
+        <div className="rounded-lg border border-cwi-green/25 bg-cwi-green/10 p-4 font-bold leading-6 text-cwi-green">
+          <p>Submission received. CWI will review it before taking further action.</p>
+          <p className="mt-2 font-mono text-xs uppercase tracking-[0.14em]">Tracking ID: {trackingId}</p>
+        </div>
       ) : null}
-      {status === "error" ? (
-        <p className="rounded-2xl border border-urgent/25 bg-urgent/10 p-4 font-bold text-urgent">{error}</p>
-      ) : null}
+      {status === "error" ? <p className="rounded-lg border border-urgent/25 bg-urgent/10 p-4 font-bold text-urgent">{error}</p> : null}
     </form>
   );
 }
 
 function validateSubmission(payload: Record<string, FormDataEntryValue>) {
-  if (typeof payload.name !== "string" || payload.name.trim().length < 1) {
-    return "Name or handle is required.";
-  }
-
   if (typeof payload.type !== "string" || payload.type.trim().length < 1) {
     return "Please select a submission type.";
   }
@@ -245,7 +208,7 @@ function validateSubmission(payload: Record<string, FormDataEntryValue>) {
   }
 
   if (typeof payload.message !== "string" || payload.message.trim().length < 10) {
-    return "Please describe the issue.";
+    return "Please describe the source, correction, or issue.";
   }
 
   if (payload.consent !== "on" || payload.safety !== "on" || payload.editorialPolicy !== "on") {
@@ -272,13 +235,11 @@ function validateEvidenceFiles(files: File[]) {
   }
 
   const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
-
   if (totalBytes > maxEvidenceBytes) {
     return "Evidence files must be under 4 MB total. For larger videos, paste the source link instead.";
   }
 
   const unsupportedFile = files.find((file) => file.size > 0 && !allowedTypes.has(file.type));
-
   if (unsupportedFile) {
     return "Please upload JPG, PNG, PDF, MP4, WebM, MOV, DOC, or DOCX files only.";
   }
@@ -305,12 +266,10 @@ function isHttpUrl(value: string) {
 
 function FormGroup({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   return (
-    <fieldset className="grid gap-5 rounded-3xl border border-line bg-white p-5">
+    <fieldset className="grid gap-5 rounded-lg border border-cwi-brown/18 bg-white/70 p-5">
       <div>
-        <legend className="font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">
-          {title}
-        </legend>
-        <p className="mt-2 text-sm leading-6 text-ink/62">{description}</p>
+        <legend className="font-display text-2xl font-black uppercase leading-tight text-cwi-ink">{title}</legend>
+        <p className="mt-2 text-sm leading-6 text-cwi-ink/62">{description}</p>
       </div>
       {children}
     </fieldset>
@@ -320,9 +279,9 @@ function FormGroup({ title, description, children }: { title: string; descriptio
 function Field({ label, helper, children }: { label: string; helper?: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-2">
-      <span className="font-mono text-xs font-black uppercase tracking-[0.14em] text-ink/62">{label}</span>
+      <span className="font-mono text-xs font-black uppercase tracking-[0.14em] text-cwi-brown/70">{label}</span>
       {children}
-      {helper ? <span className="text-xs leading-5 text-ink/55">{helper}</span> : null}
+      {helper ? <span className="text-xs leading-5 text-cwi-ink/55">{helper}</span> : null}
     </label>
   );
 }

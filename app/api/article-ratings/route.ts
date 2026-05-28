@@ -7,7 +7,7 @@ import { ensureArticleRatingsTable, getPool } from "@/lib/db";
 
 export const runtime = "nodejs";
 
-type ArticleType = "watch-desk" | "unanswered-files";
+type ArticleType = "archive" | "unanswered-files";
 
 type RatingRow = {
   average_rating: string | null;
@@ -102,7 +102,7 @@ async function isValidArticle(articleType: ArticleType, slug: string) {
     return false;
   }
 
-  if (articleType === "watch-desk") {
+  if (articleType === "archive") {
     if (posts.some((post) => post.slug === slug)) {
       return true;
     }

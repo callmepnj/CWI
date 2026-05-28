@@ -1,28 +1,14 @@
 import type { Metadata } from "next";
+import type React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, CalendarDays, ExternalLink, FileText, Scale, ShieldCheck } from "lucide-react";
-import { ArticleProgress } from "@/components/ArticleProgress";
-import { ArticleDiscussionPrompts } from "@/components/ArticleDiscussionPrompts";
-import { ArticleRating } from "@/components/ArticleRating";
+import { CalendarDays, FileText, MapPin, ShieldCheck } from "lucide-react";
+import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSourceChip, CwiStatusBadge, CwiSubmitCTA, CwiTimeline } from "@/components/CwiDesignSystem";
 import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
 import { UnansweredComments } from "@/components/UnansweredComments";
-import { UnansweredFileVisual } from "@/components/UnansweredFileVisual";
-import { UnansweredResearchBox } from "@/components/UnansweredResearchBox";
-import { UnansweredSourceArchive, type UnansweredSourceRecord } from "@/components/UnansweredSourceArchive";
-import { UnansweredStatusBadge } from "@/components/UnansweredStatusBadge";
-import { UnansweredTimeline } from "@/components/UnansweredTimeline";
-import { Button } from "@/components/ui/button";
-import { Card, CardLabel } from "@/components/ui/card";
-import {
-  getFileSources,
-  getFileVisual,
-  getFileFaqs,
-  getInlineVisuals,
-  getOgVisual,
-  getUnansweredFile,
-  unansweredFiles
-} from "@/data/unanswered-files";
+import { getLiveUpdates } from "@/data/live-newsroom";
+import { getFileFaqs, getUnansweredFile, unansweredFiles } from "@/data/unanswered-files";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -30,11 +16,10 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-const articleDisclaimer =
-  "Cockroach Watch India is an independent civic watch, satire, and commentary platform. This article discusses publicly available reports, official statements, social media trends, and public reactions. Claims are presented with attribution wherever possible and should not be treated as legal findings or official declarations unless clearly stated.";
-const unansweredFilesPath = "/india-unanswered-files";
+const pagePath = "/india-unanswered-files";
+const lastUpdated = "2026-05-24T00:00:00+05:30";
 
-export async function generateStaticParams() {
+export function generateStaticParams() {
   return unansweredFiles.map((file) => ({ slug: file.slug }));
 }
 
@@ -43,505 +28,240 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const file = getUnansweredFile(slug);
 
   if (!file) {
-    return createMetadata({
-      title: "CWI India Unanswered Files - Cockroach Watch India",
-      description: site.description,
-      path: unansweredFilesPath
-    });
+    return createMetadata({ title: "India Unanswered Files - Cockroach Watch India", description: site.description, path: pagePath });
   }
 
-  const visual = getOgVisual(file);
-  const baseMetadata = createMetadata({
+  return createMetadata({
     title: file.seoTitle,
     description: file.seoDescription,
-    path: `${unansweredFilesPath}/${file.slug}`,
+    path: `${pagePath}/${file.slug}`,
     type: "article",
-    publishedTime: "2026-05-24T00:00:00+05:30",
-    keywords: file.keywords
+    publishedTime: lastUpdated,
+    modifiedTime: lastUpdated,
+    keywords: file.keywords,
+    image: { url: file.ogImage || "/opengraph-image", alt: file.altText }
   });
-
-  return {
-    ...baseMetadata,
-    openGraph: {
-      title: file.seoTitle,
-      description: file.seoDescription,
-      url: absoluteUrl(`${unansweredFilesPath}/${file.slug}`),
-      siteName: site.name,
-      images: [
-        {
-          url: absoluteUrl(visual.src),
-          width: 1200,
-          height: 750,
-          alt: visual.alt
-        }
-      ],
-      locale: "en_IN",
-      type: "article",
-      publishedTime: "2026-05-24T00:00:00+05:30"
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: file.seoTitle,
-      description: file.seoDescription,
-      images: [absoluteUrl(visual.src)],
-      creator: "@CWatchIndia",
-      site: "@CWatchIndia"
-    }
-  };
 }
 
 export default async function UnansweredFilePage({ params }: Props) {
   const { slug } = await params;
   const file = getUnansweredFile(slug);
+  if (!file) notFound();
 
-  if (!file) {
-    notFound();
-  }
-
-  const sourceRecords = file.sources.map<UnansweredSourceRecord>((source, index) => ({
-    id: `${file.slug}-${index}`,
-    fileTitle: file.title,
-    fileSlug: file.slug,
-    fileCategory: file.category,
-    fileStatus: file.status,
-    source
-  }));
-  const relatedFiles = unansweredFiles
-    .filter((item) => item.slug !== file.slug)
-    .sort((first, second) => Number(second.category === file.category) - Number(first.category === file.category))
-    .slice(0, 3);
-  const ogVisual = getOgVisual(file);
-  const inlineVisuals = getInlineVisuals(file);
+  const relatedUpdates = getLiveUpdates(3);
   const faqs = getFileFaqs(file);
-  const inlineVisualByHeading = new Map(
-    ["What happened?", "Human cost", "Political accountability", "Government response", "Media silence/bias"].map((heading, index) => [
-      heading,
-      inlineVisuals[index]
-    ])
-  );
-  const pageUrl = absoluteUrl(`${unansweredFilesPath}/${file.slug}`);
-  const jsonLd = buildJsonLd(file, ogVisual.src, pageUrl, faqs);
-  const discussionPrompts = buildUnansweredDiscussionPrompts(file);
-  const readerQuestions = buildUnansweredReaderQuestions(file);
+  const relatedFiles = unansweredFiles.filter((item) => item.slug !== file.slug && item.category === file.category).slice(0, 3);
+  const jsonLd = [buildJsonLd(file), buildFaqJsonLd(faqs)];
 
   return (
     <>
-      <ArticleProgress />
-      {jsonLd.map((item) => (
-        <script key={`${item["@type"]}-${file.slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />
-      ))}
+      {jsonLd.map((item) => <script key={item["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
+      <CwiPageShell>
+        <div className="mb-5 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-brown/70">
+          <Link href="/" className="hover:text-cwi-green">Home</Link>
+          <span>/</span>
+          <Link href={pagePath} className="hover:text-cwi-green">India Unanswered Files</Link>
+          <span>/</span>
+          <span>{file.category}</span>
+        </div>
 
-      <article className="bg-paper text-ink">
-        <section className="relative isolate overflow-hidden bg-ink px-4 py-12 text-white sm:px-6 lg:px-8 lg:py-20">
-          <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_12%_15%,rgba(11,92,255,0.42),transparent_28rem),radial-gradient(circle_at_80%_12%,rgba(255,210,63,0.18),transparent_24rem),linear-gradient(135deg,#050816,#071123_58%,#0b1220)]" />
-          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,1fr)_520px] lg:items-center">
-            <div>
-              <div className="mb-6 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-white/58">
-                <Link href="/" className="hover:text-saffron">Home</Link>
-                <span>/</span>
-                <Link href={unansweredFilesPath} className="hover:text-saffron">CWI India Unanswered Files</Link>
-                <span>/</span>
-                <span>{file.category}</span>
+        <CwiMasthead
+          label="File open"
+          title={file.title}
+          subtitle={file.unansweredQuestion || file.summary}
+          body={file.summary}
+          primaryCta={{ href: "#sources", label: "Check sources" }}
+          secondaryCta={{ href: "/submit", label: "Send source or correction" }}
+          meta={[file.status, file.category, `${file.sourceCount} sources`, `Last updated ${formatDate(lastUpdated)}`]}
+        />
+
+        <article className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-8">
+            <section className="overflow-hidden rounded-lg border border-cwi-brown/18 bg-white/78 shadow-[0_16px_44px_rgba(29,18,10,0.08)]">
+              <div className="relative min-h-72 bg-cwi-green/10">
+                {file.heroImage ? (
+                  <Image src={file.heroImage} alt={file.altText || file.title} fill sizes="(min-width: 1024px) 70vw, 100vw" className="object-cover" priority />
+                ) : (
+                  <div className="grid min-h-72 place-items-center bg-cwi-cream"><FileText className="h-14 w-14 text-cwi-green" /></div>
+                )}
               </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <UnansweredStatusBadge status={file.status} className="ring-white/15" />
-                <span className="rounded-full bg-white/10 px-3 py-1 font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-white/76 ring-1 ring-white/15">
-                  {file.category}
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1 font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-white/76 ring-1 ring-white/15">
-                  {file.sourceCount} sources
-                </span>
+              <div className="grid gap-4 border-t border-cwi-brown/14 p-5 text-sm font-bold text-cwi-ink/70 sm:grid-cols-4">
+                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-cwi-green" /> {file.year}</span>
+                <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-cwi-green" /> {file.location}</span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-cwi-green" /> {file.status}</span>
+                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-cwi-green" /> {file.sourceCount} sources</span>
               </div>
+            </section>
 
-              <h1 className="mt-6 max-w-5xl font-display text-5xl font-black uppercase leading-[0.9] tracking-[-0.06em] sm:text-7xl">
-                {file.title}
-              </h1>
-              <p className="mt-6 max-w-3xl text-xl font-semibold leading-9 text-white/76">{file.summary}</p>
+            <section className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 shadow-sm sm:p-6">
+              <CwiSectionHeader eyebrow="Reader actions" title="Save, share, or follow this file" subtitle="These controls use CWI's existing public metrics system. No supporter or donation numbers are shown here." />
+              <UnansweredArticleActions slug={file.slug} title={file.title} summary={file.summary} path={`${pagePath}/${file.slug}`} trackView />
+            </section>
+            <FileSection title="Short answer">
+              <p>{file.title} is tracked because available public records show unresolved questions around responsibility, public harm, official response, or accountability.</p>
+            </FileSection>
 
-              <div className="mt-7 grid gap-3 border-y border-white/10 py-5 text-sm font-bold uppercase tracking-[0.08em] text-white/58 sm:grid-cols-3">
-                <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-saffron" /> {file.year}</span>
-                <span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-saffron" /> {file.location}</span>
-                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-saffron" /> {file.status}</span>
-              </div>
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Button asChild variant="saffron">
-                  <Link href="#timeline">View Timeline</Link>
-                </Button>
-                <Button asChild variant="outline" className="border-white/20 bg-white/[0.08] text-white hover:bg-white/[0.14]">
-                  <Link href="#sources">Check Sources</Link>
-                </Button>
-                <Button asChild variant="outline" className="border-white/20 bg-white/[0.08] text-white hover:bg-white/[0.14]">
-                  <Link href="#ai">Ask CWI AI</Link>
-                </Button>
-                <Button asChild variant="outline" className="border-white/20 bg-white/[0.08] text-white hover:bg-white/[0.14]">
-                  <Link href="/submit">Submit correction</Link>
-                </Button>
-              </div>
-              <div className="mt-7 rounded-[1.5rem] border border-white/10 bg-white/[0.08] p-4">
-                <p className="mb-3 font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-saffron">
-                  Like / Save / Share this investigation
-                </p>
-                <UnansweredArticleActions
-                  slug={file.slug}
-                  title={file.title}
-                  summary={file.summary}
-                  path={`${unansweredFilesPath}/${file.slug}`}
-                  compact
-                  trackView
-                />
-              </div>
-            </div>
-
-            <UnansweredFileVisual file={file} priority showCaption className="border-white/15 shadow-[0_24px_90px_rgba(0,0,0,0.35)]" />
-          </div>
-        </section>
-
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_330px] lg:px-8 lg:py-16">
-          <div className="space-y-10">
-            <Card>
-              <CardLabel>Short answer</CardLabel>
-              <p className="text-xl font-semibold leading-9 text-ink/74">
-                {file.title} is a CWI public-interest case file because the available record shows citizen harm, official response, and unresolved questions that require sustained public scrutiny.
-              </p>
+            <FileSection title="Background">
+              <p>{file.summary}</p>
               <div className="mt-5 grid gap-3 md:grid-cols-2">
                 <MiniFact label="People affected" value={file.peopleAffected} />
                 <MiniFact label="Main issue" value={file.mainIssue} />
-                <MiniFact label="Government response" value={file.governmentResponse} />
                 <MiniFact label="Ground reality" value={file.groundReality} />
+                <MiniFact label="Official response" value={file.governmentResponse} />
               </div>
-            </Card>
+            </FileSection>
 
-            <section className="rounded-[2rem] border border-line bg-white p-6 shadow-card sm:p-8">
-              <div className="space-y-10">
-                {file.sections.map((section) => (
-                  <section key={section.heading}>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h2 className="font-display text-3xl font-black uppercase leading-tight tracking-[-0.04em] text-ink">
-                        {section.heading}
-                      </h2>
-                      <SourcePills file={file} indexes={section.sourceIndex} />
-                    </div>
-                    <p className="mt-4 text-lg leading-9 text-ink/74">{section.body}</p>
-                    {inlineVisualByHeading.get(section.heading) ? (
-                      <div className="mt-6">
-                        <UnansweredFileVisual
-                          file={file}
-                          visual={inlineVisualByHeading.get(section.heading)}
-                          showCaption
-                          imageClassName="transition duration-500 hover:scale-[1.02]"
-                        />
-                      </div>
-                    ) : null}
-                  </section>
-                ))}
-              </div>
+            <section>
+              <CwiSectionHeader eyebrow="Timeline" title="How the file developed" />
+              <CwiTimeline items={file.timeline.slice(0, 8).map((item) => ({ time: item.date, title: item.title, body: item.summary, badge: "File updated", meta: `Sources ${item.sourceIndex.map((index) => index + 1).join(", ")}` }))} />
             </section>
 
-            <section id="timeline">
-              <div className="mb-6 max-w-3xl">
-                <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.2em] text-royal">Timeline</p>
-                <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-ink">
-                  How the file developed
-                </h2>
-              </div>
-              <UnansweredTimeline file={file} />
-            </section>
-
-            <Card>
-              <CardLabel>Unanswered questions</CardLabel>
-              <div className="grid gap-3 md:grid-cols-2">
-                {file.unansweredQuestions.map((question) => (
-                  <div key={question} className="rounded-2xl border border-line bg-paper p-4 text-sm font-bold leading-7 text-ink/70">
-                    {question}
+            <FileSection title="What CWI knows">
+              <div className="space-y-5">
+                {file.sections.slice(0, 3).map((section) => (
+                  <div key={section.heading}>
+                    <h3 className="font-display text-2xl font-black uppercase leading-tight text-cwi-ink">{section.heading}</h3>
+                    <p className="mt-3">{section.body}</p>
                   </div>
                 ))}
               </div>
-            </Card>
+            </FileSection>
 
-            <Card>
-              <CardLabel>FAQ</CardLabel>
-              <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em] text-ink">
-                Frequently asked questions
-              </h2>
-              <div className="mt-5 grid gap-3">
-                {faqs.map((faq) => (
-                  <details key={faq.question} className="rounded-2xl border border-line bg-paper p-4">
-                    <summary className="cursor-pointer font-black uppercase tracking-[0.05em] text-ink">
-                      {faq.question}
-                    </summary>
-                    <p className="mt-3 leading-7 text-ink/70">{faq.answer}</p>
-                  </details>
+            <FileSection title="What remains unanswered">
+              <div className="grid gap-3 md:grid-cols-2">
+                {file.unansweredQuestions.map((question) => <p key={question} className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-4 font-bold leading-7 text-cwi-ink/72">{question}</p>)}
+              </div>
+            </FileSection>
+
+            <FileSection title="Legal/current status if available">
+              <p>{file.sections.find((section) => /court|legal|status/i.test(section.heading))?.body ?? "CWI separates legal status from public reaction. If a stronger court/legal source is available, send it through the correction desk."}</p>
+            </FileSection>
+
+            <FileSection title="Official response if available">
+              <p>{file.governmentResponse}</p>
+            </FileSection>
+
+            <FileSection title="Why it matters">
+              <p>{file.mainIssue}. The open question is: {file.unansweredQuestion}</p>
+            </FileSection>
+
+            <section id="sources" className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 sm:p-6">
+              <CwiSectionHeader eyebrow="Sources and further reading" title="Source trail" subtitle="Each source is listed with what it supports. Sources do not prove more than their own record shows." />
+              <div className="grid gap-4">
+                {file.sources.map((source, index) => (
+                  <a key={source.url} href={source.url} target="_blank" rel="noreferrer" className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-4 transition hover:border-cwi-green/35">
+                    <div className="flex flex-wrap gap-2"><CwiSourceChip>Source {index + 1}</CwiSourceChip><CwiSourceChip>{source.type}</CwiSourceChip></div>
+                    <h3 className="mt-3 font-display text-xl font-black uppercase leading-tight text-cwi-ink">{source.name}</h3>
+                    <p className="mt-2 text-sm font-bold text-cwi-green">{source.publisher}</p>
+                    <p className="mt-3 leading-7 text-cwi-ink/68">{source.note}</p>
+                  </a>
                 ))}
               </div>
-            </Card>
-
-            <section>
-              <div className="mb-6 max-w-3xl">
-                <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.2em] text-royal">Source archive</p>
-                <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-ink">
-                  Evidence trail
-                </h2>
-              </div>
-              <UnansweredSourceArchive records={sourceRecords} />
             </section>
 
-            <section>
-              <div className="mb-6 max-w-3xl">
-                <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.2em] text-royal">CWI AI explainer</p>
-                <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-ink">
-                  Ask only from this file
-                </h2>
-              </div>
-              <UnansweredResearchBox files={[file]} initialSlug={file.slug} />
-            </section>
-
-            <Card>
-              <CardLabel>CWI editorial note</CardLabel>
-              <p className="leading-8 text-ink/72">
-                CWI is not against a community or party. CWI is against silence, delayed transparency, and public suffering without sustained accountability. This file uses source labels and cautious language because public-interest journalism should question power without inventing facts.
-              </p>
-              <p className="mt-4 leading-8 text-ink/72">
-                Cockroach Watch India — CWI connects this case file to the wider CWI Archive and the official website at{" "}
-                <Link href="/" className="font-bold text-royal underline-offset-4 hover:underline">
-                  https://www.cockroachwatchindia.online
-                </Link>
-                . Submit corrections, source links, and report updates through{" "}
-                <Link href="/submit" className="font-bold text-royal underline-offset-4 hover:underline">
-                  Cockroach Watch India
-                </Link>
-                .
-              </p>
-              <p className="mt-4 leading-8 text-ink/72">{articleDisclaimer}</p>
-            </Card>
-
-            <ArticleDiscussionPrompts prompts={discussionPrompts} questions={readerQuestions} />
-
-            <UnansweredComments articleSlug={file.slug} />
+            <FileSection title="CWI note">
+              <p>CWI does not treat this file as a legal finding. The record should be read as public-interest tracking with source limits, open questions, and correction paths visible.</p>
+            </FileSection>
 
             <section>
-              <div className="mb-5 flex items-center justify-between gap-4">
-                <h2 className="font-display text-3xl font-black uppercase tracking-[-0.03em]">Related Unanswered Files</h2>
-                <Link href={unansweredFilesPath} className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-royal">
-                  View all <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-              <div className="grid gap-6 md:grid-cols-3">
-                {relatedFiles.map((relatedFile) => (
-                  <Link
-                    key={relatedFile.slug}
-                    href={`${unansweredFilesPath}/${relatedFile.slug}`}
-                    className="group overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-card transition hover:-translate-y-1 hover:border-royal/30 hover:shadow-soft"
-                  >
-                    <UnansweredFileVisual
-                      file={relatedFile}
-                      imageClassName="transition duration-500 group-hover:scale-[1.03]"
-                      titleClassName="inline rounded-xl bg-white/92 px-2 py-1 text-royal shadow-[0_10px_30px_rgba(255,255,255,0.25)]"
-                    />
-                    <div className="p-5">
-                      <UnansweredStatusBadge status={relatedFile.status} />
-                      <h3 className="mt-4 font-display text-xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">
-                        {relatedFile.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-7 text-ink/68">{relatedFile.unansweredQuestion}</p>
-                    </div>
+              <CwiSectionHeader eyebrow="Related Live Newsroom updates" title="Current updates" />
+              <div className="grid gap-5 md:grid-cols-3">
+                {relatedUpdates.map((item) => (
+                  <Link key={item.id} href={`/live-newsroom/${item.slug}`} className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 transition hover:border-cwi-green/35">
+                    <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-cwi-green">{item.status}</p>
+                    <h3 className="mt-3 font-display text-xl font-black uppercase leading-tight text-cwi-ink">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-cwi-ink/68">{item.summary}</p>
                   </Link>
                 ))}
               </div>
             </section>
+
+            <section className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 shadow-sm sm:p-6">
+              <CwiSectionHeader eyebrow="Public comments" title="Comments are moderated" subtitle="Do not post private data, threats, hate, or unsupported allegations as fact." />
+              <UnansweredComments articleSlug={file.slug} />
+            </section>
+            <CwiSubmitCTA />
           </div>
 
-          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
-            <Card>
-              <CardLabel>Reader actions</CardLabel>
-              <UnansweredArticleActions
-                slug={file.slug}
-                title={file.title}
-                summary={file.summary}
-                path={`${unansweredFilesPath}/${file.slug}`}
-              />
-            </Card>
-
-            <ArticleRating articleType="unanswered-files" articleSlug={file.slug} />
-
-            <Card>
-              <CardLabel>Case status</CardLabel>
-              <div className="space-y-4">
-                <MiniFact label="Location" value={file.location} />
-                <MiniFact label="Period" value={file.year} />
-                <MiniFact label="Category" value={file.category} />
-                <MiniFact label="Source count" value={`${file.sourceCount} visible sources`} />
+          <aside className="space-y-5 lg:sticky lg:top-28 lg:self-start">
+            <div className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 shadow-sm">
+              <CwiStatusBadge tone="saffron">File open</CwiStatusBadge>
+              <h2 className="mt-4 font-display text-2xl font-black uppercase leading-tight text-cwi-ink">Newsroom record</h2>
+              <div className="mt-4 grid gap-2 text-sm font-bold text-cwi-ink/70">
+                <span>Category: {file.category}</span>
+                <span>Status: {file.status}</span>
+                <span>Location: {file.location}</span>
+                <span>Source count: {file.sourceCount}</span>
+                <span>Last updated: {formatDate(lastUpdated)}</span>
               </div>
-            </Card>
+              <CwiButtonLink href="/submit" variant="secondary" className="mt-5 w-full">Send correction</CwiButtonLink>
+            </div>
 
-            <Card>
-              <CardLabel>Political accountability</CardLabel>
-              <Scale className="h-5 w-5 text-royal" />
-              <p className="mt-4 leading-7 text-ink/70">
-                CWI shows the government response separately, then compares it with ground reality, court status, and unanswered public-interest questions.
-              </p>
-            </Card>
-
-            <Card>
-              <CardLabel>Internal links</CardLabel>
-              <div className="grid gap-2">
-                {[
-                  ["CWI India Unanswered Files", unansweredFilesPath],
-                  ["The Watch", "/watch"],
-                  ["Archive", "/watch-desk"],
-                  ["Submit Report", "/submit"],
-                  ["Issue Watch", "/issues"],
-                  ["Contact CWI", "/contact"]
-                ].map(([label, href]) => (
-                  <Link key={href} href={href} className="rounded-2xl bg-paper px-4 py-3 text-sm font-black uppercase tracking-[0.1em] text-ink/68 transition hover:bg-skywash hover:text-royal">
-                    {label}
-                  </Link>
-                ))}
+            {relatedFiles.length ? (
+              <div className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 shadow-sm">
+                <h2 className="font-display text-2xl font-black uppercase leading-tight text-cwi-ink">Related files</h2>
+                <div className="mt-4 grid gap-3">
+                  {relatedFiles.map((item) => <Link key={item.slug} href={`${pagePath}/${item.slug}`} className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-4 font-bold text-cwi-ink hover:text-cwi-green">{item.title}</Link>)}
+                </div>
               </div>
-            </Card>
+            ) : null}
           </aside>
-        </div>
-      </article>
+        </article>
+      </CwiPageShell>
     </>
   );
 }
 
-function buildUnansweredDiscussionPrompts(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
-  return [
-    `Share dated source links, court records, official replies, or ground reports that add context to ${file.title}.`,
-    `If you are familiar with ${file.location}, identify what is missing from the public record without naming private individuals.`,
-    "Help CWI separate verified facts, reported claims, official responses, and unresolved questions."
-  ];
-}
-
-function buildUnansweredReaderQuestions(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
-  return [
-    ...file.unansweredQuestions.slice(0, 3),
-    "What source would help readers verify the next major update?",
-    "What should Cockroach Watch India track next: rehabilitation, court status, policy response, or media accountability?"
-  ];
-}
-
-function buildJsonLd(
-  file: NonNullable<ReturnType<typeof getUnansweredFile>>,
-  imagePath: string,
-  pageUrl: string,
-  faqs: ReturnType<typeof getFileFaqs>
-) {
-  const articleBase = {
-    headline: file.seoTitle,
-    description: file.seoDescription,
-    image: [
-      {
-        "@type": "ImageObject",
-        url: absoluteUrl(imagePath),
-        caption: getFileVisual(file).caption
-      }
-    ],
-    datePublished: "2026-05-24T00:00:00+05:30",
-    dateModified: "2026-05-24T00:00:00+05:30",
-    author: {
-      "@type": "Organization",
-      name: "Cockroach Watch India Editorial Desk",
-      url: site.url
-    },
-    publisher: {
-      "@type": "Organization",
-      name: site.name,
-      logo: {
-        "@type": "ImageObject",
-        url: absoluteUrl("/brand/logo.png")
-      }
-    },
-    url: pageUrl,
-    mainEntityOfPage: pageUrl,
-    articleSection: file.category,
-    keywords: file.keywords.join(", "),
-    citation: file.sources.map((source) => source.url),
-    isAccessibleForFree: true
-  };
-
-  return [
-    {
-      "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      ...articleBase
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      ...articleBase
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Home",
-          item: site.url
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "CWI India Unanswered Files",
-          item: absoluteUrl(unansweredFilesPath)
-        },
-        {
-          "@type": "ListItem",
-          position: 3,
-          name: file.title,
-          item: pageUrl
-        }
-      ]
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faqs.map((faq) => ({
-        "@type": "Question",
-        name: faq.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: faq.answer
-        }
-      }))
-    }
-  ];
+function FileSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 leading-8 text-cwi-ink/72 shadow-sm sm:p-6">
+      <h2 className="font-display text-3xl font-black uppercase leading-tight text-cwi-ink">{title}</h2>
+      <div className="mt-4 space-y-4">{children}</div>
+    </section>
+  );
 }
 
 function MiniFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-paper p-4">
-      <p className="font-mono text-[0.66rem] font-black uppercase tracking-[0.16em] text-royal">{label}</p>
-      <p className="mt-2 text-sm font-semibold leading-7 text-ink/70">{value}</p>
+    <div className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-4">
+      <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.14em] text-cwi-green">{label}</p>
+      <p className="mt-2 text-sm font-semibold leading-6 text-cwi-ink/68">{value}</p>
     </div>
   );
 }
 
-function SourcePills({ file, indexes }: { file: NonNullable<ReturnType<typeof getUnansweredFile>>; indexes: number[] }) {
-  const sources = getFileSources(file, indexes);
+function buildJsonLd(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: file.title,
+    description: file.summary,
+    url: absoluteUrl(`${pagePath}/${file.slug}`),
+    datePublished: lastUpdated,
+    dateModified: lastUpdated,
+    articleSection: file.category,
+    author: { "@type": "Organization", name: site.name },
+    publisher: { "@type": "NewsMediaOrganization", name: site.name, url: site.url },
+    image: absoluteUrl(file.ogImage || "/opengraph-image"),
+    mainEntityOfPage: absoluteUrl(`${pagePath}/${file.slug}`)
+  };
+}
 
-  if (!sources.length) {
-    return null;
-  }
 
-  return (
-    <div className="flex flex-wrap gap-2">
-      {sources.map((source) => (
-        <a
-          key={source.url}
-          href={source.url}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 rounded-full border border-line bg-paper px-3 py-1 text-[0.66rem] font-black uppercase tracking-[0.12em] text-ink/58 transition hover:border-royal/35 hover:bg-skywash hover:text-royal"
-        >
-          {source.publisher}
-          <ExternalLink className="h-3 w-3" />
-        </a>
-      ))}
-    </div>
-  );
+function buildFaqJsonLd(faqs: ReturnType<typeof getFileFaqs>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer
+      }
+    }))
+  };
+}
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }

@@ -1,4 +1,4 @@
-﻿export const site = {
+export const site = {
   name: "Cockroach Watch India",
   shortName: "CWI",
   url: "https://www.cockroachwatchindia.online",
@@ -21,7 +21,7 @@
   shortDisclaimer:
     "Independent civic watch, satire, and commentary platform. Not affiliated with any political party or organization unless officially declared.",
   description:
-    "Cockroach Watch India, also known as CWI, is an independent civic watch, satire, and commentary platform documenting youth voice, public issues, creator credit, viral claims, and India's unanswered files.",
+    "Cockroach Watch India is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform tracking public issues, viral claims, source trails, corrections, youth voice, and India Unanswered Files.",
   keywords: [
     "Cockroach Watch India",
     "CWI",

@@ -25,7 +25,7 @@ export async function runPublishAgent(approvalQueueId: string) {
   }
 
   const slug = publicSlugForDraft(articleDraft.slug, articleDraft.id);
-  const url = `${site.url}/watch-desk/${slug}`;
+  const url = `${site.url}/archive/${slug}`;
   const publishedArticleId = await savePublishedArticle({
     articleDraftId: articleDraft.id,
     title: articleDraft.title,
@@ -35,7 +35,7 @@ export async function runPublishAgent(approvalQueueId: string) {
     metadata: {
       approvalQueueId,
       generatedArticleDraft,
-      note: "Published to the CWI admin database and served by the dynamic Watch Desk public route."
+      note: "Published to the CWI admin database and served by the dynamic Archive public route."
     }
   });
 
@@ -43,8 +43,8 @@ export async function runPublishAgent(approvalQueueId: string) {
     approvalQueueId,
     "published",
     generatedArticleDraft
-      ? "Publish AI generated the missing article draft, saved it to published_articles, and opened the public Watch Desk route."
-      : "Publish AI saved the approved item to the published_articles table and opened the public Watch Desk route."
+      ? "Publish AI generated the missing article draft, saved it to published_articles, and opened the public Archive route."
+      : "Publish AI saved the approved item to the published_articles table and opened the public Archive route."
   );
 
   return {
@@ -115,7 +115,7 @@ async function getOrCreatePublishableDraft(approval: Record<string, unknown>) {
 }
 
 function publicSlugForDraft(value: unknown, articleDraftId: unknown) {
-  const base = slugify(asText(value) || asText(articleDraftId) || "cwi-watch-desk-update");
+  const base = slugify(asText(value) || asText(articleDraftId) || "cwi-live-newsroom-update");
   const suffix = asText(articleDraftId).slice(0, 8);
 
   if (posts.some((post) => post.slug === base)) {
@@ -131,7 +131,7 @@ function slugify(value: string) {
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 90) || "cwi-watch-desk-update";
+    .slice(0, 90) || "cwi-live-newsroom-update";
 }
 
 function asText(value: unknown) {

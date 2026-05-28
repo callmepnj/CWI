@@ -503,7 +503,7 @@ export async function ensureAdminOsTables() {
       create table if not exists research_packs (
         id uuid primary key default gen_random_uuid(),
         topic text not null,
-        category text not null default 'Watch Desk',
+        category text not null default 'Live Newsroom',
         date_range text,
         source_list jsonb not null default '[]'::jsonb,
         source_count integer not null default 0,
@@ -542,7 +542,7 @@ export async function ensureAdminOsTables() {
         research_pack_id uuid references research_packs(id) on delete set null,
         title text not null,
         slug text,
-        category text not null default 'Watch Desk',
+        category text not null default 'Live Newsroom',
         draft jsonb not null default '{}'::jsonb,
         verification_status text not null default 'Developing',
         source_count integer not null default 0,
