@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { SocialLinks } from "@/components/SocialLinks";
 import { Card, CardLabel } from "@/components/ui/card";
 import { site } from "@/lib/site";
@@ -23,7 +24,8 @@ const contactCards = [
 
 export default function ContactPage() {
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="moderate">
+      <CwiPageShell>
       <CwiMasthead
         label="Contact CWI"
         title="Contact Cockroach Watch India"
@@ -56,5 +58,6 @@ export default function ContactPage() {
         <SocialLinks />
       </section>
     </CwiPageShell>
-  );
-}
+      </PageBackgroundGesture>
+    );
+  }

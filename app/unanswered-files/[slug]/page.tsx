@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, FileText, MapPin, ShieldCheck } from "lucide-react";
 import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSourceChip, CwiStatusBadge, CwiSubmitCTA, CwiTimeline } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
 import { UnansweredComments } from "@/components/UnansweredComments";
 import { getLiveUpdates } from "@/data/live-newsroom";
@@ -56,7 +57,8 @@ export default async function UnansweredFilePage({ params }: Props) {
   return (
     <>
       {jsonLd.map((item) => <script key={item["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
-      <CwiPageShell>
+      <PageBackgroundGesture intensity="subtle">
+        <CwiPageShell>
         <div className="mb-5 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-brown/70">
           <Link href="/" className="hover:text-cwi-green">Home</Link>
           <span>/</span>
@@ -208,10 +210,10 @@ export default async function UnansweredFilePage({ params }: Props) {
           </aside>
         </article>
       </CwiPageShell>
+      </PageBackgroundGesture>
     </>
   );
 }
-
 function FileSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-lg border border-cwi-brown/18 bg-white/78 p-5 leading-8 text-cwi-ink/72 shadow-sm sm:p-6">

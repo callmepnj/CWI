@@ -294,3 +294,23 @@ Next steps:
 - Expanded System Health to store and display exact issue details with severity for old Watch Desk links/text, preview/local URLs, public backend/mock/draft wording, metadata/canonical gaps, sitemap/robots exclusions, large images, and fake counters/supporter notes.
 - Re-ran cleanup scans for old Watch Desk/Watch More/preview/mock/backend phrases outside the scanner, sitemap old-route entries, and built public HTML; no blocked public matches remained.
 - Verification passed after reapply: `npm run typecheck`, `npm run lint`, `npm run validate:unanswered-files`, `npm run build`, main public route smoke checks, legacy redirect smoke checks, and support QR render check.
+
+2026-05-30 live newsroom + support upgrade pass:
+- User requested CWI full upgrade for `/live-newsroom` first and `/support` second, with dark civic newsroom design, ticker, solidarity bars, declaration forms, story cards, and support declaration wall.
+- Added shared client component `components/CwiCivicLiveKit.tsx` for ticker, amber shimmer join button, rotating joined-citizen gesture bar, newsroom join form, support declaration form, and success overlays.
+- Added shared dark design tokens and animations to `app/globals.css`: `--cwi-night`, dark card/border/text tokens, accent blue/amber/red/green/yellow, ticker scroll, shimmer sweep, joined bar, form controls, word reveal, and burst success states.
+- Replaced `/live-newsroom` page with requested hero copy, live ticker, stat bar, gesture bar, civic declaration join form, six source-attributed story cards, and horizontal India Unanswered Files teaser. Existing `/live-newsroom/[slug]` route and live slugs were not renamed or removed.
+- Replaced `/support` page with full-screen declaration hero, refusal marquee, who-we-are section, support declaration form, joined-citizens bar, three support-matters columns, and final closing CTA. `/join` redirect route was left untouched.
+- Page-level SEO metadata for `/live-newsroom` and `/support` now uses requested titles/descriptions and apex canonical URLs (`https://cockroachwatchindia.online/...`). Global canonical host remains as previously configured elsewhere in the app to avoid changing unrelated redirect behavior in this pass.
+- Verification: `npm run build` passes after both pages. Local dev server started at `http://localhost:3000`; `Invoke-WebRequest` returned HTTP 200 for `/live-newsroom` and `/support`.
+- Notes for next agent: `apply_patch` failed to write files in this workspace during this pass, so edits were made with PowerShell native `Set-Content`/`Add-Content`. `npm run build` regenerated `public/sitemap.xml` and `public/robots.txt`, so those files show as modified.
+
+2026-05-30 site-wide theme upgrade pass:
+- User requested applying Live Newsroom/Support visual quality across the full site, adding full light/dark mode, central theme tokens, navbar/footer refresh, route checks, and Google Font Tapestry on every headline.
+- Added `components/ThemeToggle.tsx`; toggle is available in desktop navbar and mobile menu, stores `cwi-theme` in localStorage, and uses system preference by default.
+- Updated `app/layout.tsx` with no-flash theme boot script, `suppressHydrationWarning`, Inter body font, JetBrains Mono mono font, and Google Font `Tapestry` as `--font-display` for headlines.
+- Updated `tailwind.config.ts` so existing CWI color utilities map to CSS variables instead of fixed legacy paper colors.
+- Reworked `app/globals.css` with central light/dark tokens: bg, secondary bg, card, border, primary/secondary text, blue/amber/red/green/yellow accents, shadows, legacy token aliases, dark-mode overrides for old white surfaces, forms, article text, and global h1-h6 Tapestry font application.
+- Updated shared shell/components: `Navbar`, `Footer`, `DisclaimerBanner`, `components/ui/button.tsx`, `components/ui/card.tsx`, and `components/ui/input.tsx` to use the new variable-backed card/border/button system.
+- Production verification: stopped dev server, cleared `.next`, ran `npm run build` successfully. Then ran `npm run start -- --port 3000` and checked key routes with `Invoke-WebRequest`; all returned 200: `/`, `/live-newsroom`, `/support`, `/archive`, `/india-unanswered-files`, `/india-unanswered-files/manipur-violence`, `/submit`, `/about`, `/contact`, `/editorial-policy`, `/credit-policy`, `/privacy-policy`, `/live-newsroom/neet-ug-2026-probe-official-notices-and-source-gaps`, `/archive/what-is-cockroach-watch-india`.
+- Note: `npm run build` regenerated `public/sitemap.xml` and `public/robots.txt`; they remain modified. Production server is running locally at `http://localhost:3000` from `npm run start`.

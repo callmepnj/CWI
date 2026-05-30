@@ -14,6 +14,7 @@ import {
   CwiSubmitCTA,
   CwiTimeline
 } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { posts } from "@/data/posts";
 import { getPublishedWatchPostBySlug } from "@/lib/db/articles";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
@@ -70,7 +71,8 @@ export default async function ArchiveArticlePage({ params }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <CwiPageShell>
+      <PageBackgroundGesture intensity="subtle">
+        <CwiPageShell>
         <div className="mb-5 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-brown/70">
           <Link href="/" className="hover:text-cwi-green">Home</Link>
           <span>/</span>
@@ -183,7 +185,8 @@ export default async function ArchiveArticlePage({ params }: Props) {
             ) : null}
           </aside>
         </article>
-      </CwiPageShell>
+        </CwiPageShell>
+      </PageBackgroundGesture>
     </>
   );
 }

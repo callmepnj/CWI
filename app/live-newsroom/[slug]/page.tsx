@@ -1,3 +1,4 @@
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -119,7 +120,8 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
       {jsonLd.map((item) => (
         <script key={`${item["@type"]}-${slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />
       ))}
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+      <PageBackgroundGesture intensity="subtle">
+        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
 
         {/* Back navigation */}
         <Link
@@ -327,7 +329,8 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
             </div>
           </div>
         )}
-      </div>
+        </div>
+      </PageBackgroundGesture>
     </>
   );
 }

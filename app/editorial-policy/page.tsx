@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTrustStrip } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { Card, CardLabel } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -38,7 +39,8 @@ const policies = [
 
 export default function EditorialPolicyPage() {
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="subtle">
+      <CwiPageShell>
       <CwiMasthead
         label="Editorial trust"
         title="Editorial Policy"
@@ -82,5 +84,6 @@ export default function EditorialPolicyPage() {
 
       <div className="mt-10"><CwiSubmitCTA /></div>
     </CwiPageShell>
-  );
-}
+      </PageBackgroundGesture>
+    );
+  }

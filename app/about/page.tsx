@@ -1,4 +1,5 @@
 import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTrustStrip } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { Card, CardLabel } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -26,7 +27,8 @@ const whatCwiIsNot = [
 
 export default function AboutPage() {
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="moderate">
+      <CwiPageShell>
       <CwiMasthead
         label="About CWI"
         title="About Cockroach Watch India"
@@ -75,7 +77,8 @@ export default function AboutPage() {
 
       <div className="mt-10"><CwiSubmitCTA /></div>
     </CwiPageShell>
-  );
+      </PageBackgroundGesture>
+    );
 }
 
 function InfoCard({ title, body }: { title: string; body: string }) {

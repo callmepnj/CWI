@@ -188,7 +188,7 @@ const sourceMap = {
     usedIn: "NEET official notices and candidate actions",
     supports: "NTA-published NEET(UG) public notices, including re-exam and candidate notice pages.",
     doesNotProve: "It does not prove viral screenshots, private coaching claims, or non-NTA timelines.",
-    lastUsedAt: "2026-05-28T10:45:00+05:30"
+    lastUsedAt: "2026-05-30T10:45:00+05:30"
   },
   ntaMain: {
     id: "src-nta-main",
@@ -199,7 +199,7 @@ const sourceMap = {
     usedIn: "Agency context",
     supports: "Official agency ownership and public communications context.",
     doesNotProve: "It does not confirm social-media claims unless a matching notice is published.",
-    lastUsedAt: "2026-05-28T10:45:00+05:30"
+    lastUsedAt: "2026-05-30T10:45:00+05:30"
   },
   cbseLatest: {
     id: "src-cbse-latest",
@@ -210,7 +210,7 @@ const sourceMap = {
     usedIn: "CBSE OSM and post-result notices",
     supports: "CBSE-published latest notices, including OSM and scanned answer-book updates.",
     doesNotProve: "It does not independently audit disputed screenshots or third-party portal claims.",
-    lastUsedAt: "2026-05-28T09:30:00+05:30"
+    lastUsedAt: "2026-05-30T09:30:00+05:30"
   },
   cbseCirculars: {
     id: "src-cbse-circulars",
@@ -221,7 +221,7 @@ const sourceMap = {
     usedIn: "CBSE post-result and OSM process context",
     supports: "Official circular listings for post-result facilities and OSM-related instructions.",
     doesNotProve: "It does not settle every individual student's mark dispute.",
-    lastUsedAt: "2026-05-28T09:30:00+05:30"
+    lastUsedAt: "2026-05-30T09:30:00+05:30"
   },
   parikshaSangam: {
     id: "src-pariksha-sangam",
@@ -232,7 +232,7 @@ const sourceMap = {
     usedIn: "Verification, photocopy, and re-evaluation action path",
     supports: "Official student-facing route for re-checking and re-evaluation services when active.",
     doesNotProve: "It does not confirm whether any specific answer sheet was mis-scanned.",
-    lastUsedAt: "2026-05-28T09:30:00+05:30"
+    lastUsedAt: "2026-05-30T09:30:00+05:30"
   },
   teleManas: {
     id: "src-tele-manas",
@@ -243,7 +243,7 @@ const sourceMap = {
     usedIn: "Student safety advisory",
     supports: "Official mental-health support context for students in distress.",
     doesNotProve: "It is a support resource, not an exam-policy source.",
-    lastUsedAt: "2026-05-28T10:45:00+05:30"
+    lastUsedAt: "2026-05-30T10:45:00+05:30"
   },
   indianExpressNeetProbe: {
     id: "src-indianexpress-neet-probe",
@@ -254,7 +254,7 @@ const sourceMap = {
     usedIn: "NEET probe update",
     supports: "Reported CBI arrests, custody details, and investigation context attributed to officials.",
     doesNotProve: "It is not a court record or CBI press release.",
-    lastUsedAt: "2026-05-28T10:45:00+05:30"
+    lastUsedAt: "2026-05-30T10:45:00+05:30"
   },
   ndtvNeetProbe: {
     id: "src-ndtv-neet-probe",
@@ -265,7 +265,7 @@ const sourceMap = {
     usedIn: "NEET probe update",
     supports: "Additional reported context on the arrests and alleged leak chain.",
     doesNotProve: "It does not replace primary legal filings.",
-    lastUsedAt: "2026-05-28T10:45:00+05:30"
+    lastUsedAt: "2026-05-30T10:45:00+05:30"
   },
   ndtvCbseOsm: {
     id: "src-ndtv-cbse-osm",
@@ -276,7 +276,7 @@ const sourceMap = {
     usedIn: "CBSE OSM portal claim context",
     supports: "Reported CBSE denial and the disputed social-media vulnerability claim.",
     doesNotProve: "It does not independently verify either side's technical evidence.",
-    lastUsedAt: "2026-05-28T09:30:00+05:30"
+    lastUsedAt: "2026-05-30T09:30:00+05:30"
   },
   nationalHeraldCji: {
     id: "src-nationalherald-cji",
@@ -287,7 +287,7 @@ const sourceMap = {
     usedIn: "CJI/CJP context verification",
     supports: "Reported clarification that the remarks were framed around fake-degree entrants.",
     doesNotProve: "It does not provide the complete court transcript or settle every viral quote card.",
-    lastUsedAt: "2026-05-28T08:15:00+05:30"
+    lastUsedAt: "2026-05-30T08:15:00+05:30"
   },
   financialExpressCji: {
     id: "src-financialexpress-cji",
@@ -298,13 +298,13 @@ const sourceMap = {
     usedIn: "CJI/CJP context verification",
     supports: "Second reported account of the clarification and public debate.",
     doesNotProve: "It is not a primary judicial transcript.",
-    lastUsedAt: "2026-05-28T08:15:00+05:30"
+    lastUsedAt: "2026-05-30T08:15:00+05:30"
   }
 } satisfies Record<string, Source>;
 
 export const todaysBriefs: TodaysBrief[] = [
   {
-    id: "brief-2026-05-28",
+    id: "brief-2026-05-30",
     date: "May 28, 2026",
     title: "Newsroom record for May 28",
     topUpdates: [
@@ -318,9 +318,9 @@ export const todaysBriefs: TodaysBrief[] = [
     editorNote: "Today's newsroom record prioritizes candidate safety, official action links, and clear source gaps.",
     editorName: "PNJ / CWI Editorial Desk",
     status: "approved",
-    approvedAt: "2026-05-28T11:00:00+05:30",
-    createdAt: "2026-05-28T07:30:00+05:30",
-    updatedAt: "2026-05-28T11:00:00+05:30"
+    approvedAt: "2026-05-30T11:00:00+05:30",
+    createdAt: "2026-05-30T07:30:00+05:30",
+    updatedAt: "2026-05-30T11:00:00+05:30"
   }
 ];
 
@@ -354,8 +354,8 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
       sourceMap.indianExpressNeetProbe,
       sourceMap.ndtvNeetProbe
     ],
-    lastCheckedAt: "2026-05-28T10:45:00+05:30",
-    lastUpdatedAt: "2026-05-28T10:45:00+05:30",
+    lastCheckedAt: "2026-05-30T10:45:00+05:30",
+    lastUpdatedAt: "2026-05-30T10:45:00+05:30",
     displayImage: "/images/cwi-unanswered-files/neet-paper-leak/hero.jpg",
     displayImageAlt: "CWI editorial visual on NEET exam accountability and student verification",
     correctionOpen: true,
@@ -363,9 +363,9 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
     hiddenFromLiveNewsroom: false,
     isArchivedContext: false,
     approvalStatus: "approved",
-    createdAt: "2026-05-28T08:20:00+05:30",
-    updatedAt: "2026-05-28T10:45:00+05:30",
-    publishedAt: "2026-05-28T10:45:00+05:30",
+    createdAt: "2026-05-30T08:20:00+05:30",
+    updatedAt: "2026-05-30T10:45:00+05:30",
+    publishedAt: "2026-05-30T10:45:00+05:30",
     approvedBy: "PNJ / CWI Editorial Desk"
   },
   {
@@ -399,8 +399,8 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
       sourceMap.parikshaSangam,
       sourceMap.teleManas
     ],
-    lastCheckedAt: "2026-05-28T10:30:00+05:30",
-    lastUpdatedAt: "2026-05-28T10:30:00+05:30",
+    lastCheckedAt: "2026-05-30T10:30:00+05:30",
+    lastUpdatedAt: "2026-05-30T10:30:00+05:30",
     displayImage: "/images/cwi-unanswered-files/neet-paper-leak/hero.jpg",
     displayImageAlt: "Student exam stress and public accountability visual for CWI advisory",
     correctionOpen: true,
@@ -408,9 +408,9 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
     hiddenFromLiveNewsroom: false,
     isArchivedContext: false,
     approvalStatus: "approved",
-    createdAt: "2026-05-28T07:45:00+05:30",
-    updatedAt: "2026-05-28T10:30:00+05:30",
-    publishedAt: "2026-05-28T10:30:00+05:30",
+    createdAt: "2026-05-30T07:45:00+05:30",
+    updatedAt: "2026-05-30T10:30:00+05:30",
+    publishedAt: "2026-05-30T10:30:00+05:30",
     approvedBy: "PNJ / CWI Editorial Desk"
   },
   {
@@ -438,16 +438,16 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
       "CWI has not independently verified the alleged vulnerability, the screenshots, or whether any real student data was exposed.",
     sourceGap: "Independent security audit evidence or a primary CBSE technical note is still needed.",
     sourceTrail: [sourceMap.cbseLatest, sourceMap.cbseCirculars, sourceMap.parikshaSangam, sourceMap.ndtvCbseOsm],
-    lastCheckedAt: "2026-05-28T09:30:00+05:30",
-    lastUpdatedAt: "2026-05-28T09:30:00+05:30",
+    lastCheckedAt: "2026-05-30T09:30:00+05:30",
+    lastUpdatedAt: "2026-05-30T09:30:00+05:30",
     correctionOpen: true,
     sourceRequestOpen: true,
     hiddenFromLiveNewsroom: false,
     isArchivedContext: false,
     approvalStatus: "approved",
-    createdAt: "2026-05-28T08:00:00+05:30",
-    updatedAt: "2026-05-28T09:30:00+05:30",
-    publishedAt: "2026-05-28T09:30:00+05:30",
+    createdAt: "2026-05-30T08:00:00+05:30",
+    updatedAt: "2026-05-30T09:30:00+05:30",
+    publishedAt: "2026-05-30T09:30:00+05:30",
     approvedBy: "PNJ / CWI Editorial Desk"
   },
   {
@@ -475,16 +475,16 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
       "CWI has not received a complete primary transcript or official document that settles the exact wording used in every viral quote card.",
     sourceGap: "Full court transcript, primary clarification, or authoritative legal record is still needed.",
     sourceTrail: [sourceMap.nationalHeraldCji, sourceMap.financialExpressCji],
-    lastCheckedAt: "2026-05-28T08:15:00+05:30",
-    lastUpdatedAt: "2026-05-28T08:15:00+05:30",
+    lastCheckedAt: "2026-05-30T08:15:00+05:30",
+    lastUpdatedAt: "2026-05-30T08:15:00+05:30",
     correctionOpen: true,
     sourceRequestOpen: true,
     hiddenFromLiveNewsroom: false,
     isArchivedContext: false,
     approvalStatus: "approved",
-    createdAt: "2026-05-28T07:55:00+05:30",
-    updatedAt: "2026-05-28T08:15:00+05:30",
-    publishedAt: "2026-05-28T08:15:00+05:30",
+    createdAt: "2026-05-30T07:55:00+05:30",
+    updatedAt: "2026-05-30T08:15:00+05:30",
+    publishedAt: "2026-05-30T08:15:00+05:30",
     approvedBy: "PNJ / CWI Editorial Desk"
   }
 ];
@@ -501,7 +501,7 @@ export const publicAdvisories: PublicAdvisory[] = [
     context: "Student safety comes before virality.",
     relatedLink: "/live-newsroom/neet-cbse-student-help-official-links-before-sharing",
     relatedLinkText: "Open student advisory",
-    lastUpdatedAt: "2026-05-28T10:30:00+05:30",
+    lastUpdatedAt: "2026-05-30T10:30:00+05:30",
     priority: "high"
   },
   {
@@ -514,7 +514,7 @@ export const publicAdvisories: PublicAdvisory[] = [
       "Look for the original post, timestamp, URL context, official response, and whether an independent technical review exists.",
     relatedLink: "/live-newsroom/cbse-osm-portal-claims-what-is-official-and-what-is-disputed",
     relatedLinkText: "Open verification note",
-    lastUpdatedAt: "2026-05-28T09:30:00+05:30",
+    lastUpdatedAt: "2026-05-30T09:30:00+05:30",
     priority: "normal"
   },
   {
@@ -527,7 +527,7 @@ export const publicAdvisories: PublicAdvisory[] = [
       "Check whether the post links to the original court context, a primary clarification, or at least two named media reports.",
     relatedLink: "/live-newsroom/cji-cockroach-remark-cjp-context-needs-primary-source",
     relatedLinkText: "Open source request",
-    lastUpdatedAt: "2026-05-28T08:15:00+05:30",
+    lastUpdatedAt: "2026-05-30T08:15:00+05:30",
     priority: "normal"
   }
 ];
@@ -543,10 +543,10 @@ export const claimTrackerItems: ClaimTrackerItem[] = [
       "CBSE's reported position is that the cited URL was a testing/dummy platform. The social-media claimant disputes that. CWI needs independent technical evidence before calling the claim settled.",
     sourceGap: "Independent audit evidence or primary CBSE technical note.",
     sources: [sourceMap.cbseLatest, sourceMap.ndtvCbseOsm],
-    lastCheckedAt: "2026-05-28T09:30:00+05:30",
+    lastCheckedAt: "2026-05-30T09:30:00+05:30",
     approvalStatus: "approved",
-    createdAt: "2026-05-28T08:05:00+05:30",
-    updatedAt: "2026-05-28T09:30:00+05:30"
+    createdAt: "2026-05-30T08:05:00+05:30",
+    updatedAt: "2026-05-30T09:30:00+05:30"
   },
   {
     id: "claim-cji-quote-card",
@@ -558,10 +558,10 @@ export const claimTrackerItems: ClaimTrackerItem[] = [
       "Media reports document a clarification, but CWI still needs primary context before treating every quote-card version as accurate.",
     sourceGap: "Full transcript or authoritative primary clarification.",
     sources: [sourceMap.nationalHeraldCji, sourceMap.financialExpressCji],
-    lastCheckedAt: "2026-05-28T08:15:00+05:30",
+    lastCheckedAt: "2026-05-30T08:15:00+05:30",
     approvalStatus: "approved",
-    createdAt: "2026-05-28T07:55:00+05:30",
-    updatedAt: "2026-05-28T08:15:00+05:30"
+    createdAt: "2026-05-30T07:55:00+05:30",
+    updatedAt: "2026-05-30T08:15:00+05:30"
   }
 ];
 
@@ -633,3 +633,4 @@ export function getSourceBackedReports(): LiveNewsroomItem[] {
 export function getItemBySlug(slug: string): LiveNewsroomItem | undefined {
   return getPublicLiveNewsroomItems().find((item) => item.slug === slug);
 }
+

@@ -1,4 +1,5 @@
 import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTrustStrip } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { WatchDeskGrid } from "@/components/WatchDeskGrid";
 import { posts, type WatchPost } from "@/data/posts";
 import { getPublishedWatchPosts } from "@/lib/db/articles";
@@ -43,7 +44,8 @@ export default async function ArchivePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(archiveJsonLd) }} />
-      <CwiPageShell>
+      <PageBackgroundGesture intensity="moderate">
+        <CwiPageShell>
         <CwiMasthead
           label="CWI Archive"
           title="Older records. Current updates live in the Live Newsroom."
@@ -79,6 +81,7 @@ export default async function ArchivePage() {
           <CwiSubmitCTA />
         </div>
       </CwiPageShell>
+      </PageBackgroundGesture>
     </>
   );
 }

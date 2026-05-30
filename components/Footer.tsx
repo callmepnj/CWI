@@ -1,4 +1,4 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 
@@ -42,11 +42,11 @@ const footerGroups = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-cwi-brown/18 bg-cwi-ink px-4 py-12 text-cwi-cream">
+    <footer className="border-t border-cwi-border bg-cwi-card px-4 py-12 text-cwi-ink">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1fr]">
         <div>
           <div className="flex items-center gap-4">
-            <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-lg border border-cwi-cream/15 bg-white">
+            <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-lg border border-cwi-border bg-cwi-bg">
               <Image src="/brand/logo.png" alt="Cockroach Watch India CWI logo" width={56} height={56} className="h-full w-full object-cover" />
             </span>
             <div>
@@ -54,21 +54,21 @@ export function Footer() {
               <p className="mt-2 font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Live Newsroom / Public archive</p>
             </div>
           </div>
-          <p className="mt-5 max-w-2xl leading-7 text-cwi-cream/74">
+          <p className="mt-5 max-w-2xl leading-7 text-cwi-brown">
             CWI is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform. Current updates live in the Live Newsroom; older explainers are preserved in the Archive.
           </p>
-          <p className="mt-6 max-w-3xl rounded-lg border border-cwi-cream/12 bg-cwi-cream/6 p-4 text-xs font-bold uppercase leading-6 tracking-[0.08em] text-cwi-cream/72">
+          <p className="mt-6 max-w-3xl rounded-lg border border-cwi-border bg-cwi-muted p-4 text-xs font-bold uppercase leading-6 tracking-[0.08em] text-cwi-brown">
             {site.disclaimer}
           </p>
-          <div className="mt-5 max-w-xl rounded-lg border border-cwi-cream/12 bg-cwi-cream/6 p-4">
+          <div className="mt-5 max-w-xl rounded-lg border border-cwi-border bg-cwi-muted p-4">
             <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join the Watchlist</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-cwi-cream/70">Watchlist signup coming soon. It will ask only for email and consent.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-cwi-brown">Watchlist signup coming soon. It will ask only for email and consent.</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-              <input disabled type="email" placeholder="Email signup coming soon" className="min-h-11 rounded-lg border border-cwi-cream/12 bg-cwi-cream/10 px-3 text-sm font-bold text-cwi-cream placeholder:text-cwi-cream/45" />
+              <input disabled type="email" placeholder="Email signup coming soon" className="min-h-11 rounded-lg border border-cwi-border bg-cwi-card px-3 text-sm font-bold text-cwi-ink placeholder:text-cwi-brown/70" />
               <button disabled type="button" className="min-h-11 rounded-lg border border-cwi-saffron/30 bg-cwi-saffron/20 px-4 font-mono text-xs font-black uppercase tracking-[0.12em] text-cwi-saffron opacity-80">Coming soon</button>
             </div>
-            <label className="mt-3 flex gap-2 text-xs font-bold leading-5 text-cwi-cream/62">
-              <input disabled type="checkbox" className="mt-0.5 h-4 w-4 rounded border-cwi-cream/30" />
+            <label className="mt-3 flex gap-2 text-xs font-bold leading-5 text-cwi-brown">
+              <input disabled type="checkbox" className="mt-0.5 h-4 w-4 rounded border-cwi-border" />
               Consent checkbox will be required when signup opens.
             </label>
           </div>
@@ -96,7 +96,7 @@ function FooterLink({ label, href }: { label: string; href: string }) {
       href={href}
       target={external && href.startsWith("http") ? "_blank" : undefined}
       rel={external && href.startsWith("http") ? "noreferrer" : undefined}
-      className="rounded-lg border border-cwi-cream/10 bg-cwi-cream/5 px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-cream/76 transition hover:border-cwi-saffron/60 hover:bg-cwi-cream/10 hover:text-cwi-saffron"
+      className="rounded-lg border border-cwi-border bg-cwi-bg px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-brown transition hover:border-cwi-saffron/60 hover:bg-cwi-muted hover:text-cwi-saffron"
     >
       {label}
     </Link>

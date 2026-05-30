@@ -1,4 +1,4 @@
-import type React from "react";
+﻿import type React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileText, Send, ShieldCheck } from "lucide-react";
@@ -43,15 +43,16 @@ export function CwiMasthead({
   return (
     <section
       className={cn(
-        "relative isolate overflow-hidden rounded-lg border-2 border-cwi-green bg-cwi-cream p-6 shadow-[0_22px_70px_rgba(29,18,10,0.12)] sm:p-8 lg:p-10",
-        "before:absolute before:inset-x-0 before:top-0 before:h-2 before:bg-cwi-saffron",
+        "relative isolate overflow-hidden rounded-lg border border-cwi-green/55 bg-cwi-card p-6 shadow-[0_22px_70px_var(--cwi-shadow-soft)] ring-1 ring-cwi-green/10 sm:p-8 lg:p-10",
+        "before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-1.5 before:bg-cwi-saffron",
+        "after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-[radial-gradient(circle_at_20%_15%,rgba(59,130,246,0.18),transparent_26rem)]",
         className
       )}
     >
-      <span className="pointer-events-none absolute -right-5 top-8 -z-10 select-none font-display text-[7rem] font-black uppercase leading-none text-cwi-green/[0.045] sm:text-[10rem]">
+      <span className="pointer-events-none absolute right-0 top-0 z-0 select-none overflow-hidden font-display text-[clamp(3rem,10vw,6rem)] font-black uppercase leading-none text-cwi-green/[0.018] sm:right-2 sm:top-2 lg:right-4 lg:top-4">
         CWI
       </span>
-      <div className="max-w-5xl">
+      <div className="relative z-20 max-w-5xl">
         <p className="font-mono text-xs font-black uppercase tracking-[0.22em] text-cwi-green">{label}</p>
         <h1 className="mt-4 font-display text-4xl font-black uppercase leading-[0.95] text-cwi-ink sm:text-6xl lg:text-7xl">
           {title}
@@ -61,7 +62,7 @@ export function CwiMasthead({
       </div>
 
       {meta?.length ? (
-        <div className="mt-7 flex flex-wrap gap-2">
+        <div className="relative z-20 mt-7 flex flex-wrap gap-2">
           {meta.map((item) => (
             <span
               key={item}
@@ -74,7 +75,7 @@ export function CwiMasthead({
       ) : null}
 
       {primaryCta || secondaryCta || tertiaryCta ? (
-        <div className="mt-8 flex flex-wrap gap-3">
+        <div className="relative z-20 mt-8 flex flex-wrap gap-3">
           {primaryCta ? (
             <CwiButtonLink href={primaryCta.href}>
               {primaryCta.label}

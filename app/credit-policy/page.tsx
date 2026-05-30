@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { Card, CardLabel } from "@/components/ui/card";
 import { site } from "@/lib/site";
 import { createMetadata } from "@/lib/seo";
@@ -22,7 +23,8 @@ const sections = [
 
 export default function CreditPolicyPage() {
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="subtle">
+      <CwiPageShell>
       <CwiMasthead
         label="Creator rights"
         title="Credit Policy"
@@ -52,5 +54,6 @@ export default function CreditPolicyPage() {
 
       <div className="mt-10"><CwiSubmitCTA /></div>
     </CwiPageShell>
-  );
-}
+      </PageBackgroundGesture>
+    );
+  }

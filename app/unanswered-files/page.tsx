@@ -1,3 +1,4 @@
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { CwiButtonLink, CwiDossierCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTrustStrip } from "@/components/CwiDesignSystem";
 import { UnansweredFilesGrid } from "@/components/UnansweredFilesGrid";
 import { unansweredFiles, unansweredFilesKeywords } from "@/data/unanswered-files";
@@ -40,7 +41,8 @@ export default function UnansweredFilesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }} />
-      <CwiPageShell>
+      <PageBackgroundGesture intensity="moderate">
+        <CwiPageShell>
         <CwiMasthead
           label="CWI public files"
           title="India Unanswered Files"
@@ -91,7 +93,8 @@ export default function UnansweredFilesPage() {
           </div>
           <div className="mt-6"><CwiButtonLink href="/live-newsroom" variant="secondary">Open Live Newsroom</CwiButtonLink></div>
         </section>
-      </CwiPageShell>
+        </CwiPageShell>
+      </PageBackgroundGesture>
     </>
   );
 }

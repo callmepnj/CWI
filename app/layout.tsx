@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import type React from "react";
-import { Archivo, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { Footer } from "@/components/Footer";
@@ -9,15 +9,15 @@ import { Navbar } from "@/components/Navbar";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-const display = Archivo({
+const display = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["700", "800", "900"],
+  weight: ["500", "600", "700"],
   variable: "--font-display"
 });
 
-const sans = Space_Grotesk({
+const sans = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-sans"
 });
 
@@ -78,8 +78,13 @@ const websiteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-IN" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang="en-IN" suppressHydrationWarning className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="font-sans antialiased">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var stored=localStorage.getItem('cwi-theme');var system=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var theme=stored||system||'light';document.documentElement.classList.toggle('dark',theme==='dark');document.documentElement.dataset.theme=theme;}catch(e){document.documentElement.classList.remove('dark');document.documentElement.dataset.theme='light';}})();`
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
@@ -97,3 +102,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
+
+
+
+

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { Card, CardLabel } from "@/components/ui/card";
 import { corrections } from "@/data/live-newsroom";
 import { createMetadata } from "@/lib/seo";
@@ -15,7 +16,8 @@ export default function CorrectionsPage() {
   const publicCorrections = corrections.filter((correction) => correction.status === "published");
 
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="subtle">
+      <CwiPageShell>
       <CwiMasthead
         label="Editorial transparency"
         title="Corrections & Clarifications"
@@ -53,8 +55,9 @@ export default function CorrectionsPage() {
 
       <div className="mt-10"><CwiSubmitCTA /></div>
     </CwiPageShell>
-  );
-}
+      </PageBackgroundGesture>
+    );
+  }
 
 function CorrectionLine({ label, value }: { label: string; value: string }) {
   return (

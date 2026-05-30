@@ -1,5 +1,6 @@
 import { SubmitForm } from "@/components/SubmitForm";
 import { CwiMasthead, CwiPageShell, CwiTrustStrip } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -10,7 +11,8 @@ export const metadata = createMetadata({
 
 export default function SubmitPage() {
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="subtle">
+      <CwiPageShell>
       <CwiMasthead
         label="CWI intake desk"
         title="Submit source or correction"
@@ -24,6 +26,7 @@ export default function SubmitPage() {
       <div className="mt-10">
         <SubmitForm />
       </div>
-    </CwiPageShell>
+      </CwiPageShell>
+    </PageBackgroundGesture>
   );
 }

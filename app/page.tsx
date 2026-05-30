@@ -1,4 +1,5 @@
 import { CwiButtonLink, CwiDossierCard, CwiEditorialCard, CwiLeadCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTimeline, CwiTrustStrip } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { getLeadStory, getLiveUpdates, getTodaysTopItems, getWhatChangedToday, todaysBriefs } from "@/data/live-newsroom";
 import { posts } from "@/data/posts";
 import { unansweredFiles } from "@/data/unanswered-files";
@@ -50,7 +51,8 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
-      <CwiPageShell>
+      <PageBackgroundGesture>
+        <CwiPageShell>
         <CwiMasthead
           label="CWI Live Newsroom is the main desk"
           title="Cockroach Watch India - CWI"
@@ -221,7 +223,8 @@ export default function HomePage() {
             <CwiButtonLink href="/submit" variant="saffron" className="mt-6">Send source or correction</CwiButtonLink>
           </div>
         </section>
-      </CwiPageShell>
+        </CwiPageShell>
+      </PageBackgroundGesture>
     </>
   );
 }

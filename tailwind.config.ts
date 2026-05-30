@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: ["class"],
@@ -10,37 +10,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#FDF8F3",
-        ink: "#1A1410",
-        soot: "#0F0A07",
-        saffron: "#F57C00",
-        leaf: "#1B5E20",
-        clay: "#5D4037",
-        urgent: "#B85C2A",
-        royal: "#1B5E20",
-        skywash: "#E8DCC8",
-        line: "#D7CCC8",
-        // CWI Newsroom Colors
-        "cwi-cream": "#FDF8F3",
-        "cwi-ink": "#1A1410",
-        "cwi-green": "#1B5E20",
-        "cwi-saffron": "#F57C00",
-        "cwi-brown": "#5D4037",
-        "cwi-muted": "#E8DCC8",
-        "cwi-border": "#D7CCC8"
+        paper: "var(--cwi-bg)",
+        ink: "var(--cwi-text-primary)",
+        soot: "var(--cwi-night)",
+        saffron: "var(--cwi-accent-amber)",
+        leaf: "var(--cwi-accent-blue)",
+        clay: "var(--cwi-text-secondary)",
+        urgent: "var(--cwi-alert-red)",
+        royal: "var(--cwi-accent-blue)",
+        skywash: "var(--cwi-bg-secondary)",
+        line: "var(--cwi-border)",
+        "cwi-cream": "var(--cwi-bg)",
+        "cwi-ink": "var(--cwi-text-primary)",
+        "cwi-green": "var(--cwi-accent-blue)",
+        "cwi-saffron": "var(--cwi-accent-amber)",
+        "cwi-brown": "var(--cwi-text-secondary)",
+        "cwi-muted": "var(--cwi-bg-secondary)",
+        "cwi-border": "var(--cwi-border)",
+        "cwi-card": "var(--cwi-card)"
       },
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
-        sans: ["var(--font-sans)", "Arial", "sans-serif"],
+        display: ["var(--font-display)", "Space Grotesk", "sans-serif"],
+        sans: ["var(--font-sans)", "Inter", "Arial", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"]
       },
       boxShadow: {
-        hard: "0 20px 50px rgba(11, 18, 32, 0.16)",
-        soft: "0 18px 60px rgba(11, 18, 32, 0.10)",
-        card: "0 14px 36px rgba(11, 18, 32, 0.08)"
+        hard: "0 20px 50px var(--cwi-shadow-strong)",
+        soft: "0 18px 60px var(--cwi-shadow-soft)",
+        card: "0 14px 36px var(--cwi-shadow-soft)"
       },
       backgroundImage: {
-        "paper-grain": "radial-gradient(circle at 1px 1px, rgba(93,64,55,0.08) 1px, transparent 0)"
+        "paper-grain": "radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--cwi-text-secondary) 10%, transparent) 1px, transparent 0)"
       },
       keyframes: {
         ticker: {

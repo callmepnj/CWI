@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader } from "@/components/CwiDesignSystem";
+import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { Card, CardLabel } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -23,7 +24,8 @@ const terms = [
 
 export default function TermsPage() {
   return (
-    <CwiPageShell>
+    <PageBackgroundGesture intensity="subtle">
+      <CwiPageShell>
       <CwiMasthead
         label="Terms"
         title="Terms"
@@ -48,5 +50,6 @@ export default function TermsPage() {
         <p className="leading-8 text-cwi-ink/72">Questions about these terms can be sent to <Link href={`mailto:${site.email}`} className="font-bold text-cwi-green underline-offset-4 hover:underline">{site.email}</Link>.</p>
       </section>
     </CwiPageShell>
-  );
-}
+      </PageBackgroundGesture>
+    );
+  }
