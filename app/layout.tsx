@@ -82,7 +82,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var stored=localStorage.getItem('cwi-theme');var system=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var theme=stored||system||'light';document.documentElement.classList.toggle('dark',theme==='dark');document.documentElement.dataset.theme=theme;}catch(e){document.documentElement.classList.remove('dark');document.documentElement.dataset.theme='light';}})();`
+            __html: `(function(){try{var stored=localStorage.getItem('cwi-theme');var system=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var theme=stored||'light';document.documentElement.classList.toggle('dark',theme==='dark');document.documentElement.dataset.theme=theme;}catch(e){document.documentElement.classList.remove('dark');document.documentElement.dataset.theme='light';}})();`
           }}
         />
         <script

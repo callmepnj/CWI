@@ -10,9 +10,12 @@ type Theme = "light" | "dark";
 export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const [theme, setTheme] = useState<Theme>("light");
 
-  useEffect(() {
-    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+  useEffect(() => {
+    const saved = window.localStorage.getItem(storageKey) as Theme | null;
+    const current = saved || (document.documentElement.classList.contains("dark") ? "dark" : "light");
     setTheme(current);
+    document.documentElement.classList.toggle("dark", current === "dark");
+    document.documentElement.dataset.theme = current;
   }, []);
 
   function toggleTheme() {
