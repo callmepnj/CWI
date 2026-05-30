@@ -1,48 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
-import { posts, trendingTopics } from "@/data/posts";
 import { site } from "@/lib/site";
 
-const footerLinks = [
-  { label: "Home", href: "/" },
+const exploreLinks = [
   { label: "Live Newsroom", href: "/live-newsroom" },
-  { label: "Latest CWI Updates", href: "/latest" },
-  { label: "Cockroach Watch India Guide", href: "/cockroach-watch-india" },
-  { label: "About Cockroach Watch India", href: "/about-cockroach-watch-india" },
-  { label: "Archive", href: "/archive" },
   { label: "India Unanswered Files", href: "/india-unanswered-files" },
-  { label: "Corrections", href: "/corrections" },
+  { label: "Archive", href: "/archive" },
   { label: "Submit Report", href: "/submit" },
-  { label: "Support", href: "/support" },
-  { label: "About CWI", href: "/about" },
-  { label: "Editorial Policy", href: "/editorial-policy" },
-  { label: "Contact CWI", href: "/contact" },
-  { label: "Manipur Investigation", href: "/watch/manipur-crisis" },
-  { label: "Charter", href: "/charter" },
-  { label: "Issues", href: "/issues" },
-  { label: "Join", href: "/join" },
-  { label: "Five-Point Agenda", href: "/five-point-agenda" },
-  { label: "Youth Voice", href: "/youth-voice" },
-  { label: "Media Bank", href: "/media-bank" },
+];
+
+const trustLinks = [
   { label: "Editorial Policy", href: "/editorial-policy" },
   { label: "Credit Policy", href: "/credit-policy" },
   { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Corrections", href: "/corrections" },
+  { label: "Contact", href: "/contact" },
+  { label: "About CWI", href: "/about" },
   { label: "Terms", href: "/terms" },
-  { label: "X", href: site.x },
+];
+
+const socialLinks = [
   { label: "Instagram", href: site.instagram },
+  { label: "X", href: site.x },
   { label: "YouTube", href: site.youtube },
   { label: "Reddit", href: site.reddit },
   { label: "Facebook", href: site.facebook },
   { label: "Bluesky", href: site.bluesky },
-  { label: "Email", href: `mailto:${site.email}` }
+  { label: "Email", href: `mailto:${site.email}` },
 ];
 
 export function Footer() {
-  const latestPosts = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date)).slice(0, 4);
-
   return (
-    <footer className="bg-ink px-4 py-12 text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.8fr_0.8fr]">
+    <footer className="bg-ink px-4 py-14 text-white">
+      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.3fr_0.6fr_0.6fr_0.6fr]">
+        {/* Brand Column */}
         <div>
           <div className="flex items-center gap-4">
             <span className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white ring-1 ring-white/15">
@@ -54,46 +45,93 @@ export function Footer() {
                 className="h-full w-full object-cover"
               />
             </span>
-            <p className="font-display text-4xl font-black uppercase leading-none tracking-[-0.04em]">
-              Cockroach Watch India
-            </p>
+            <div>
+              <p className="font-display text-2xl font-black uppercase leading-none tracking-[-0.04em]">
+                Cockroach Watch India
+              </p>
+              <p className="mt-1 font-mono text-[0.62rem] font-black uppercase tracking-[0.18em] text-saffron">
+                Document. Verify. Amplify.
+              </p>
+            </div>
           </div>
-          <p className="mt-4 max-w-xl text-white/72">
-            Cockroach Watch India - CWI is an independent civic watch, satire, and commentary platform. The Live Newsroom keeps updates tied to sources, dates, corrections, and human review.
+          <p className="mt-5 max-w-md text-sm leading-7 text-white/65">
+            Cockroach Watch India — CWI is an independent civic watch, satire, commentary, and public archive platform.
+            We document, verify, and amplify youth voice, public issues, creator credit, source-backed updates, and
+            India&apos;s unanswered files.
           </p>
-          <p className="mt-6 max-w-3xl rounded-3xl border border-white/10 bg-white/5 p-4 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-white/78">
-            {site.disclaimer}
-          </p>
+          <div className="mt-6 flex items-center gap-2">
+            <Link
+              href="/support"
+              className="rounded-full border border-saffron/30 bg-saffron/10 px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-saffron transition hover:bg-saffron/20"
+            >
+              Support CWI
+            </Link>
+            <Link
+              href="/submit"
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-white/75 transition hover:bg-white/10"
+            >
+              Submit a Report
+            </Link>
+          </div>
         </div>
+
+        {/* Explore Column */}
         <div>
-          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Archive preview</p>
-          <div className="space-y-3">
-            {latestPosts.map((post) => (
-              <Link key={post.slug} href={`/archive/${post.slug}`} className="block rounded-2xl border border-white/10 bg-white/5 p-3 text-xs font-black uppercase leading-5 tracking-[0.1em] text-white/78 transition hover:border-saffron/60 hover:text-saffron">
-                {post.title}
+          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Explore</p>
+          <nav className="grid gap-2">
+            {exploreLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-bold leading-6 text-white/70 transition hover:text-saffron"
+              >
+                {link.label}
               </Link>
             ))}
-          </div>
-          <p className="mt-5 text-xs font-bold uppercase leading-6 tracking-[0.08em] text-white/52">
-            Trending: {trendingTopics.slice(0, 5).join(" / ")}
-          </p>
+          </nav>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          {footerLinks.map((link) => (
-            <Link
-              key={`${link.label}-${link.href}`}
-              href={link.href}
-              className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/78 transition hover:border-saffron/60 hover:bg-white/10 hover:text-saffron"
-            >
-              {link.label}
-            </Link>
-          ))}
+
+        {/* Trust Column */}
+        <div>
+          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Trust</p>
+          <nav className="grid gap-2">
+            {trustLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-bold leading-6 text-white/70 transition hover:text-saffron"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </div>
+
+        {/* Social Column */}
+        <div>
+          <p className="mb-4 font-mono text-xs font-black uppercase tracking-[0.18em] text-saffron">Social</p>
+          <nav className="grid gap-2">
+            {socialLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noreferrer" : undefined}
+                className="text-sm font-bold leading-6 text-white/70 transition hover:text-saffron"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="mx-auto mt-12 max-w-7xl border-t border-white/10 pt-6">
+        <p className="text-xs font-bold uppercase tracking-[0.08em] text-white/40">
+          © {new Date().getFullYear()} Cockroach Watch India. Not affiliated with any political party.
+        </p>
       </div>
     </footer>
   );
-}
-
-function dateValue(value: string) {
-  return new Date(`${value}T00:00:00+05:30`).getTime();
 }

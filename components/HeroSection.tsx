@@ -19,7 +19,7 @@ export function HeroSection() {
         <div className="flex flex-col justify-center">
           <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full bg-royal px-4 py-2 font-mono text-[0.7rem] font-black uppercase tracking-[0.18em] text-white shadow-[0_14px_30px_rgba(11,92,255,0.22)]">
             <ShieldCheck className="h-4 w-4" />
-            CWI Live Newsroom is the main desk
+            Independent. Source-led. Human-reviewed.
           </p>
           <h1 className="max-w-5xl font-display text-5xl font-black uppercase leading-[0.92] tracking-[-0.06em] text-ink sm:text-7xl lg:text-8xl">
             Cockroach Watch India - CWI
@@ -30,16 +30,13 @@ export function HeroSection() {
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-9 text-ink/82">
             Independent civic watch, satire, and commentary platform tracking youth voice, public issues, creator credit, source trails, and corrections.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-4">
             <Button asChild>
               <Link href="/live-newsroom">Enter Live Newsroom</Link>
             </Button>
-            <Button asChild variant="green">
-              <Link href="/submit">Submit Report <ArrowRight className="h-4 w-4" /></Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/archive">Browse Archive</Link>
-            </Button>
+            <Link href="/submit" className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.12em] text-royal transition hover:text-ink">
+              Submit a Report <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
           <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-black uppercase tracking-[0.14em] text-ink/58">
             <span>Follow CWI:</span>

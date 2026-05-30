@@ -52,12 +52,12 @@ export const metadata: Metadata = {
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "NewsMediaOrganization",
   name: site.name,
   alternateName: site.shortName,
   url: site.url,
   email: site.email,
-  description: "Founder-led civic watch, satire, and commentary platform.",
+  description: "Cockroach Watch India — CWI is an independent civic watch, satire, commentary, and public archive platform. We document, verify, and amplify youth voice, public issues, creator credit, source-backed updates, and India's unanswered files.",
   logo: `${site.url}/brand/logo.png`,
   sameAs: [site.x, site.instagram, site.youtube, site.telegram, site.reddit, site.facebook, site.bluesky]
 };

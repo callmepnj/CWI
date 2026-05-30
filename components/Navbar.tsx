@@ -11,25 +11,19 @@ import { cn } from "@/lib/utils";
 const primaryItems = [
   { label: "Home", href: "/" },
   { label: "Live Newsroom", href: "/live-newsroom" },
-  { label: "Archive", href: "/archive" },
-  { label: "Unanswered Files", href: "/india-unanswered-files" },
+  { label: "India Unanswered Files", href: "/india-unanswered-files" },
   { label: "Submit", href: "/submit" },
-  { label: "Support CWI", href: "/support" }
 ];
 
 const moreItems = [
+  { label: "Archive", href: "/archive" },
   { label: "About", href: "/about" },
-  { label: "CWI Guide", href: "/cockroach-watch-india" },
-  { label: "About Cockroach Watch India", href: "/about-cockroach-watch-india" },
-  { label: "Latest", href: "/latest" },
   { label: "Corrections", href: "/corrections" },
   { label: "Editorial Policy", href: "/editorial-policy" },
+  { label: "Credit Policy", href: "/credit-policy" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Contact", href: "/contact" },
-  { label: "Issues", href: "/issues" },
-  { label: "Charter", href: "/charter" },
-  { label: "Youth Voice", href: "/youth-voice" },
-  { label: "Media Bank", href: "/media-bank" },
-  { label: "Credit Policy", href: "/credit-policy" }
+  { label: "Support CWI", href: "/support" },
 ];
 
 export function Navbar() {

@@ -106,9 +106,6 @@ export default function UnansweredFilesPage() {
                 <Button asChild variant="outline" className="border-white/20 bg-white/[0.08] text-white hover:bg-white/[0.14]">
                   <Link href="#sources">Check Sources</Link>
                 </Button>
-                <Button asChild variant="outline" className="border-white/20 bg-white/[0.08] text-white hover:bg-white/[0.14]">
-                  <Link href="#ai">Ask CWI AI</Link>
-                </Button>
               </div>
               <div className="mt-8 grid gap-3 text-sm font-semibold leading-7 text-white/70 sm:grid-cols-3">
                 {["Verified facts first", "Government response shown separately", "Ground reality compared carefully"].map((item) => (
@@ -188,7 +185,7 @@ export default function UnansweredFilesPage() {
 
         <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
           <div className="mb-9 max-w-4xl">
-            <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.24em] text-royal">CWI AI research</p>
+            <p className="mb-3 font-mono text-xs font-black uppercase tracking-[0.24em] text-royal">Source-bound research</p>
             <h2 className="font-display text-4xl font-black uppercase leading-tight tracking-[-0.05em] text-ink sm:text-5xl">
               Ask only from verified sources
             </h2>

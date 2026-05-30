@@ -11,6 +11,17 @@
   --cwi-brown: #5a3b24;
   --cwi-muted: #74695e;
   --cwi-border: #ded6c7;
+
+  /* CWI Typography Tokens */
+  --cwi-font-hero: clamp(2rem, 5vw, 3.5rem);
+  --cwi-font-h1: clamp(1.75rem, 4vw, 2.5rem);
+  --cwi-font-h2: clamp(1.25rem, 2.5vw, 1.75rem);
+  --cwi-font-h3: 1.25rem;
+  --cwi-font-body: 1rem;
+  --cwi-font-small: 0.875rem;
+  --cwi-font-label: 0.75rem;
+  --cwi-line-height-body: 1.75;
+  --cwi-line-height-heading: 1.2;
 }
 
 * {

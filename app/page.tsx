@@ -4,7 +4,6 @@ import { HeroSection } from "@/components/HeroSection";
 import { Section } from "@/components/Section";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
-import { posts } from "@/data/posts";
 import { unansweredFiles } from "@/data/unanswered-files";
 import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/lib/db/live-newsroom";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
@@ -53,9 +52,9 @@ const homepageWebPageJsonLd = {
 };
 
 export const metadata = createMetadata({
-  title: "Cockroach Watch India - CWI Live Newsroom",
+  title: "Cockroach Watch India — Document. Verify. Amplify.",
   description:
-    "Cockroach Watch India is an independent civic watch, satire, commentary, public archive, and youth voice platform. Enter the CWI Live Newsroom for verified context and corrections.",
+    "CWI is an independent civic watch and public archive platform tracking youth voice, public issues, paper leak developments, and India's unanswered files. Source-backed. Human-reviewed.",
   path: "/",
   keywords: ["Cockroach Watch India", "CWI Live Newsroom", "CWI", "India Unanswered Files", "public advisories", "youth voice"]
 });
@@ -63,8 +62,6 @@ export const metadata = createMetadata({
 export default async function HomePage() {
   const dbLiveItems = await getPublishedLiveNewsroomItems(8).catch(() => []);
   const liveItems = mergeBySlug(dbLiveItems, getLiveNewsroomFallbackItems(8)).slice(0, 6);
-  const developingItems = liveItems.filter((item) => ["Developing", "Reported", "Public Advisory"].includes(item.verificationStatus)).slice(0, 3);
-  const archiveItems = [...posts].sort((first, second) => dateValue(second.date) - dateValue(first.date)).slice(0, 4);
 
   return (
     <>
@@ -96,20 +93,6 @@ export default async function HomePage() {
         </Button>
       </Section>
 
-      <Section eyebrow="Developing" title="Breaking / Developing" subtitle="Updates that need careful reading, clear attribution, and visible source context.">
-        <div className="grid gap-5 md:grid-cols-3">
-          {(developingItems.length ? developingItems : liveItems.slice(0, 3)).map((item) => (
-            <Card key={item.id}>
-              <CardLabel>{item.verificationStatus}</CardLabel>
-              <h2 className="font-display text-2xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">{item.title}</h2>
-              <p className="mt-3 text-sm font-semibold leading-7 text-ink/66">{item.summary}</p>
-              <Link href={`/live-newsroom/${item.slug}`} className="mt-5 inline-flex items-center gap-2 font-mono text-xs font-black uppercase tracking-[0.14em] text-royal">
-                Read update <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Card>
-          ))}
-        </div>
-      </Section>
 
       <Section
         eyebrow="India Unanswered Files"
@@ -160,13 +143,10 @@ export default async function HomePage() {
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
           <Button asChild variant="outline">
-            <Link href="/cockroach-watch-india">Cockroach Watch India guide</Link>
+            <Link href="/about">About CWI</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/about-cockroach-watch-india">About Cockroach Watch India</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/latest">Latest CWI updates</Link>
+            <Link href="/editorial-policy">Editorial Policy</Link>
           </Button>
         </div>
       </Section>
@@ -187,20 +167,6 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      <Section eyebrow="CWI Archive" title="Archive preview" subtitle="Older CWI explainers and context posts are preserved as archive material. Current source-backed updates live in the Live Newsroom.">
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {archiveItems.map((post) => (
-            <Link key={post.slug} href={`/archive/${post.slug}`} className="rounded-[1.5rem] border border-line bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-royal/35 hover:shadow-soft">
-              <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.16em] text-royal">{post.category}</p>
-              <h2 className="mt-3 font-display text-xl font-black uppercase leading-tight tracking-[-0.03em] text-ink">{post.title}</h2>
-              <p className="mt-3 text-sm font-semibold leading-6 text-ink/66">{post.summary}</p>
-            </Link>
-          ))}
-        </div>
-        <Button asChild className="mt-8" variant="outline">
-          <Link href="/archive">Browse Archive</Link>
-        </Button>
-      </Section>
 
       <Section eyebrow="Follow CWI" title="Join the Watchlist" subtitle="Get CWI updates without sharing political preference or sensitive personal data.">
         <form className="grid gap-4 rounded-[2rem] border border-line bg-white p-6 shadow-card md:grid-cols-[1fr_auto]">
@@ -231,8 +197,4 @@ function mergeBySlug<T extends { slug: string }>(primary: T[], fallback: T[]) {
     seen.add(item.slug);
     return true;
   });
-}
-
-function dateValue(value: string) {
-  return new Date(`${value}T00:00:00+05:30`).getTime();
 }
