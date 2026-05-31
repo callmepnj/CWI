@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type React from "react";
 import { useMemo, useState } from "react";
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
+import { pendingNewsroomRecords } from "@/data/live-newsroom-pending";
 import {
   claimTrackerItems,
   corrections,
@@ -32,11 +33,12 @@ interface AdminLiveNewsroomProps {
   section?: string;
 }
 
-type AdminTab = "daily" | "items" | "verification" | "advisories" | "sources" | "corrections";
+type AdminTab = "daily" | "items" | "pending" | "verification" | "advisories" | "sources" | "corrections";
 
 const tabs: Array<[AdminTab, string]> = [
   ["daily", "Daily controls"],
   ["items", "Live updates"],
+  ["pending", "Pending queue"],
   ["verification", "Verification Desk"],
   ["advisories", "Advisories"],
   ["sources", "Source Ledger"],
@@ -115,6 +117,7 @@ export function AdminLiveNewsroom({ section: _section }: AdminLiveNewsroomProps)
 
       {activeTab === "daily" ? <DailyControls queueAction={queueAction} /> : null}
       {activeTab === "items" ? <ItemsPanel items={approvedItems} queueAction={queueAction} /> : null}
+      {activeTab === "pending" ? <PendingQueuePanel /> : null}
       {activeTab === "verification" ? <VerificationPanel /> : null}
       {activeTab === "advisories" ? <AdvisoryPanel /> : null}
       {activeTab === "sources" ? <SourcesPanel /> : null}
@@ -177,6 +180,20 @@ function ItemsPanel({ items, queueAction }: { items: LiveNewsroomItem[]; queueAc
   );
 }
 
+function PendingQueuePanel() {
+  return (
+    <RecordGrid
+      title="Curated approval queue"
+      empty="No pending newsroom records are queued."
+      records={pendingNewsroomRecords.map((record) => ({
+        title: record.headline,
+        meta: `${record.verificationStatus} / ${record.sourceCount} source${record.sourceCount === 1 ? "" : "s"} / ${record.riskLevel} risk`,
+        body: `${record.whatHappened} CWI relevance: ${record.cwiRelevance}`,
+        footer: `Source: ${record.source}${record.author ? ` / ${record.author}` : ""}. Publish only after human approval.`
+      }))}
+    />
+  );
+}
 function VerificationPanel() {
   return (
     <RecordGrid
@@ -286,3 +303,5 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+

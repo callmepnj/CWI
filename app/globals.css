@@ -499,3 +499,159 @@ h1, h2, h3, h4, h5, h6,
 .cwi-dark-page h3 {
   font-family: var(--font-display), "Space Grotesk", sans-serif;
 }
+
+.cwi-floating-join::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.8), rgba(245, 158, 11, 0.72), rgba(59, 130, 246, 0.8));
+  filter: blur(10px);
+  opacity: 0.5;
+  animation: cwi-join-glow 2.8s ease-in-out infinite;
+}
+
+.cwi-floating-join::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 999px;
+  background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.18) 42%, transparent 58%);
+  transform: translateX(-120%);
+  animation: cwi-join-sweep 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cwi-join-glow {
+  0%, 100% { opacity: 0.34; transform: scale(0.98); }
+  50% { opacity: 0.72; transform: scale(1.03); }
+}
+
+@keyframes cwi-join-sweep {
+  0%, 55% { transform: translateX(-120%); opacity: 0; }
+  70% { opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+@media (max-width: 640px) {
+  .cwi-floating-join {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+.cwi-floating-join {
+  z-index: 2147483000 !important;
+  isolation: isolate;
+  background: linear-gradient(135deg, #071426 0%, #0b1f3a 58%, #111827 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(251, 191, 36, 0.52) !important;
+  box-shadow:
+    0 18px 44px rgba(2, 8, 23, 0.28),
+    0 0 0 1px rgba(59, 130, 246, 0.18),
+    0 0 34px rgba(37, 99, 235, 0.38),
+    0 0 22px rgba(245, 158, 11, 0.18) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html:not(.dark) .cwi-floating-join {
+  background: linear-gradient(135deg, #061326 0%, #0b2450 60%, #1f2937 100%) !important;
+  color: #ffffff !important;
+  border-color: rgba(217, 119, 6, 0.72) !important;
+  box-shadow:
+    0 18px 46px rgba(15, 23, 42, 0.24),
+    0 0 0 2px rgba(255, 255, 255, 0.85),
+    0 0 34px rgba(37, 99, 235, 0.44),
+    0 0 26px rgba(217, 119, 6, 0.24) !important;
+}
+
+.cwi-floating-join span,
+.cwi-floating-join svg {
+  color: inherit;
+}
+
+.cwi-join-modal-layer {
+  z-index: 2147483010 !important;
+}
+
+.cwi-join-modal-card {
+  color-scheme: dark;
+}
+
+html:not(.dark) .cwi-join-modal-layer {
+  background: rgba(248, 250, 252, 0.76) !important;
+}
+
+html:not(.dark) .cwi-join-modal-card {
+  color-scheme: light;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(148, 163, 184, 0.62) !important;
+  box-shadow:
+    0 30px 90px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.9) !important;
+}
+
+html:not(.dark) .cwi-join-modal-card > .sticky {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
+}
+
+html:not(.dark) .cwi-join-modal-card section {
+  background: #f8fafc !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .cwi-join-modal-card section:last-child {
+  background: #fffbeb !important;
+  border-color: rgba(217, 119, 6, 0.24) !important;
+}
+
+html:not(.dark) .cwi-join-modal-card h2,
+html:not(.dark) .cwi-join-modal-card h3,
+html:not(.dark) .cwi-join-modal-card strong,
+html:not(.dark) .cwi-join-modal-card [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .cwi-join-modal-card p,
+html:not(.dark) .cwi-join-modal-card [class*="text-blue-100"] {
+  color: #334155 !important;
+}
+
+html:not(.dark) .cwi-join-modal-card [class*="text-amber-50"] {
+  color: #78350f !important;
+}
+
+html:not(.dark) .cwi-join-modal-card [class*="text-amber-200"],
+html:not(.dark) .cwi-join-modal-card [class*="text-amber-300"] {
+  color: #d97706 !important;
+}
+
+html:not(.dark) .cwi-join-modal-card [class*="text-blue-300"],
+html:not(.dark) .cwi-join-modal-card [class*="text-blue-700"] {
+  color: #2563eb !important;
+}
+
+html:not(.dark) .cwi-join-modal-card a:not([download]):not([class*="bg-blue-500"]) {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .cwi-join-modal-card section a:not([download]) {
+  background: #ffffff !important;
+  border-color: rgba(203, 213, 225, 0.95) !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .cwi-join-modal-card section a:not([download]):hover {
+  border-color: rgba(217, 119, 6, 0.42) !important;
+  background: #eff6ff !important;
+}
+
+html:not(.dark) .cwi-join-modal-card button[aria-label="Close Join the Watch"] {
+  background: #f8fafc !important;
+  border-color: rgba(203, 213, 225, 0.95) !important;
+  color: #0f172a !important;
+}

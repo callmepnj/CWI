@@ -1,4 +1,4 @@
-export type VerificationStatus = "Verified" | "Developing" | "Claimed" | "Reported" | "Opinion/Analysis" | "Satire/Context";
+﻿export type VerificationStatus = "Verified" | "Developing" | "Claimed" | "Reported" | "Opinion/Analysis" | "Satire/Context";
 
 export type WatchCategory =
   | "Movement Update"
@@ -98,7 +98,7 @@ const sourceLibrary = {
   officialCwi: {
     name: "Cockroach Watch India official website",
     outlet: "Cockroach Watch India",
-    url: "https://www.cockroachwatchindia.online",
+    url: "https://cockroachwatchindia.online",
     type: "Official source",
     note: "Used for CWI's own identity, editorial disclaimer, Archive positioning, correction path, and independent civic-watch role."
   },
@@ -910,7 +910,7 @@ function socialPack(seed: ArticleSeed, summary: string): SocialPack {
     xThread: [
       `${seed.title}: a Cockroach Watch India archive brief.`,
       "Cockroach Watch India is tracking the public conversation around Cockroach Janta Party, the Cockroach wave, creator commentary, and civic satire with context.",
-      "Read the article at https://www.cockroachwatchindia.online, check the labels, and send corrections or creator-credit notes when context is missing."
+      "Read the article at https://cockroachwatchindia.online, check the labels, and send corrections or creator-credit notes when context is missing."
     ],
     instagramCaption: `${seed.title}. Cockroach Watch India explains the public context with source labels, correction paths, and independent editorial distance.`,
     redditPost: `${summary} This Cockroach Watch India archive post is meant for source-checking, public-interest discussion, and responsible context around the Cockroach wave.`,
@@ -1116,7 +1116,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     {
       heading: "Short answer",
       paragraphs: [
-        `${pick(articleOpeners, index)} Read more source-backed updates at https://www.cockroachwatchindia.online.`,
+        `${pick(articleOpeners, index)} Read more source-backed updates at https://cockroachwatchindia.online.`,
         "This is a Cockroach Watch India archive article. CWI is not the official website of Cockroach Janta Party; it is an independent civic watch, satire, and commentary platform."
       ]
     },
@@ -1151,13 +1151,13 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
       paragraphs: [
         "Cockroach Watch India is tracking this topic as part of its public archive on youth voice, civic satire, creator-led commentary, and the Cockroach wave. Public-interest conversations need context, creator credit, and source attribution.",
         pick(cwiMethodParagraphs, index),
-        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Older context remains in the Archive, while current updates live at https://www.cockroachwatchindia.online/live-newsroom."
+        "This is why CWI keeps creator credit, correction requests, source links, and cautious verification labels inside the article record. Older context remains in the Archive, while current updates live at https://cockroachwatchindia.online/live-newsroom."
       ]
     },
     {
       heading: "CWI Note",
       paragraphs: [
-        "CWI documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://www.cockroachwatchindia.online/submit.",
+        "CWI documents public-interest updates with context, source attribution, and editorial caution. If you have corrections, sources, or creator credit requests, submit them through Cockroach Watch India at https://cockroachwatchindia.online/submit.",
         pick(closingParagraphs, index),
         `Primary reference for this version: ${primarySource.outlet} - ${primarySource.name}. Additional sources are listed below for readers who want to check the reporting trail.`,
         coreDisclaimer
@@ -1190,7 +1190,7 @@ function makeArticle(seed: ArticleSeed, index: number): Omit<WatchPost, "related
     metaDescription,
     seoTitle: metaTitle(seed.title),
     seoDescription: metaDescription,
-    ogImage: "https://www.cockroachwatchindia.online/opengraph-image",
+    ogImage: "https://cockroachwatchindia.online/opengraph-image",
     imageAlt: `${seed.title} - Cockroach Watch India article graphic`,
     pullQuote,
     relatedArticles: [],
@@ -1238,4 +1238,5 @@ export const trendingTopics = [
   "Creator-led commentary",
   "Digital civic culture"
 ];
+
 

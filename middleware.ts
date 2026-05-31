@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+﻿import { NextResponse, type NextRequest } from "next/server";
 
-const officialHost = "www.cockroachwatchindia.online";
+const officialHost = "cockroachwatchindia.online";
 const redirectHosts = new Set([["cwi-ten", "vercel", "app"].join("."), "cockroachwatchindia.online"]);
 
 const routeRedirects: Array<[RegExp, string | ((pathname: string) => string)]> = [
@@ -67,3 +67,5 @@ function normalizeHost(url: URL, host?: string) {
     url.port = "";
   }
 }
+
+

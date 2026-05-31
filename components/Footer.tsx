@@ -1,5 +1,6 @@
 ﻿import Image from "next/image";
 import Link from "next/link";
+import { JoinNowTrigger } from "@/components/JoinNowTrigger";
 import { site } from "@/lib/site";
 
 const footerGroups = [
@@ -61,16 +62,12 @@ export function Footer() {
             {site.disclaimer}
           </p>
           <div className="mt-5 max-w-xl rounded-lg border border-cwi-border bg-cwi-muted p-4">
-            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join the Watchlist</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-cwi-brown">Watchlist signup coming soon. It will ask only for email and consent.</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-              <input disabled type="email" placeholder="Email signup coming soon" className="min-h-11 rounded-lg border border-cwi-border bg-cwi-card px-3 text-sm font-bold text-cwi-ink placeholder:text-cwi-brown/70" />
-              <button disabled type="button" className="min-h-11 rounded-lg border border-cwi-saffron/30 bg-cwi-saffron/20 px-4 font-mono text-xs font-black uppercase tracking-[0.12em] text-cwi-saffron opacity-80">Coming soon</button>
+            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join the Watch</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-cwi-brown">Support CWI, submit public updates, follow the newsroom, and help document what the feed forgets.</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <JoinNowTrigger>Join Now</JoinNowTrigger>
+              <Link href="/submit" className="inline-flex min-h-11 items-center justify-center rounded-full border border-cwi-border bg-cwi-card px-4 py-2 text-sm font-black uppercase tracking-[0.1em] text-cwi-ink transition hover:border-cwi-saffron/60 hover:text-cwi-saffron">Submit Report</Link>
             </div>
-            <label className="mt-3 flex gap-2 text-xs font-bold leading-5 text-cwi-brown">
-              <input disabled type="checkbox" className="mt-0.5 h-4 w-4 rounded border-cwi-border" />
-              Consent checkbox will be required when signup opens.
-            </label>
           </div>
         </div>
 
@@ -102,3 +99,5 @@ function FooterLink({ label, href }: { label: string; href: string }) {
     </Link>
   );
 }
+
+

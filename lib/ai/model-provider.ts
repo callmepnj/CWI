@@ -1,4 +1,4 @@
-type GenerateAITextInput = {
+﻿type GenerateAITextInput = {
   systemPrompt: string;
   userPrompt: string;
   temperature?: number;
@@ -277,10 +277,10 @@ function buildMockText(taskName: string, userPrompt: string) {
       notice,
       seoTitle: `${topic} - CWI Live Newsroom | Cockroach Watch India`,
       metaDescription: `Cockroach Watch India explains ${topic}, what is known, what remains unclear, and why the CWI Live Newsroom is tracking this update.`,
-      canonicalUrl: `https://www.cockroachwatchindia.online/live-newsroom/${slug}`,
+      canonicalUrl: `https://cockroachwatchindia.online/live-newsroom/${slug}`,
       ogTitle: `${topic} - CWI Live Newsroom`,
       ogDescription: `CWI Live Newsroom context for ${topic}.`,
-      ogImage: "https://www.cockroachwatchindia.online/opengraph-image",
+      ogImage: "https://cockroachwatchindia.online/opengraph-image",
       twitterTitle: `${topic} - Cockroach Watch India`,
       twitterDescription: `CWI Live Newsroom context for ${topic}.`,
       schemaJson: { "@type": "NewsArticle", headline: topic },
@@ -294,7 +294,7 @@ function buildMockText(taskName: string, userPrompt: string) {
       notice,
       instagramCaption: `${topic}\n\nLocal draft placeholder - human review required.\n\nCWI Live Newsroom record.`,
       facebookCaption: `${topic}\n\nCWI is reviewing this topic with source attribution.`,
-      xCaption: `${topic}\nCWI Live Newsroom review queued. https://www.cockroachwatchindia.online`,
+      xCaption: `${topic}\nCWI Live Newsroom review queued. https://cockroachwatchindia.online`,
       redditTitle: `${topic} - what verified context should CWI add?`,
       redditBody: "Discussion prompt for verified sources and context only.",
       youtubeTitle: `${topic} | CWI Live Newsroom`,
@@ -321,3 +321,4 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "")
     .slice(0, 80) || "cwi-topic";
 }
+

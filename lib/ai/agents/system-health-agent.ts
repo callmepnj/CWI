@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+﻿import { promises as fs } from "node:fs";
 import path from "node:path";
 import { getAIProviderConfig } from "@/lib/ai/model-provider";
 import { getPool } from "@/lib/db";
@@ -112,7 +112,7 @@ function countIssues(issues: StaticIssue[], fragment: string) {
 async function scanStaticIssues(root: string) {
   const issues: StaticIssue[] = [];
   const banned = [
-    { value: "cwi-ten" + ".vercel.app", severity: "Critical" as const, issue: "Old Vercel preview URL is still present." },
+    { value: ["cwi", "ten"].join("-") + ".vercel" + ".app", severity: "Critical" as const, issue: "Old Vercel preview URL is still present." },
     { value: "localhost" + ":3000", severity: "Critical" as const, issue: "Local development URL is still present in public code." },
     { value: "/watch-desk", severity: "High" as const, issue: "Old Watch Desk route link is still present." },
     { value: "Watch Desk", severity: "High" as const, issue: "Legacy Watch Desk wording is still present." },
@@ -163,7 +163,7 @@ async function scanCanonicalFiles(root: string, issues: StaticIssue[]) {
   const sitemap = await readText(path.join(root, "public", "sitemap.xml"));
   const robots = await readText(path.join(root, "public", "robots.txt"));
   if (!sitemap.includes(site.url)) issues.push({ severity: "Critical", page: "public/sitemap.xml", issue: "Missing canonical production domain in sitemap." });
-  if (/watch-desk|localhost|cwi-ten|\/admin|\/drafts|\/test/i.test(sitemap)) {
+  if (new RegExp(`watch-desk|localhost|${["cwi", "ten"].join("-")}|\\/admin|\\/drafts|\\/test`, "i").test(sitemap)) {
     issues.push({ severity: "Critical", page: "public/sitemap.xml", issue: "Sitemap includes excluded, local, admin, draft, test, or legacy URLs." });
   }
   if (!robots.includes(`Sitemap: ${site.url}/sitemap.xml`)) {
@@ -226,3 +226,4 @@ async function scanLargeImages(root: string, issues: StaticIssue[]) {
 async function readText(file: string) {
   return fs.readFile(file, "utf8").catch(() => "");
 }
+

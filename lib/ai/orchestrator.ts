@@ -1,4 +1,4 @@
-import { runArticleAgent } from "@/lib/ai/agents/article-agent";
+﻿import { runArticleAgent } from "@/lib/ai/agents/article-agent";
 import { runCommandAgent } from "@/lib/ai/agents/command-agent";
 import { runImageAgent } from "@/lib/ai/agents/image-agent";
 import { runPublishAgent } from "@/lib/ai/agents/publish-agent";
@@ -190,7 +190,7 @@ export async function runManualLinkToApproval(input: ManualLinkInput) {
 
 export async function runTopicToArticle(input: TopicToArticleInput) {
   return runManualLinkToApproval({
-    url: input.url || "https://www.cockroachwatchindia.online/live-newsroom",
+    url: input.url || "https://cockroachwatchindia.online/live-newsroom",
     topic: input.topic,
     platform: "Manual Topic",
     notes: input.sourceNotes,
@@ -395,3 +395,4 @@ function categoryFromDestination(destination: ContentDestination, contentType?: 
 function clean(value?: unknown) {
   return typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
 }
+

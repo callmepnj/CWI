@@ -9,13 +9,19 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+const primaryNavItems = [
   { label: "Home", href: "/" },
   { label: "Live Newsroom", href: "/live-newsroom" },
-  { label: "Unanswered Files", href: "/india-unanswered-files" },
-  { label: "Archive", href: "/archive" },
-  { label: "Submit", href: "/submit" },
-  { label: "Support CWI", href: "/support" }
+  { label: "Watch Desk", href: "/archive" },
+  { label: "India Unanswered Files", href: "/india-unanswered-files" },
+  { label: "Submit", href: "/submit" }
+];
+
+const moreNavItems = [
+  { label: "Support CWI", href: "/support" },
+  { label: "About", href: "/about" },
+  { label: "Corrections", href: "/corrections" },
+  { label: "Credit Policy", href: "/credit-policy" }
 ];
 
 export function Navbar() {
@@ -36,18 +42,31 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-ink/70 transition hover:bg-cwi-muted hover:text-cwi-saffron",
-                isActive(pathname, item.href) && "bg-cwi-muted text-cwi-saffron ring-1 ring-cwi-border"
-              )}
-            >
-              {item.label}
-            </Link>
+          {primaryNavItems.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} />
           ))}
+          <div className="group relative">
+            <button
+              type="button"
+              className="rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-ink/70 transition hover:bg-cwi-muted hover:text-cwi-saffron"
+            >
+              More
+            </button>
+            <div className="invisible absolute right-0 top-full min-w-56 translate-y-2 rounded-xl border border-cwi-border bg-cwi-card p-2 opacity-0 shadow-[0_18px_50px_var(--cwi-shadow-soft)] transition group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+              {moreNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "block rounded-lg px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-cwi-ink/70 transition hover:bg-cwi-muted hover:text-cwi-saffron",
+                    isActive(pathname, item.href) && "bg-cwi-muted text-cwi-saffron"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
@@ -71,7 +90,7 @@ export function Navbar() {
       {open ? (
         <div className="border-t border-cwi-border bg-cwi-bg px-4 py-5 shadow-[0_18px_52px_var(--cwi-shadow-soft)] lg:hidden">
           <nav className="mx-auto grid max-w-7xl gap-2" aria-label="Mobile navigation">
-            {navItems.map((item) => (
+            {[...primaryNavItems, ...moreNavItems].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -92,7 +111,22 @@ export function Navbar() {
   );
 }
 
+function NavLink({ item, pathname }: { item: { label: string; href: string }; pathname: string }) {
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-ink/70 transition hover:bg-cwi-muted hover:text-cwi-saffron",
+        isActive(pathname, item.href) && "bg-cwi-muted text-cwi-saffron ring-1 ring-cwi-border"
+      )}
+    >
+      {item.label}
+    </Link>
+  );
+}
+
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+

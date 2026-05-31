@@ -1,4 +1,4 @@
-import { site } from "@/lib/site";
+﻿import { site } from "@/lib/site";
 
 export const cwiBigBrain = {
   brand: "Cockroach Watch India - CWI",
@@ -9,7 +9,7 @@ export const cwiBigBrain = {
     "Not just content. Public memory.",
     "Keep the public record careful, labelled, and correction-friendly."
   ],
-  bannedUrls: ["cwi-ten" + ".vercel.app", "vercel preview URLs", "local development URLs in production metadata"],
+  bannedUrls: [["cwi", "ten"].join("-") + ".vercel" + ".app", "vercel preview URLs", "local development URLs in production metadata"],
   editorialRules: [
     "Do not invent facts.",
     "Do not invent sources.",
@@ -87,3 +87,5 @@ ${cwiBigBrain.approvalRule}
 Return useful, source-cautious output. If evidence is weak, say so clearly.
 `.trim();
 }
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Card, CardLabel } from "@/components/ui/card";
@@ -27,8 +27,9 @@ export function PollCard() {
         ))}
       </div>
       <p className="mt-5 text-sm font-bold uppercase leading-6 tracking-[0.06em] text-ink/62">
-        {selected ? `Recorded locally in this session: ${selected}.` : "This frontend poll is a UI placeholder until backend analytics are connected."}
+        {selected ? `Recorded locally in this session: ${selected}.` : "Choose one to record your view locally in this session."}
       </p>
     </Card>
   );
 }
+

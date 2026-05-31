@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import shutil
@@ -159,7 +159,7 @@ TOPICS = [
         "Women wrestlers sexual harassment case",
         "Women wrestlers sexual harassment case",
         "women-wrestlers-case",
-        "CWI India Unanswered Files visual on women wrestlers’ protest, dignity, and accountability.",
+        "CWI India Unanswered Files visual on women wrestlersâ€™ protest, dignity, and accountability.",
         "women-wrestlers-protest",
     ),
     Topic(
@@ -351,7 +351,7 @@ def main() -> None:
 
     image_index = {
         "section": "India Unanswered Files",
-        "site": "https://www.cockroachwatchindia.online",
+        "site": "https://cockroachwatchindia.online",
         "generatedAt": "2026-05-24",
         "topics": index_topics,
         "review": {
@@ -467,3 +467,4 @@ def write_zip() -> None:
 
 if __name__ == "__main__":
     main()
+

@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { Footer } from "@/components/Footer";
+import { FloatingJoinButton } from "@/components/FloatingJoinButton";
 import { MobileNav } from "@/components/MobileNav";
 import { Navbar } from "@/components/Navbar";
 import { createMetadata } from "@/lib/seo";
@@ -98,10 +99,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main>{children}</main>
         <Footer />
         <MobileNav />
+        <FloatingJoinButton />
       </body>
     </html>
   );
 }
+
+
 
 
 

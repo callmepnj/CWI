@@ -1,4 +1,4 @@
-import { getPool } from "@/lib/db";
+﻿import { getPool } from "@/lib/db";
 import { ensureAdminDatabase } from "@/lib/db/admin";
 import { optionalUuid } from "@/lib/db/ids";
 
@@ -24,7 +24,7 @@ export async function saveSocialPack(pack: {
         bluesky_caption, discord_announcement, hashtag_set, credit_line, website_line,
         risk_note
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'Source/creator credit required where applicable', 'Website: https://www.cockroachwatchindia.online', 'Human review required before posting')
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'Source/creator credit required where applicable', 'Website: https://cockroachwatchindia.online', 'Human review required before posting')
       returning id;
     `,
     [
@@ -43,3 +43,4 @@ export async function saveSocialPack(pack: {
   );
   return result.rows[0].id;
 }
+

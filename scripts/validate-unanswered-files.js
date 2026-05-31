@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+﻿/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -77,7 +77,7 @@ const rows = cases.map(([articleName, slug, folder, fileSlug]) => {
     "SEO image fields": yesNo(["heroImage", "thumbnailImage", "ogImage", "socialImages", "galleryImages", "altText"].every((field) => dataSource.includes(field))),
     "FAQ schema": yesNo(pageSource.includes('"@type": "FAQPage"')),
     "Image index": yesNo(indexExists),
-    "Sitemap added": yesNo(sitemap.includes(`https://www.cockroachwatchindia.online/india-unanswered-files/${slug}`)),
+    "Sitemap added": yesNo(sitemap.includes(`https://cockroachwatchindia.online/india-unanswered-files/${slug}`)),
     "No old Vercel URL": yesNo(noOldVercel),
     "Build status": buildPass ? "pass" : "fail",
   };
@@ -165,3 +165,5 @@ function printMarkdownTable(tableRows) {
     console.log(`| ${headers.map((header) => String(row[header]).replace(/\|/g, "\\|")).join(" | ")} |`);
   }
 }
+
+

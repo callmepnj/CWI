@@ -7,4 +7,4 @@ Disallow: /drafts
 Disallow: /test
 Disallow: /archive/cwi-priority-public-interest-update
 
-Sitemap: https://www.cockroachwatchindia.online/sitemap.xml
+Sitemap: https://cockroachwatchindia.online/sitemap.xml

@@ -1,7 +1,7 @@
-export const site = {
+﻿export const site = {
   name: "Cockroach Watch India",
   shortName: "CWI",
-  url: "https://www.cockroachwatchindia.online",
+  url: "https://cockroachwatchindia.online",
   email: "cockroachwatchindia@gmail.com",
   founderName: "PNJ",
   founderHandle: "callmepnj",
@@ -34,3 +34,4 @@ export const site = {
     "digital public memory"
   ]
 };
+

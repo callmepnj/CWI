@@ -1,5 +1,6 @@
-import { CwiButtonLink, CwiDossierCard, CwiEditorialCard, CwiLeadCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTimeline, CwiTrustStrip } from "@/components/CwiDesignSystem";
+﻿import { CwiButtonLink, CwiDossierCard, CwiEditorialCard, CwiLeadCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTimeline, CwiTrustStrip } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { JoinNowTrigger } from "@/components/JoinNowTrigger";
 import { getLeadStory, getLiveUpdates, getTodaysTopItems, getWhatChangedToday, todaysBriefs } from "@/data/live-newsroom";
 import { posts } from "@/data/posts";
 import { unansweredFiles } from "@/data/unanswered-files";
@@ -162,6 +163,18 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="mt-12 grid gap-5 rounded-lg border border-cwi-green/24 bg-cwi-green/8 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join the Watch</p>
+            <h2 className="mt-2 font-display text-3xl font-black uppercase leading-tight text-cwi-ink">Support CWI and keep public memory alive.</h2>
+            <p className="mt-3 leading-7 text-cwi-ink/68">Support CWI, submit public updates, follow the newsroom, and help document what the feed forgets.</p>
+          </div>
+          <div className="flex flex-wrap gap-3 lg:justify-end">
+            <JoinNowTrigger>Join Now</JoinNowTrigger>
+            <CwiButtonLink href="/submit" variant="secondary">Submit Report</CwiButtonLink>
+            <CwiButtonLink href="/live-newsroom" variant="secondary">Live Newsroom</CwiButtonLink>
+          </div>
+        </section>
         <div className="mt-12">
           <CwiSubmitCTA />
         </div>
@@ -207,20 +220,13 @@ export default function HomePage() {
             </div>
           </div>
           <div className="rounded-lg border border-cwi-green bg-cwi-green p-6 text-cwi-cream">
-            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join Watchlist</p>
+            <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-saffron">Join the Watch</p>
             <h2 className="mt-3 font-display text-3xl font-black uppercase leading-tight">Follow the record without giving sensitive data.</h2>
-            <p className="mt-4 leading-7 text-cwi-cream/78">Watchlist signup coming soon. It will ask only for email and consent, not political preference or private identity details.</p>
-            <form className="mt-5 grid gap-3" aria-label="Join the CWI Watchlist coming soon">
-              <label className="grid gap-2">
-                <span className="font-mono text-xs font-black uppercase tracking-[0.14em] text-cwi-cream/72">Email</span>
-                <input disabled type="email" placeholder="Watchlist signup coming soon" className="min-h-12 rounded-lg border border-cwi-cream/20 bg-cwi-cream/10 px-4 text-sm font-bold text-cwi-cream placeholder:text-cwi-cream/52" />
-              </label>
-              <label className="flex gap-3 text-sm font-bold leading-6 text-cwi-cream/72">
-                <input disabled type="checkbox" className="mt-1 h-4 w-4 rounded border-cwi-cream/30" />
-                I agree to receive CWI newsroom updates when signup opens.
-              </label>
-            </form>
-            <CwiButtonLink href="/submit" variant="saffron" className="mt-6">Send source or correction</CwiButtonLink>
+            <p className="mt-4 leading-7 text-cwi-cream/78">Use the Join Now panel to support CWI, follow official channels, submit reports, and keep source-backed public memory moving.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <JoinNowTrigger className="bg-cwi-saffron text-cwi-green hover:bg-cwi-saffron/90">Join Now</JoinNowTrigger>
+              <CwiButtonLink href="/submit" variant="saffron">Send source or correction</CwiButtonLink>
+            </div>
           </div>
         </section>
         </CwiPageShell>
@@ -240,3 +246,6 @@ function formatDate(value: string) {
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).format(new Date(value));
 }
+
+
+
