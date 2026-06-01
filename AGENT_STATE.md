@@ -365,3 +365,10 @@ Next steps:
 - Added `cwi-page-gesture` overflow containment in `components/PageBackgroundGesture.tsx` and global `html, body { overflow-x: clip; max-width: 100%; }` to prevent page-wide horizontal drift from decorative absolute background elements.
 - Verified `npm run typecheck` and `npm run lint` pass.
 - Browser/CDP check on `/live-newsroom` at 1365px viewport confirmed `hasDocumentHorizontalOverflow: false`, page gesture overflow hidden, body overflow-x clip, and floating Join button centered within ~7px of viewport center with bottom offset 24px.
+
+2026-06-01 Local admin password fix:
+- User reported `/admin/login` rejected the highlighted `.env.example` password `change-this-long-admin-password`.
+- Root cause: only `.env.example` existed; Next.js does not load it as runtime env. Created gitignored `.env.local` with matching `CWI_ADMIN_PASSWORD="change-this-long-admin-password"` and `AI_PROVIDER="mock"`.
+- Restarted `npm run dev`; Next reported `Environments: .env.local`.
+- Verified POST `/api/admin/login` with `change-this-long-admin-password` returns `{ ok: true, message: "Admin session started." }`.
+- Confirmed `.env.local` is ignored by git and `.env.example` / `.env.local` admin password values match locally.
