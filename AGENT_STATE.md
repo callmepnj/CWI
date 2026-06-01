@@ -351,3 +351,17 @@ Next steps:
 - Added scoped light-mode CSS overrides for `.cwi-join-modal-layer` and `.cwi-join-modal-card` so the modal uses an opaque white surface, dark readable text, clear section panels, readable social links, and a visible close button in light mode.
 - Verified `npm run typecheck` and `npm run lint` pass.
 - Browser/CDP computed-style check on `http://localhost:3000/live-newsroom` confirmed modal background `rgb(255,255,255)`, title color `rgb(15,23,42)`, social link text dark, floating button present once, and `navbarJoinText` is empty.
+
+2026-06-01 Live Newsroom light-mode unanswered file card fix:
+- User screenshot showed India Unanswered Files cards on `/live-newsroom` as dark navy blocks in light mode with titles effectively invisible.
+- Root cause: those link cards used `--cwi-card-dark` / `--cwi-border-dark` while light mode changed inherited text to dark `--cwi-text-primary`.
+- Updated the live newsroom file cards and stats strip to use theme-aware `--cwi-card`, `--cwi-border`, `--cwi-text-primary`, and soft shadows.
+- Verified `npm run typecheck` and `npm run lint` pass.
+- Started local dev server at `http://localhost:3000`; CDP computed-style check on `/live-newsroom` confirmed file card background `rgb(255,255,255)`, title color `rgb(15,23,42)`, and View File color `rgb(37,99,235)` in light mode.
+
+2026-06-01 Floating Join centered + horizontal overflow fix:
+- User requested the visible bottom Join Now CTA be fixed to the middle permanently.
+- Updated `components/FloatingJoinButton.tsx` so the global floating Join button is fixed at bottom center and no longer drags/snaps left/right or reads/writes its old side localStorage state.
+- Added `cwi-page-gesture` overflow containment in `components/PageBackgroundGesture.tsx` and global `html, body { overflow-x: clip; max-width: 100%; }` to prevent page-wide horizontal drift from decorative absolute background elements.
+- Verified `npm run typecheck` and `npm run lint` pass.
+- Browser/CDP check on `/live-newsroom` at 1365px viewport confirmed `hasDocumentHorizontalOverflow: false`, page gesture overflow hidden, body overflow-x clip, and floating Join button centered within ~7px of viewport center with bottom offset 24px.

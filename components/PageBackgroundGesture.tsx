@@ -38,7 +38,7 @@ export function PageBackgroundGesture({
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`cwi-page-gesture relative ${className}`}>
       {/* Primary radial gradient gesture - top left */}
       <div
         className={`pointer-events-none absolute -left-1/3 -top-1/4 z-0 h-96 w-96 rounded-full blur-[100px] mix-blend-screen ${intensityMap[intensity]}`}
@@ -71,3 +71,4 @@ export function PageBackgroundGesture({
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ClipboardList, ExternalLink, Radio, Siren } from "lucide-react";
 import { CwiGestureBar, CwiTicker, NewsroomJoinForm } from "@/components/CwiCivicLiveKit";
@@ -130,7 +130,7 @@ export default function LiveNewsroomPage() {
               <ClipboardList className="h-4 w-4" /> Read India Unanswered Files
             </Link>
           </div>
-          <div className="mt-8 rounded-lg border border-[var(--cwi-border-dark)] bg-[var(--cwi-card-dark)] px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--cwi-accent-amber)] sm:text-sm">
+          <div className="mt-8 rounded-lg border border-[var(--cwi-border)] bg-[var(--cwi-card)] px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--cwi-accent-amber)] shadow-[0_18px_50px_var(--cwi-shadow-soft)] sm:text-sm">
             17 Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 30 May 2026
           </div>
         </div>
@@ -162,9 +162,9 @@ export default function LiveNewsroomPage() {
         <h2 className="text-3xl font-black sm:text-5xl">India&apos;s Unanswered Files - Still Open</h2>
         <div className="mt-7 flex gap-4 overflow-x-auto pb-4">
           {files.map(([title, status, href]) => (
-            <Link key={title} href={href} className="min-w-[270px] rounded-lg border border-[var(--cwi-border-dark)] border-l-4 border-l-[var(--cwi-accent-amber)] bg-[var(--cwi-card-dark)] p-5 transition hover:-translate-y-1 hover:border-[var(--cwi-accent-amber)]/55">
+            <Link key={title} href={href} className="min-w-[270px] rounded-lg border border-[var(--cwi-border)] border-l-4 border-l-[var(--cwi-accent-amber)] bg-[var(--cwi-card)] p-5 text-[var(--cwi-text-primary)] shadow-[0_18px_50px_var(--cwi-shadow-soft)] transition hover:-translate-y-1 hover:border-[var(--cwi-accent-amber)]/55">
               <span className="rounded-full border border-[var(--cwi-accent-amber)]/35 px-2 py-1 text-xs font-black text-[var(--cwi-accent-amber)]">{status}</span>
-              <h3 className="mt-4 text-xl font-black leading-tight">{title}</h3>
+              <h3 className="mt-4 text-xl font-black leading-tight text-[var(--cwi-text-primary)]">{title}</h3>
               <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[var(--cwi-accent-blue)]">View File <ArrowRight className="h-4 w-4" /></span>
             </Link>
           ))}
@@ -194,4 +194,5 @@ function StoryCard({ story }: { story: (typeof stories)[number] }) {
     </article>
   );
 }
+
 

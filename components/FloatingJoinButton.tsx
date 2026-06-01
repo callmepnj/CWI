@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import type React from "react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
@@ -17,27 +17,12 @@ import {
   X
 } from "lucide-react";
 import { joinConfig } from "@/lib/config/join";
-import { cn } from "@/lib/utils";
-
-type JoinSide = "left" | "right";
-
-const storageKey = "cwi-floating-join-side";
 
 export function FloatingJoinButton() {
-  const [side, setSide] = useState<JoinSide>(joinConfig.defaultPosition);
   const [open, setOpen] = useState(false);
-  const [dragX, setDragX] = useState<number | null>(null);
-  const [dragging, setDragging] = useState(false);
   const [qrFailed, setQrFailed] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const startRef = useRef({ x: 0, y: 0, moved: false });
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(storageKey);
-    if (stored === "left" || stored === "right") {
-      setSide(stored);
-    }
-
     function openJoin() {
       setOpen(true);
     }
@@ -63,69 +48,19 @@ export function FloatingJoinButton() {
 
   if (!joinConfig.enabled) return null;
 
-  function startDrag(event: React.PointerEvent<HTMLButtonElement>) {
-    if (event.pointerType === "mouse" && event.button !== 0) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    startRef.current = { x: event.clientX, y: event.clientY, moved: false };
-    setDragX(rect.left);
-    setDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function moveDrag(event: React.PointerEvent<HTMLButtonElement>) {
-    if (!dragging || dragX === null) return;
-
-    const start = startRef.current;
-    const deltaX = event.clientX - start.x;
-    const deltaY = event.clientY - start.y;
-    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-      start.moved = true;
-    }
-
-    const width = buttonRef.current?.offsetWidth ?? 160;
-    const margin = window.innerWidth < 640 ? 12 : 24;
-    const next = Math.min(window.innerWidth - width - margin, Math.max(margin, dragX + deltaX));
-    setDragX(next);
-    startRef.current = { ...start, x: event.clientX, y: event.clientY };
-  }
-
-  function endDrag(event: React.PointerEvent<HTMLButtonElement>) {
-    if (!dragging) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const nextSide: JoinSide = rect.left + rect.width / 2 < window.innerWidth / 2 ? "left" : "right";
-    setSide(nextSide);
-    window.localStorage.setItem(storageKey, nextSide);
-    setDragging(false);
-    setDragX(null);
-  }
-
   function handleClick() {
-    if (startRef.current.moved) {
-      startRef.current.moved = false;
-      return;
-    }
     setOpen(true);
   }
-
-  const sideClass = side === "left" ? "left-3 sm:left-6" : "right-3 sm:right-6";
 
   return (
     <>
       <motion.button
-        ref={buttonRef}
         type="button"
         aria-label="Join the Watch"
-        className={cn(
-          "cwi-floating-join fixed bottom-4 inline-flex min-h-14 touch-none select-none items-center gap-3 rounded-full px-4 py-3 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-amber-300 sm:bottom-6 sm:px-5",
-          dragging ? "" : sideClass
-        )}
-        style={dragX !== null ? { left: dragX, right: "auto" } : undefined}
+        className="cwi-floating-join fixed bottom-4 left-1/2 inline-flex min-h-14 touch-none select-none items-center gap-3 rounded-full px-4 py-3 text-left outline-none transition focus-visible:ring-2 focus-visible:ring-amber-300 sm:bottom-6 sm:px-5"
+        style={{ x: "-50%" }}
         whileHover={{ y: -3 }}
         whileTap={{ scale: 0.97 }}
-        onPointerDown={startDrag}
-        onPointerMove={moveDrag}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
         onClick={handleClick}
       >
         <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-500/18 text-amber-200 ring-1 ring-blue-300/25">
@@ -289,5 +224,7 @@ function ModalCta({ href, children }: { href: string; children: React.ReactNode 
     </a>
   );
 }
+
+
 
 

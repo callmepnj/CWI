@@ -655,3 +655,18 @@ html:not(.dark) .cwi-join-modal-card button[aria-label="Close Join the Watch"] {
   border-color: rgba(203, 213, 225, 0.95) !important;
   color: #0f172a !important;
 }
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.cwi-page-gesture {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.cwi-page-gesture > .relative.z-10 {
+  width: 100%;
+}
