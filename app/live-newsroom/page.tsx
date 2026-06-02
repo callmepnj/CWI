@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ClipboardList, ExternalLink, Radio, Siren } from "lucide-react";
 import { CwiGestureBar, CwiTicker, NewsroomJoinForm } from "@/components/CwiCivicLiveKit";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { sourcePackUnansweredFileCard } from "@/data/live-newsroom-source-pack";
 
 export const revalidate = 300;
 
@@ -168,6 +169,11 @@ export default function LiveNewsroomPage() {
               <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[var(--cwi-accent-blue)]">View File <ArrowRight className="h-4 w-4" /></span>
             </Link>
           ))}
+          <div className="min-w-[270px] rounded-lg border border-dashed border-[var(--cwi-accent-amber)]/60 bg-[var(--cwi-accent-amber)]/10 p-5 text-[var(--cwi-text-primary)]">
+            <span className="rounded-full border border-[var(--cwi-accent-amber)]/35 px-2 py-1 text-xs font-black uppercase text-[var(--cwi-accent-amber)]">Pending approval</span>
+            <h3 className="mt-4 text-xl font-black leading-tight text-[var(--cwi-text-primary)]">{sourcePackUnansweredFileCard.title}</h3>
+            <p className="mt-3 text-sm font-bold leading-6 text-[var(--cwi-text-secondary)]">{sourcePackUnansweredFileCard.summary}</p>
+          </div>
           <Link href="/india-unanswered-files" className="grid min-w-[270px] place-items-center rounded-lg border border-[var(--cwi-accent-blue)]/45 bg-[var(--cwi-accent-blue)]/10 p-5 text-center font-black text-[var(--cwi-text-primary)]">
             View All 17 Unanswered Files <ArrowRight className="mt-3 h-5 w-5" />
           </Link>
@@ -194,5 +200,6 @@ function StoryCard({ story }: { story: (typeof stories)[number] }) {
     </article>
   );
 }
+
 
 

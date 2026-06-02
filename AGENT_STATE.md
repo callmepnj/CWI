@@ -372,3 +372,13 @@ Next steps:
 - Restarted `npm run dev`; Next reported `Environments: .env.local`.
 - Verified POST `/api/admin/login` with `change-this-long-admin-password` returns `{ ok: true, message: "Admin session started." }`.
 - Confirmed `.env.local` is ignored by git and `.env.example` / `.env.local` admin password values match locally.
+
+2026-06-02 Live Newsroom source-pack slash-command upgrade:
+- Implemented source-pack-backed pending records from the attached CJP/exam-crisis pack and CWI-ADV-2026-004 advisory in `data/live-newsroom-source-pack.ts`.
+- Merged source-pack records into the existing pending newsroom queue without publishing them; records include source gaps, draft previews, SEO previews, social previews, timeline, source library, and high-caution advisory metadata.
+- Added admin-only slash-command API at `/api/ai/slash-command`; supports command parsing, `/next`, `/status`, `/sources-needed`, `/legal-check`, `/publish-check`, `/timeline`, `/source`, `/unanswered`, `/health`, `/fix-ui`, approval actions, and publish blocking unless an approved `approvalQueueId` is provided.
+- Added slash-command console to `/admin/live-newsroom`, with command chips, result preview, next command, approval-required status, and JSON preview of command output.
+- Expanded admin pending queue UI with source library, source-pack timeline, source gaps, draft/SEO/social previews, and pending India Unanswered Files connection card.
+- Added a public `/live-newsroom#india-unanswered-files` pending approval card for National Exam Accountability Crisis without linking to/publishing a file detail page.
+- Basic tests per user instruction: `npm run typecheck` passed, `npm run lint` passed. Minimal smoke checks passed for `/live-newsroom`, authenticated `/admin/live-newsroom`, `/api/ai/slash-command` `/next cjp`, and `/publish cjp` blocking without approval. Old-domain scan for app/components/data/lib/public/scripts/middleware/README/package found no `cwi-ten.vercel.app` or `www.cockroachwatchindia.online` matches.
+- `npm run validate:unanswered-files` was attempted and failed on existing validator flags (`No old Vercel URL`, `Build status`) across all unanswered files; no new source-pack publication was involved.

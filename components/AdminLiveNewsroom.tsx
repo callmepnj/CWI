@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import type React from "react";
 import { useMemo, useState } from "react";
@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardLabel } from "@/components/ui/card";
 import { pendingNewsroomRecords } from "@/data/live-newsroom-pending";
+import { slashCommandHelp, sourcePackSourceLibrary, sourcePackTimeline, sourcePackUnansweredFileCard } from "@/data/live-newsroom-source-pack";
 import {
   claimTrackerItems,
   corrections,
@@ -57,6 +58,15 @@ const dailyControls = [
   ["Add Correction", "Create a correction or clarification record for approval.", FilePlus2]
 ] as const;
 
+type SlashCommandResult = {
+  title: string;
+  message: string;
+  nextCommand: string;
+  data: Record<string, unknown>;
+  approvalRequired: boolean;
+  autoPublished: boolean;
+};
+
 const itemActions = [
   "Mark item NEW TODAY",
   "Mark item UPDATED TODAY",
@@ -69,6 +79,9 @@ export function AdminLiveNewsroom({ section: _section }: AdminLiveNewsroomProps)
   void _section;
   const [activeTab, setActiveTab] = useState<AdminTab>("daily");
   const [message, setMessage] = useState("No public newsroom changes are saved until they pass approval.");
+  const [slashCommand, setSlashCommand] = useState("/next cjp");
+  const [slashPending, setSlashPending] = useState(false);
+  const [slashResult, setSlashResult] = useState<SlashCommandResult | null>(null);
 
   const approvedItems = useMemo(
     () => liveNewsroomItems.filter((item) => item.approvalStatus === "approved" && !item.hiddenFromLiveNewsroom),
@@ -80,6 +93,27 @@ export function AdminLiveNewsroom({ section: _section }: AdminLiveNewsroomProps)
     setMessage(`${action}${target} was prepared for the approval queue. Publishing remains blocked until approval.`);
   }
 
+  async function runSlashCommand(event?: React.FormEvent<HTMLFormElement>) {
+    event?.preventDefault();
+    setSlashPending(true);
+    setSlashResult(null);
+    try {
+      const response = await fetch("/api/ai/slash-command", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ command: slashCommand })
+      });
+      const data = (await response.json().catch(() => null)) as { ok?: boolean; data?: SlashCommandResult; error?: string; message?: string } | null;
+      if (!response.ok || !data?.ok) {
+        setSlashResult({ title: "Command failed", message: data?.error ?? "Slash command failed.", nextCommand: "/status", data: {}, approvalRequired: true, autoPublished: false });
+      } else {
+        setSlashResult(data.data ?? null);
+        setMessage(data.data?.message ?? data.message ?? "Slash command completed. Review approval queue before publishing.");
+      }
+    } finally {
+      setSlashPending(false);
+    }
+  }
   return (
     <div className="space-y-6">
       <Card className="border-cwi-green/25 bg-cwi-cream/80 before:from-cwi-saffron before:via-cwi-green before:to-cwi-saffron">
@@ -99,6 +133,14 @@ export function AdminLiveNewsroom({ section: _section }: AdminLiveNewsroomProps)
           {message}
         </div>
       </Card>
+
+      <SlashCommandConsole
+        command={slashCommand}
+        pending={slashPending}
+        result={slashResult}
+        onCommandChange={setSlashCommand}
+        onSubmit={runSlashCommand}
+      />
 
       <div className="flex gap-2 overflow-x-auto border-b border-line pb-2">
         {tabs.map(([id, label]) => (
@@ -126,6 +168,57 @@ export function AdminLiveNewsroom({ section: _section }: AdminLiveNewsroomProps)
   );
 }
 
+function SlashCommandConsole({
+  command,
+  pending,
+  result,
+  onCommandChange,
+  onSubmit
+}: {
+  command: string;
+  pending: boolean;
+  result: SlashCommandResult | null;
+  onCommandChange: (value: string) => void;
+  onSubmit: (event?: React.FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <Card className="rounded-2xl border-cwi-green/20 bg-white before:bg-cwi-green">
+      <CardLabel className="bg-cwi-green/10 text-cwi-green ring-cwi-green/20">Slash-command AI desk</CardLabel>
+      <form onSubmit={onSubmit} className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <label className="grid gap-2">
+          <span className="text-xs font-black uppercase tracking-[0.16em] text-ink/55">Command</span>
+          <input
+            value={command}
+            onChange={(event) => onCommandChange(event.target.value)}
+            className="min-h-12 rounded-xl border border-line bg-cwi-cream px-4 font-mono text-sm font-bold text-ink outline-none transition focus:border-cwi-green focus:ring-2 focus:ring-cwi-green/15"
+            placeholder="/next cjp"
+          />
+        </label>
+        <Button type="submit" disabled={pending} className="min-h-12 self-end">
+          <Send className="h-4 w-4" /> {pending ? "Running" : "Run Command"}
+        </Button>
+      </form>
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        {slashCommandHelp.slice(0, 14).map((item) => (
+          <button key={item} type="button" className="shrink-0 rounded-full border border-line bg-cwi-cream px-3 py-1.5 font-mono text-xs font-black text-ink/62 hover:border-cwi-green/40 hover:text-cwi-green" onClick={() => onCommandChange(`${item} cjp`)}>
+            {item}
+          </button>
+        ))}
+      </div>
+      {result ? (
+        <div className="mt-4 rounded-2xl border border-cwi-saffron/25 bg-cwi-saffron/8 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge>{result.autoPublished ? "Published" : "Approval required"}</Badge>
+            <Badge>Next: {result.nextCommand}</Badge>
+          </div>
+          <h3 className="mt-3 font-display text-xl font-black text-ink">{result.title}</h3>
+          <p className="mt-2 text-sm font-bold leading-6 text-ink/68">{result.message}</p>
+          <pre className="mt-4 max-h-72 overflow-auto rounded-xl bg-cwi-cream p-3 text-xs font-semibold leading-5 text-ink/72">{JSON.stringify(result.data, null, 2)}</pre>
+        </div>
+      ) : null}
+    </Card>
+  );
+}
 function DailyControls({ queueAction }: { queueAction: (action: string, subject?: string) => void }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -182,16 +275,65 @@ function ItemsPanel({ items, queueAction }: { items: LiveNewsroomItem[]; queueAc
 
 function PendingQueuePanel() {
   return (
-    <RecordGrid
-      title="Curated approval queue"
-      empty="No pending newsroom records are queued."
-      records={pendingNewsroomRecords.map((record) => ({
-        title: record.headline,
-        meta: `${record.verificationStatus} / ${record.sourceCount} source${record.sourceCount === 1 ? "" : "s"} / ${record.riskLevel} risk`,
-        body: `${record.whatHappened} CWI relevance: ${record.cwiRelevance}`,
-        footer: `Source: ${record.source}${record.author ? ` / ${record.author}` : ""}. Publish only after human approval.`
-      }))}
-    />
+    <div className="space-y-5">
+      <RecordGrid
+        title="Curated approval queue"
+        empty="No pending newsroom records are queued."
+        records={pendingNewsroomRecords.map((record) => ({
+          title: record.headline,
+          meta: `${record.verificationStatus} / ${record.sourceCount} source${record.sourceCount === 1 ? "" : "s"} / ${record.riskLevel} risk`,
+          body: `${record.whatHappened} CWI relevance: ${record.cwiRelevance}`,
+          footer: `Source: ${record.source}${record.author ? ` / ${record.author}` : ""}. Publish only after human approval.`,
+          details: [
+            record.draftPreview ? `Draft preview: ${record.draftPreview}` : "",
+            record.seoPreview ? `SEO canonical: ${record.seoPreview.canonical}` : "",
+            record.socialPreview?.x ? `Social preview: ${record.socialPreview.x}` : "",
+            record.sourceGaps?.length ? `Source gaps: ${record.sourceGaps.join("; ")}` : ""
+          ].filter(Boolean)
+        }))}
+      />
+
+      <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+        <Card className="rounded-2xl before:bg-cwi-saffron">
+          <CardLabel className="bg-cwi-saffron/15 text-cwi-brown ring-cwi-saffron/25">Source Library</CardLabel>
+          <div className="mt-4 grid gap-3">
+            {sourcePackSourceLibrary.map((source) => (
+              <a key={`${source.sourceName}-${source.date}`} href={source.url} target="_blank" rel="noreferrer" className="rounded-2xl border border-line bg-cwi-cream p-4 transition hover:border-cwi-green/35">
+                <Badge>{source.status}</Badge>
+                <h3 className="mt-2 font-display text-lg font-black text-ink">{source.sourceName}</h3>
+                <p className="mt-1 text-sm font-bold leading-6 text-ink/68">{source.headline}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.1em] text-cwi-brown">{source.date} / {source.usedIn}</p>
+              </a>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="rounded-2xl before:bg-cwi-green">
+          <CardLabel className="bg-cwi-green/10 text-cwi-green ring-cwi-green/20">Timeline</CardLabel>
+          <div className="mt-4 grid gap-3">
+            {sourcePackTimeline.map((item) => (
+              <div key={`${item.date}-${item.event}`} className="rounded-2xl border border-line bg-cwi-cream p-4">
+                <Badge>{item.verificationLabel}</Badge>
+                <h3 className="mt-2 font-display text-lg font-black text-ink">{item.date}</h3>
+                <p className="mt-1 text-sm font-bold leading-6 text-ink/68">{item.event}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.1em] text-cwi-brown">{item.source}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card className="rounded-2xl border-cwi-saffron/30 before:bg-cwi-saffron">
+        <CardLabel className="bg-cwi-saffron/15 text-cwi-brown ring-cwi-saffron/25">India Unanswered Files connection</CardLabel>
+        <h3 className="font-display text-2xl font-black text-ink">{sourcePackUnansweredFileCard.title}</h3>
+        <p className="mt-2 max-w-3xl text-sm font-bold leading-6 text-ink/68">{sourcePackUnansweredFileCard.summary}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <MiniMetric label="Status" value={sourcePackUnansweredFileCard.status} />
+          <MiniMetric label="Risk" value={sourcePackUnansweredFileCard.riskLevel} />
+          <MiniMetric label="Source count" value={`${sourcePackUnansweredFileCard.sourceCount}`} />
+        </div>
+      </Card>
+    </div>
   );
 }
 function VerificationPanel() {
@@ -261,7 +403,7 @@ function RecordGrid({
 }: {
   title: string;
   empty: string;
-  records: Array<{ title: string; meta: string; body: string; footer: string }>;
+  records: Array<{ title: string; meta: string; body: string; footer: string; details?: string[] }>;
 }) {
   return (
     <div className="space-y-4">
@@ -278,6 +420,13 @@ function RecordGrid({
               <Badge>{record.meta}</Badge>
               <h3 className="mt-3 font-display text-xl font-black text-ink">{record.title}</h3>
               <p className="mt-2 text-sm leading-6 text-ink/68">{record.body}</p>
+              {record.details?.length ? (
+                <div className="mt-4 grid gap-2">
+                  {record.details.map((detail) => (
+                    <p key={detail} className="rounded-2xl bg-cwi-cream p-3 text-xs font-bold leading-5 text-cwi-brown">{detail}</p>
+                  ))}
+                </div>
+              ) : null}
               <p className="mt-4 rounded-2xl bg-cwi-cream p-3 text-xs font-bold leading-5 text-cwi-brown">{record.footer}</p>
             </Card>
           ))}
@@ -303,5 +452,10 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+
+
+
+
 
 

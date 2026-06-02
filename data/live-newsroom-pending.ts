@@ -1,4 +1,5 @@
-﻿import type { SourceType } from "@/data/live-newsroom";
+import type { SourceType } from "@/data/live-newsroom";
+import { cjpExamSourcePackRecords } from "@/data/live-newsroom-source-pack";
 
 export type PendingNewsroomRecord = {
   id: string;
@@ -24,9 +25,14 @@ export type PendingNewsroomRecord = {
   socialCaption: string;
   sourceType: SourceType;
   approvalStatus: "pending";
+  draftPreview?: string;
+  seoPreview?: { canonical: string; schemaTypes: string[]; openGraphTitle: string; twitterCard: "summary_large_image" };
+  socialPreview?: Record<string, string>;
+  sourceGaps?: string[];
+  timeline?: Array<{ date: string; event: string; source: string; verificationLabel: string }>;
 };
 
-export const pendingNewsroomRecords: PendingNewsroomRecord[] = [
+const basePendingNewsroomRecords: PendingNewsroomRecord[] = [
   {
     id: "pending-cjp-x-withheld-ndtv-2026-05-21",
     headline: "Cockroach Janta Party X account withheld in India, founder says",
@@ -173,3 +179,13 @@ export const pendingNewsroomRecords: PendingNewsroomRecord[] = [
     approvalStatus: "pending"
   }
 ];
+
+export const pendingNewsroomRecords: PendingNewsroomRecord[] = [
+  ...basePendingNewsroomRecords,
+  ...cjpExamSourcePackRecords
+];
+
+
+
+
+
