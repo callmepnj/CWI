@@ -382,3 +382,16 @@ Next steps:
 - Added a public `/live-newsroom#india-unanswered-files` pending approval card for National Exam Accountability Crisis without linking to/publishing a file detail page.
 - Basic tests per user instruction: `npm run typecheck` passed, `npm run lint` passed. Minimal smoke checks passed for `/live-newsroom`, authenticated `/admin/live-newsroom`, `/api/ai/slash-command` `/next cjp`, and `/publish cjp` blocking without approval. Old-domain scan for app/components/data/lib/public/scripts/middleware/README/package found no `cwi-ten.vercel.app` or `www.cockroachwatchindia.online` matches.
 - `npm run validate:unanswered-files` was attempted and failed on existing validator flags (`No old Vercel URL`, `Build status`) across all unanswered files; no new source-pack publication was involved.
+
+2026-06-02 Live Newsroom human article quality pass:
+- User reported Live Newsroom detail content was too thin and requested full human, source-backed CWI-style article bodies.
+- Rewrote `/live-newsroom/[slug]` detail template to render full sections: Short answer, What happened, Why students/public are angry, What we know, What remains unclear, Why it matters, CWI context, Timeline, Sources and further reading, CWI verification note, and Submit Update CTA.
+- Source cards now show what each source is used for and source limitations where available; no source text was copied into article bodies.
+- Added `buildSourcePackFullArticle` to source-pack data so pending CJP/advisory slash-command outputs include full article-body previews with source gaps and verification notes.
+- Added admin buttons/controls for `Rewrite Full Human Article` and `Improve Human Explanation`; these remain approval-queue actions and do not auto-publish.
+- Verification: `npm run typecheck` passed, `npm run lint` passed, `npm run build` passed. Smoke checks returned 200 for `/live-newsroom`, all current `/live-newsroom/[slug]` pages, authenticated `/admin/live-newsroom`, and `/api/ai/slash-command` `/draft cjp`; current detail pages contained the new full article sections and slash command returned `approvalRequired` with `fullArticlePreview`.
+
+## 2026-06-02 Live Newsroom main page visibility fix
+- Made `/live-newsroom` visibly show the approved internal CWI records by adding the `LiveNewsroomFeed` section as `#cwi-records` with the heading `Human-written Live Newsroom articles`.
+- Changed the hero `Enter Newsroom` CTA to jump to the internal records, and relabelled the old hardcoded external cards from `Source-backed updates` to `Source links CWI is tracking` with `Open Source` links.
+- Reason: prior content-quality changes were visible on detail pages and admin output, but the main newsroom page still led with old source-link cards, making the upgrade look absent.

@@ -282,3 +282,31 @@ export function findSourcePackRecord(query?: string) {
     record.category.toLowerCase().includes(value)
   );
 }
+
+export function buildSourcePackFullArticle(record: SourcePackRecord) {
+  const isAdvisory = record.category.toLowerCase().includes("advisory") || record.type.toLowerCase().includes("advisory");
+  const publicAnger = isAdvisory
+    ? "The immediate public concern is safety. Students and volunteers may see fast-moving posts about airport arrival, marching, or sit-in plans, but the legal permission status can change quickly. CWI's job is to slow the feed down and separate civic awareness from unsafe crowd instructions."
+    : "Students are angry because exam failures do not remain abstract. They affect months of preparation, application fees, family pressure, mental stress, trust in institutions, and future plans. When public systems feel uncertain, students need clear source-backed information instead of rumours or slogans.";
+  const whyItMatters = isAdvisory
+    ? "This matters because public safety can be damaged by both panic and overconfidence. A developing mobilization needs careful language: verify permission, avoid unsafe crowding, follow lawful instructions, and do not treat any social post as final official clearance."
+    : "This matters because an exam failure is not just a technical problem. It can affect trust, money, preparation, families, and the future of students already operating under extreme pressure. CWI is tracking the story as public memory, not as campaign promotion.";
+
+  return {
+    shortAnswer: record.draftPreview.replace(/^Short answer:\s*/i, ""),
+    whatHappened: [
+      record.whatHappened,
+      "The attached source pack places this update inside a wider student-accountability moment. CWI is treating media reports, campaign statements, and official documents as separate layers, because each layer proves different things.",
+      "This draft is prepared for approval only. It should not be published until the source list, source gaps, legal risk, and wording are reviewed by a human editor."
+    ],
+    whyStudentsOrPublicAreAngry: publicAnger,
+    whatWeKnow: record.summaryBullets,
+    whatRemainsUnclear: record.sourceGaps.length ? record.sourceGaps : [record.whatRemainsUnclear],
+    whyItMatters,
+    cwiContext: `Cockroach Watch India - CWI is tracking this update through the CWI Live Newsroom as part of its public archive on youth voice, exam accountability, civic satire, digital rights, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest updates with source attribution and editorial caution.`,
+    timeline: record.timeline,
+    sources: sourcePackSourceLibrary.filter((source) => record.source.includes("CWI-ADV") ? source.sourceName === "CWI-ADV-2026-004" : source.sourceName !== "CWI-ADV-2026-004"),
+    verificationNote: "This Live Newsroom item is based on publicly available reporting and source material available at the time of drafting. CWI will update this page if official clarification, corrections, or new verified sources become available.",
+    submitCorrection: "Have a correction, source, document, or verified update? Submit it to CWI."
+  };
+}

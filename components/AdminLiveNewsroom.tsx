@@ -55,7 +55,9 @@ const dailyControls = [
   ["Add Public Advisory", "Write a calm reader caution before screenshots or links spread.", AlertCircle],
   ["Add India Unanswered File priority", "Promote up to six priority files for the homepage shelf.", Archive],
   ["Add Source Ledger entry", "Log what a source supports and what it does not prove.", TableProperties],
-  ["Add Correction", "Create a correction or clarification record for approval.", FilePlus2]
+  ["Add Correction", "Create a correction or clarification record for approval.", FilePlus2],
+  ["Rewrite Full Human Article", "Generate a complete human CWI-style article body and send it to approval.", FileText],
+  ["Improve Human Explanation", "Keep the title and sources, improve the body sections, and send the draft to approval.", ListChecks]
 ] as const;
 
 type SlashCommandResult = {
@@ -72,7 +74,9 @@ const itemActions = [
   "Mark item UPDATED TODAY",
   "Mark item SOURCE REQUEST OPEN",
   "Hide item from Live Newsroom",
-  "Send to Approval Queue"
+  "Send to Approval Queue",
+  "Rewrite Full Human Article",
+  "Improve Human Explanation"
 ] as const;
 
 export function AdminLiveNewsroom({ section: _section }: AdminLiveNewsroomProps) {
@@ -286,6 +290,7 @@ function PendingQueuePanel() {
           footer: `Source: ${record.source}${record.author ? ` / ${record.author}` : ""}. Publish only after human approval.`,
           details: [
             record.draftPreview ? `Draft preview: ${record.draftPreview}` : "",
+            record.draftPreview ? "Full article sections: short answer, what happened, why students/public are angry, what we know, what remains unclear, why it matters, CWI context, timeline, sources, verification note, submit correction CTA" : "",
             record.seoPreview ? `SEO canonical: ${record.seoPreview.canonical}` : "",
             record.socialPreview?.x ? `Social preview: ${record.socialPreview.x}` : "",
             record.sourceGaps?.length ? `Source gaps: ${record.sourceGaps.join("; ")}` : ""
@@ -452,10 +457,3 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-
-
-
-
-
-

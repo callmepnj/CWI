@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ClipboardList, ExternalLink, Radio, Siren } from "lucide-react";
 import { CwiGestureBar, CwiTicker, NewsroomJoinForm } from "@/components/CwiCivicLiveKit";
+import { LiveNewsroomFeed } from "@/components/LiveNewsroomFeed";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { getPublicLiveNewsroomItems } from "@/data/live-newsroom";
 import { sourcePackUnansweredFileCard } from "@/data/live-newsroom-source-pack";
 
 export const revalidate = 300;
@@ -110,6 +112,8 @@ const files = [
 ];
 
 export default function LiveNewsroomPage() {
+  const newsroomItems = getPublicLiveNewsroomItems();
+
   return (
     <PageBackgroundGesture intensity="moderate">
       <div className="cwi-dark-page min-h-screen">
@@ -124,7 +128,7 @@ export default function LiveNewsroomPage() {
             CWI Live Newsroom tracks what matters - student rights, civic accountability, public memory, and the questions no one wants to answer.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="#stories" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--cwi-accent-blue)] px-5 py-3 font-bold text-white shadow-[0_0_24px_rgba(59,130,246,0.28)] transition hover:-translate-y-0.5">
+            <Link href="#cwi-records" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--cwi-accent-blue)] px-5 py-3 font-bold text-white shadow-[0_0_24px_rgba(59,130,246,0.28)] transition hover:-translate-y-0.5">
               <Siren className="h-4 w-4" /> Enter Newsroom
             </Link>
             <Link href="#india-unanswered-files" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[var(--cwi-border-dark)] px-5 py-3 font-bold text-[var(--cwi-text-primary)] transition hover:border-[var(--cwi-accent-amber)]/60">
@@ -147,11 +151,27 @@ export default function LiveNewsroomPage() {
         <NewsroomJoinForm />
       </section>
 
+      <section id="cwi-records" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--cwi-accent-amber)]">Full CWI records</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-5xl">Human-written Live Newsroom articles</h2>
+            <p className="mt-3 leading-7 text-[var(--cwi-text-secondary)]">
+              Open these approved CWI records for the full explanation: short answer, what happened, what we know, what remains unclear, timeline, source trail, and correction path.
+            </p>
+          </div>
+          <Link href="/submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-[var(--cwi-border)] bg-[var(--cwi-card)] px-4 py-2 text-sm font-black text-[var(--cwi-text-primary)] transition hover:border-[var(--cwi-accent-amber)]/60">
+            Send correction <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        <LiveNewsroomFeed items={newsroomItems} />
+      </section>
+
       <section id="stories" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-7 flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--cwi-accent-amber)]">Live newsroom stories</p>
-            <h2 className="mt-2 text-3xl font-black sm:text-5xl">Source-backed updates</h2>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--cwi-accent-amber)]">External source watch</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-5xl">Source links CWI is tracking</h2>
           </div>
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
@@ -195,11 +215,8 @@ function StoryCard({ story }: { story: (typeof stories)[number] }) {
       <p className="mt-3 line-clamp-2 leading-7 text-[var(--cwi-text-secondary)]">{story.summary}</p>
       <p className="mt-5 text-sm font-bold text-[var(--cwi-text-secondary)]">Source: {story.source}</p>
       <a href={story.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 font-black text-[var(--cwi-accent-amber)]">
-        Read More <ExternalLink className="h-4 w-4" />
+        Open Source <ExternalLink className="h-4 w-4" />
       </a>
     </article>
   );
 }
-
-
-

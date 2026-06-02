@@ -2,6 +2,7 @@ import { fail, ok, requireAdminApi } from "@/lib/ai/admin-api";
 import { runPublishApprovedItem, runSystemHealthWorkflow, runUIUXAuditWorkflow } from "@/lib/ai/orchestrator";
 import { getApprovalItem, saveApprovalItem, updateApprovalItem } from "@/lib/db/approval";
 import {
+  buildSourcePackFullArticle,
   cjpExamSourcePackRecords,
   findSourcePackRecord,
   slashCommandHelp,
@@ -127,7 +128,7 @@ async function runSlashCommand(input: { name: string; query: string; selectedIte
       `${itemType} queued`,
       `${record.headline} was prepared for approval. Nothing has been published.`,
       nextCommandFor(command, record),
-      { approvalQueueId, selectedItem: summarize(record), draftPreview: record.draftPreview, seoPreview: record.seoPreview, socialPreview: socialPreviewFor(command, record), sourceGaps: record.sourceGaps }
+      { approvalQueueId, selectedItem: summarize(record), fullArticlePreview: buildSourcePackFullArticle(record), draftPreview: record.draftPreview, seoPreview: record.seoPreview, socialPreview: socialPreviewFor(command, record), sourceGaps: record.sourceGaps }
     );
   }
 
@@ -207,5 +208,3 @@ function nextCommandFor(command: string, record: SourcePackRecord) {
   if (command === "social" || command === "caption") return `/publish-check ${record.slug}`;
   return `/next ${record.slug}`;
 }
-
-
