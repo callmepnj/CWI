@@ -395,3 +395,28 @@ Next steps:
 - Made `/live-newsroom` visibly show the approved internal CWI records by adding the `LiveNewsroomFeed` section as `#cwi-records` with the heading `Human-written Live Newsroom articles`.
 - Changed the hero `Enter Newsroom` CTA to jump to the internal records, and relabelled the old hardcoded external cards from `Source-backed updates` to `Source links CWI is tracking` with `Open Source` links.
 - Reason: prior content-quality changes were visible on detail pages and admin output, but the main newsroom page still led with old source-link cards, making the upgrade look absent.
+
+## 2026-06-02 Global Cockimage brand mark
+- Copied `C:\Users\praka\Downloads\Cockimage.jpg` into `public/brand/cockimage.jpg`.
+- Updated shared/global brand logo references from `/brand/logo.png` to `/brand/cockimage.jpg` in navbar, footer, organization JSON-LD, manifest, Live Newsroom article JSON-LD, archive image fallback, and watch radar animation.
+- Navbar/footer image rendering now uses `object-contain` padding so the full cockroach mark remains visible in small global logo slots on every page.
+
+## 2026-06-02 Cockroach takeover animation
+- Reverted the mistaken global logo replacement; navbar/footer/manifest/JSON-LD remain on `/brand/logo.png`.
+- Copied the provided image to `public/images/cockroach-logo.jpg` for takeover-only use.
+- Added `lib/config/cockroach-takeover.ts` and `components/CockroachTakeoverButton.tsx`.
+- Mounted `CockroachTakeoverButton` globally in `app/layout.tsx`, bottom-left, click-only. It renders no swarm elements until activated.
+- Takeover includes dark overlay, controlled Framer Motion swarm paths, CWI reveal, tagline, Live Newsroom/Submit CTAs, close button, Escape close, backdrop close after reveal, body scroll lock, and reduced-motion fallback.
+- Verification for takeover pass: `npm run typecheck` passed, `npm run lint` passed, `npm run build` passed. Fresh dev smoke on `localhost:3001` returned 200 for `/`, confirmed the global button label is present, overlay is not server-rendered before click, original `/brand/logo.png` remains in page HTML, and `public/images/cockroach-logo.jpg` exists.
+- URL scan found only intentional `localhost` detector strings inside `lib/ai/agents/system-health-agent.ts`; no old Vercel/apex-domain regressions or mistaken `/brand/cockimage.jpg` references were found.
+
+## 2026-06-02 Cockroach takeover prompt correction
+- Updated the takeover to use the required transparent asset copied from `C:\Users\praka\Downloads\Cockimage-removebg-preview.png` to `public/images/cockroach-takeover/cockroach.png`.
+- Removed the prior temporary `public/images/cockroach-logo.jpg` asset and kept all normal site logo references unchanged on `/brand/logo.png`.
+- Reworked swarm generation so cockroaches spawn one-by-one from all four viewport edges with deterministic varied start positions, paths, rotation, scale, opacity, delay, and duration. Overlay uses fixed `100vw/100vh` and renders swarm elements only while active.
+- Final CWI reveal now uses fixed high-contrast dark navy colors independent of light/dark site theme; button is hidden on `/admin` routes.
+- Fresh dev smoke on `localhost:3001` returned 200 for `/`, `/live-newsroom`, `/submit`, and `/admin/login`. Public routes contained `Activate CWI cockroach animation` and the required takeover asset; `/admin/login` did not contain the button; overlay dialog text was not present before click; original `/brand/logo.png` remained present.
+
+## 2026-06-02 Cockroach takeover swarm density bump
+- User requested many more cockroaches before push.
+- Increased takeover density from 44 desktop / 22 mobile to 220 desktop / 90 mobile. Swarm elements still render only after click, remain hidden on admin routes, and still use the lightweight transparent PNG at `/images/cockroach-takeover/cockroach.png`.

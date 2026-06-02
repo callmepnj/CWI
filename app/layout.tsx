@@ -1,8 +1,9 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import type React from "react";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
+import { CockroachTakeoverButton } from "@/components/CockroachTakeoverButton";
 import { Footer } from "@/components/Footer";
 import { FloatingJoinButton } from "@/components/FloatingJoinButton";
 import { MobileNav } from "@/components/MobileNav";
@@ -99,6 +100,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main>{children}</main>
         <Footer />
         <MobileNav />
+        <CockroachTakeoverButton />
         <FloatingJoinButton />
       </body>
     </html>
