@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/admin-auth";
 import { getAdminDashboardData } from "@/lib/cwi-admin-os";
 import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/lib/db/live-newsroom";
+import {
+  getPendingLiveNewsroomApprovals,
+  getPendingLiveNewsroomArticleDrafts,
+  getPendingLiveNewsroomResearchPacks,
+  getPendingLiveNewsroomSeoPacks,
+  getPendingLiveNewsroomSocialPacks,
+  getPendingLiveNewsroomVerificationReports
+} from "@/lib/live-newsroom-pending";
 
 export const runtime = "nodejs";
 
@@ -49,18 +57,18 @@ export async function GET(request: Request) {
       data: {
         overview: {
           totalLiveNewsroomItems: getLiveNewsroomFallbackItems(80).length,
-          waitingApprovals: 0,
+          waitingApprovals: getPendingLiveNewsroomApprovals().length,
           developingUpdates: 0,
           sourceBackedReports: getLiveNewsroomFallbackItems(80).filter((item) => ["Verified", "Source-backed"].includes(item.verificationStatus)).length
         },
         publishedItems: [],
         fallbackItems: getLiveNewsroomFallbackItems(80),
-        approvals: [],
-        researchPacks: [],
-        verificationReports: [],
-        articleDrafts: [],
-        seoPacks: [],
-        socialPacks: [],
+        approvals: getPendingLiveNewsroomApprovals(),
+        researchPacks: getPendingLiveNewsroomResearchPacks(),
+        verificationReports: getPendingLiveNewsroomVerificationReports(),
+        articleDrafts: getPendingLiveNewsroomArticleDrafts(),
+        seoPacks: getPendingLiveNewsroomSeoPacks(),
+        socialPacks: getPendingLiveNewsroomSocialPacks(),
         imageLibrary: []
       }
     });

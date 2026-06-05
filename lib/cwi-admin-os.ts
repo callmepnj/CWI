@@ -8,6 +8,14 @@ import { getLiveNewsroomFallbackItems, getPublishedLiveNewsroomItems } from "@/l
 import { optionalUuid, requireUuid } from "@/lib/db/ids";
 import { getLatestAiishnessReports, getNewsIntelligenceItems, saveNewsIntelligenceItem } from "@/lib/db/news-intelligence";
 import { getAdminSupporterNotes } from "@/lib/db/support";
+import {
+  getPendingLiveNewsroomApprovals,
+  getPendingLiveNewsroomArticleDrafts,
+  getPendingLiveNewsroomResearchPacks,
+  getPendingLiveNewsroomSeoPacks,
+  getPendingLiveNewsroomSocialPacks,
+  getPendingLiveNewsroomVerificationReports
+} from "@/lib/live-newsroom-pending";
 import { site } from "@/lib/site";
 import { cwiOsAgents, syncBigBrainRules } from "@/lib/ai/big-brain";
 import { syncStaticPublicMemory } from "@/lib/ai/source-memory";
@@ -233,7 +241,12 @@ async function buildAdminDashboardData() {
     pool.query(`select * from memory_graph_edges order by updated_at desc limit 100;`).catch(() => ({ rows: [] }))
   ]);
 
-  const approvalRows = approvals.rows;
+  const approvalRows = mergeRowsById([...getPendingLiveNewsroomApprovals(), ...approvals.rows]);
+  const researchPackRows = mergeRowsById([...getPendingLiveNewsroomResearchPacks(), ...researchPacks.rows]);
+  const verificationReportRows = mergeRowsById([...getPendingLiveNewsroomVerificationReports(), ...verificationReports.rows]);
+  const articleDraftRows = mergeRowsById([...getPendingLiveNewsroomArticleDrafts(), ...articleDrafts.rows]);
+  const seoPackRows = mergeRowsById([...getPendingLiveNewsroomSeoPacks(), ...seoPacks.rows]);
+  const socialPackRows = mergeRowsById([...getPendingLiveNewsroomSocialPacks(), ...socialPacks.rows]);
   const dbPublishedPosts = await getPublishedWatchPosts(8).catch(() => []);
   const liveNewsroomItems = await getPublishedLiveNewsroomItems(24).catch(() => []);
   const liveNewsroomFallbackItems = getLiveNewsroomFallbackItems(24);
@@ -260,10 +273,10 @@ async function buildAdminDashboardData() {
       liveNewsroomApprovals: approvalRows.filter((row) => row.content_destination === "live_newsroom").length,
       pendingApprovals,
       reportsReceived: reports.rows.length,
-      researchPacksReady: researchPacks.rows.length,
-      articlesReady: articleDrafts.rows.length,
-      seoPacksReady: seoPacks.rows.length,
-      socialPacksReady: socialPacks.rows.length,
+      researchPacksReady: researchPackRows.length,
+      articlesReady: articleDraftRows.length,
+      seoPacksReady: seoPackRows.length,
+      socialPacksReady: socialPackRows.length,
       uiuxIssuesFound: uiuxAudits.rows.length,
       memoryNodes: memoryNodes.rows.length,
       memoryGraphNodes: memoryGraphNodes.rows.length,
@@ -279,11 +292,11 @@ async function buildAdminDashboardData() {
     },
     agents: agents.rows,
     approvals: approvalRows,
-    researchPacks: researchPacks.rows,
-    verificationReports: verificationReports.rows,
-    articleDrafts: articleDrafts.rows,
-    seoPacks: seoPacks.rows,
-    socialPacks: socialPacks.rows,
+    researchPacks: researchPackRows,
+    verificationReports: verificationReportRows,
+    articleDrafts: articleDraftRows,
+    seoPacks: seoPackRows,
+    socialPacks: socialPackRows,
     imageLibrary: imageLibrary.rows,
     uiuxAudits: uiuxAudits.rows,
     manualLinks: manualLinks.rows,
@@ -316,6 +329,14 @@ async function buildAdminDashboardData() {
   };
 }
 
+function mergeRowsById<T extends Record<string, unknown>>(rows: T[]) {
+  const byId = new Map<string, T>();
+  for (const row of rows) {
+    const key = String(row.id ?? JSON.stringify(row));
+    byId.set(key, row);
+  }
+  return Array.from(byId.values());
+}
 function publicAiConfig() {
   const config = getAIProviderConfig();
   return {
