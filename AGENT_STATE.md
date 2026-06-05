@@ -1,4 +1,4 @@
-﻿# Agent State
+# Agent State
 
 Last updated: 2026-05-25
 
@@ -420,3 +420,11 @@ Next steps:
 ## 2026-06-02 Cockroach takeover swarm density bump
 - User requested many more cockroaches before push.
 - Increased takeover density from 44 desktop / 22 mobile to 220 desktop / 90 mobile. Swarm elements still render only after click, remain hidden on admin routes, and still use the lightweight transparent PNG at `/images/cockroach-takeover/cockroach.png`.
+
+## 2026-06-05 Live Newsroom extracted PDF content update
+- User requested content-only Live Newsroom update from `aaaa.pdf`, with no UI/UX/color/layout/navbar/footer/design changes.
+- Updated existing approval-first source-pack data in `data/live-newsroom-source-pack.ts`; no public Live Newsroom UI files were changed.
+- Added three new pending source-pack records: `cbse-class-12-osm-controversy-2026`, `cockroach-janta-party-what-is-cjp-june-6-protest`, and `jee-advanced-2026-data-exposure-cloud-storage`.
+- Each record includes source-backed summary, short-answer draft preview, what happened, what we know, what remains unclear, source gaps, risk level, source count, CWI relevance, SEO preview, social preview, timeline, and canonical preview using `https://cockroachwatchindia.online/live-newsroom/[slug]`.
+- Added related source-library entries and timeline entries for CBSE OSM, CJP June 6, and JEE Advanced data exposure. Publishing remains blocked until human approval through the existing admin flow.
+- Verification: `npm run typecheck` passed; `npm run build` passed; `git diff --check` passed. Build-generated sitemap/robots changes were restored because these records are pending, not approved/published.
