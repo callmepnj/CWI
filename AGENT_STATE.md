@@ -428,3 +428,10 @@ Next steps:
 - Each record includes source-backed summary, short-answer draft preview, what happened, what we know, what remains unclear, source gaps, risk level, source count, CWI relevance, SEO preview, social preview, timeline, and canonical preview using `https://cockroachwatchindia.online/live-newsroom/[slug]`.
 - Added related source-library entries and timeline entries for CBSE OSM, CJP June 6, and JEE Advanced data exposure. Publishing remains blocked until human approval through the existing admin flow.
 - Verification: `npm run typecheck` passed; `npm run build` passed; `git diff --check` passed. Build-generated sitemap/robots changes were restored because these records are pending, not approved/published.
+
+## 2026-06-05 Live Newsroom PDF public visibility fix
+- User clarified the public Live Newsroom still looked unchanged and asked to use the attached extracted PDF research as trusted data.
+- Added six approved/public Live Newsroom content records in `data/live-newsroom.ts` without changing UI, UX, colors, layout, navbar, footer, fonts, buttons, or unrelated pages.
+- New public slugs: `neet-ug-2026-nta-roadmap-cbi-probe-reexam-june-21`, `cbse-class-12-osm-controversy-2026`, `cuet-ug-2026-technical-glitch-tcs-nta-delay`, `jee-advanced-2026-data-exposure-cloud-storage`, `cockroach-janta-party-what-is-cjp-june-6-protest`, and `sonam-wangchuk-cjp-june-6-protest-support-explained`.
+- Each record uses the existing Live Newsroom data shape with CWI-style short answer, what changed/happened, what we know, what remains unclear/source gaps, cautious labels, source trails, correction/source-request flags, and apex-domain canonical sitemap URLs.
+- Verification: `npm run typecheck` passed; `npm run build` passed and generated `public/sitemap.xml` with 119 URLs including all six new public Live Newsroom slugs; `git diff --check` passed with only line-ending warnings; bad URL scan found only intentional detector strings in `lib/ai/agents/system-health-agent.ts`.
