@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ClipboardList, ExternalLink, Radio, Siren } from "lucide-react";
 import { CwiGestureBar, CwiTicker, NewsroomJoinForm } from "@/components/CwiCivicLiveKit";
 import { LiveNewsroomFeed } from "@/components/LiveNewsroomFeed";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { PollCard } from "@/components/PollCard";
 import { getPublicLiveNewsroomItems } from "@/data/live-newsroom";
 import { sourcePackUnansweredFileCard } from "@/data/live-newsroom-source-pack";
 
@@ -131,17 +132,31 @@ export default function LiveNewsroomPage() {
             <Link href="#cwi-records" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--cwi-accent-blue)] px-5 py-3 font-bold text-white shadow-[0_0_24px_rgba(59,130,246,0.28)] transition hover:-translate-y-0.5">
               <Siren className="h-4 w-4" /> Enter Newsroom
             </Link>
-            <Link href="#india-unanswered-files" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[var(--cwi-border-dark)] px-5 py-3 font-bold text-[var(--cwi-text-primary)] transition hover:border-[var(--cwi-accent-amber)]/60">
-              <ClipboardList className="h-4 w-4" /> Read India Unanswered Files
+            <Link href="#education-poll" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-[var(--cwi-border-dark)] px-5 py-3 font-bold text-[var(--cwi-text-primary)] transition hover:border-[var(--cwi-accent-amber)]/60">
+              <ClipboardList className="h-4 w-4" /> Vote in Public Poll
             </Link>
           </div>
           <div className="mt-8 rounded-lg border border-[var(--cwi-border)] bg-[var(--cwi-card)] px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--cwi-accent-amber)] shadow-[0_18px_50px_var(--cwi-shadow-soft)] sm:text-sm">
-            17 Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 30 May 2026
+            17 Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 8 June 2026
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><CwiGestureBar count="143 citizens" text="have joined the CWI Watch. Join them." /></section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="rounded-lg border border-[var(--cwi-accent-amber)]/45 bg-[var(--cwi-accent-amber)]/10 p-5 shadow-[0_18px_50px_var(--cwi-shadow-soft)] sm:p-6">
+          <span className="inline-flex rounded-full border border-[var(--cwi-accent-amber)]/45 px-3 py-1 font-mono text-xs font-black uppercase tracking-[0.14em] text-[var(--cwi-accent-amber)]">Peaceful protest. Verified information. Public accountability.</span>
+          <h2 className="mt-4 text-2xl font-black leading-tight text-[var(--cwi-text-primary)] sm:text-4xl">Peaceful protest is the credibility of the movement.</h2>
+          <p className="mt-3 max-w-5xl leading-8 text-[var(--cwi-text-secondary)]">
+            CWI believes public protest must remain peaceful, disciplined, and source-aware. The strength of a student movement is not in chaos, but in clarity: clear demands, verified information, lawful assembly, and public accountability. India&apos;s youth have every right to ask questions about exams, jobs, fairness, and the future, but the movement must protect its credibility by rejecting violence, misinformation, hate, and reckless rumours.
+          </p>
+        </div>
+      </section>
+
+      <section id="education-poll" className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+        <PollCard />
+      </section>
 
       <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8" id="join-watch">
         <div className="mb-7 text-center">
@@ -220,3 +235,6 @@ function StoryCard({ story }: { story: (typeof stories)[number] }) {
     </article>
   );
 }
+
+
+

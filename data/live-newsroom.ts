@@ -1,4 +1,6 @@
-// Live Newsroom - daily, source-led editorial records.
+﻿// Live Newsroom - daily, source-led editorial records.
+
+import { june2026LiveNewsroomItems } from "./live-newsroom-june-2026";
 
 export type NewsroomItemStatus =
   | "Verified"
@@ -8,6 +10,9 @@ export type NewsroomItemStatus =
   | "Needs Source"
   | "Correction"
   | "Reported"
+  | "Claim under review"
+  | "Official clarification awaited"
+  | "Opinion / public sentiment"
   | "Unverified"
   | "False/Misleading"
   | "Blocked";
@@ -324,7 +329,7 @@ export const todaysBriefs: TodaysBrief[] = [
   }
 ];
 
-export const liveNewsroomItems: LiveNewsroomItem[] = [
+const baseLiveNewsroomItems: LiveNewsroomItem[] = [
   {
     id: "live-neet-probe-2026",
     slug: "neet-ug-2026-probe-official-notices-and-source-gaps",
@@ -712,7 +717,26 @@ export const liveNewsroomItems: LiveNewsroomItem[] = [
   }
 ];
 
+export const liveNewsroomItems: LiveNewsroomItem[] = [
+  ...june2026LiveNewsroomItems,
+  ...baseLiveNewsroomItems
+];
+
 export const publicAdvisories: PublicAdvisory[] = [
+  {
+    id: "adv-peaceful-protest-source-aware-june-2026",
+    slug: "peaceful-protest-verified-information-public-accountability",
+    type: "Verify before sharing",
+    title: "Peaceful protest. Verified information. Public accountability.",
+    warning: "Student protest must remain peaceful, lawful, source-aware, and free from violence, hate, misinformation, and reckless rumours.",
+    whatToRead:
+      "Read the June 8 CWI protest advisory and verify NEET, CBSE, NTA and protest claims before forwarding screenshots or calls to action.",
+    context: "CWI believes the credibility of a student movement comes from clear demands, lawful assembly, verified information, and public accountability.",
+    relatedLink: "/live-newsroom/peaceful-protest-advisory-student-movements-credible-june-2026",
+    relatedLinkText: "Open peaceful protest advisory",
+    lastUpdatedAt: "2026-06-08T10:30:00+05:30",
+    priority: "high"
+  },
   {
     id: "adv-neet-cbse-official-links",
     slug: "verify-neet-cbse-official-links-before-sharing",
@@ -856,4 +880,6 @@ export function getSourceBackedReports(): LiveNewsroomItem[] {
 export function getItemBySlug(slug: string): LiveNewsroomItem | undefined {
   return getPublicLiveNewsroomItems().find((item) => item.slug === slug);
 }
+
+
 

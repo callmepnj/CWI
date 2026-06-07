@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 const root = process.cwd();
 const baseUrl = "https://cockroachwatchindia.online";
-const lastModified = "2026-05-28";
+const lastModified = "2026-06-08";
 
 const staticRoutes = [
   "/",
@@ -27,8 +27,12 @@ const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match)
 const unansweredFilesSource = readFileSync(join(root, "data", "unanswered-files.ts"), "utf8");
 const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
 const liveNewsroomSource = readFileSync(join(root, "data", "live-newsroom.ts"), "utf8");
-const liveNewsroomBlock = liveNewsroomSource.match(/export const liveNewsroomItems:[\s\S]*?export const publicAdvisories/)?.[0] ?? "";
-const liveNewsroomSlugs = Array.from(liveNewsroomBlock.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
+const juneLiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-june-2026.ts"), "utf8");
+const liveNewsroomBlock = liveNewsroomSource.match(/(?:const baseLiveNewsroomItems|export const liveNewsroomItems):[\s\S]*?export const publicAdvisories/)?.[0] ?? "";
+const liveNewsroomSlugs = Array.from(new Set([
+  ...Array.from(liveNewsroomBlock.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
+  ...Array.from(juneLiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1])
+]));
 
 const routes = Array.from(new Set([
   ...staticRoutes,
@@ -73,3 +77,6 @@ writeFileSync(join(root, "public", "sitemap.xml"), sitemap);
 writeFileSync(join(root, "public", "robots.txt"), robots);
 
 console.log(`Generated public/sitemap.xml with ${routes.length} URLs`);
+
+
+

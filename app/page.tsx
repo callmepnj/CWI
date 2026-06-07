@@ -69,6 +69,17 @@ export default function HomePage() {
           <CwiTrustStrip items={["What changed today", "What remains unclear", "Source trail visible", "Correction path open"]} />
         </div>
 
+        <section className="mt-10 rounded-lg border border-cwi-green/24 bg-white/78 p-5 shadow-[0_14px_38px_rgba(29,18,10,0.08)] sm:p-6">
+          <p className="font-mono text-xs font-black uppercase tracking-[0.18em] text-cwi-green">Live from CWI Newsroom</p>
+          <h2 className="mt-2 font-display text-3xl font-black uppercase leading-tight text-cwi-ink">Peaceful Protest, Student Anger and the Demand for Education Accountability</h2>
+          <p className="mt-3 max-w-4xl leading-7 text-cwi-ink/70">
+            From exam integrity to student dignity, CWI is tracking the latest public updates, verified reports, protest developments, and youth questions from 30 May to today.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <CwiButtonLink href="/live-newsroom">Enter Live Newsroom</CwiButtonLink>
+            <CwiButtonLink href="/live-newsroom#education-poll" variant="secondary">Vote in Public Poll</CwiButtonLink>
+          </div>
+        </section>
         <section className="mt-12">
           <CwiSectionHeader
             eyebrow="Today from Live Newsroom"
@@ -246,6 +257,8 @@ function formatDate(value: string) {
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("en-IN", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "Asia/Kolkata" }).format(new Date(value));
 }
+
+
 
 
 
