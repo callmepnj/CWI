@@ -1,5 +1,6 @@
 ﻿// Live Newsroom - daily, source-led editorial records.
 
+import { june14LiveNewsroomItems, june14Sources } from "./live-newsroom-june-14-2026";
 import { june2026LiveNewsroomItems } from "./live-newsroom-june-2026";
 
 export type NewsroomItemStatus =
@@ -718,6 +719,7 @@ const baseLiveNewsroomItems: LiveNewsroomItem[] = [
 ];
 
 export const liveNewsroomItems: LiveNewsroomItem[] = [
+  ...june14LiveNewsroomItems,
   ...june2026LiveNewsroomItems,
   ...baseLiveNewsroomItems
 ];
@@ -815,6 +817,7 @@ export const claimTrackerItems: ClaimTrackerItem[] = [
 export const corrections: Correction[] = [];
 
 export const sources: Source[] = [
+  ...june14Sources,
   sourceMap.ntaNeetPublicNotices,
   sourceMap.cbseLatest,
   sourceMap.cbseCirculars,
@@ -880,6 +883,7 @@ export function getSourceBackedReports(): LiveNewsroomItem[] {
 export function getItemBySlug(slug: string): LiveNewsroomItem | undefined {
   return getPublicLiveNewsroomItems().find((item) => item.slug === slug);
 }
+
 
 
 

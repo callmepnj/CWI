@@ -13,7 +13,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "CWI Live Newsroom - Cockroach Watch India Latest Updates",
   description:
-    "CWI Live Newsroom by Cockroach Watch India tracks source-backed updates on NEET 2026, NTA accountability, student protests, India Unanswered Files, and civic issues with verified context. Updated daily.",
+    "CWI Live Newsroom by Cockroach Watch India tracks source-backed updates on NEET 2026, NTA accountability, student protests, India Unanswered Files, and civic issues with verified context. Updated through June 14, 2026.",
   alternates: { canonical: "https://cockroachwatchindia.online/live-newsroom" },
   openGraph: {
     title: "CWI Live Newsroom - India Is Watching",
@@ -30,6 +30,10 @@ export const metadata: Metadata = {
 };
 
 const tickerItems = [
+  "LIVE - June 13 ultimatum expired. CWI tracking CJP state-by-state mobilisation after Delhi, Pune and Lucknow. Developing.",
+  "TODAY - Bengaluru, Amritsar and Jaipur added to CWI city protest watch. Source checks ongoing.",
+  "VERIFY - June 25 strike date, foreign-funding screenshots and Patna crackdown claims remain unverified.",
+  "NEET - June 21 re-exam security audit watch open. Official clarification awaited on final safeguards.",
   "LIVE - NEET UG 2026 re-exam set for June 21. NTA tells Supreme Court security upgraded. Developing.",
   "SC on NEET: 'Very traumatic for students. No lesson learnt.' - May 29, 2026",
   "CBI probe into NEET 2026 paper leak ongoing. Mastermind arrested in Rajasthan network - reported.",
@@ -137,7 +141,7 @@ export default function LiveNewsroomPage() {
             </Link>
           </div>
           <div className="mt-8 rounded-lg border border-[var(--cwi-border)] bg-[var(--cwi-card)] px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--cwi-accent-amber)] shadow-[0_18px_50px_var(--cwi-shadow-soft)] sm:text-sm">
-            17 Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 8 June 2026
+            17 Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 14 June 2026
           </div>
         </div>
       </section>
@@ -235,6 +239,7 @@ function StoryCard({ story }: { story: (typeof stories)[number] }) {
     </article>
   );
 }
+
 
 
 

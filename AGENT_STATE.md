@@ -446,3 +446,17 @@ Next steps:
 - Note: `apply_patch` failed to write any file in this workspace during this turn, so PowerShell file writes were used instead.
 - Final verification for the 2026-06-08 pass: `node scripts/generate-static-seo.mjs` generated 125 URLs; `npm run typecheck`, `npm run lint`, and `npm run build` all passed. Local smoke checks returned 200 for `/`, `/live-newsroom`, new June article slugs, `/sitemap.xml`, and `/robots.txt`; Live Newsroom HTML contains the peaceful-protest badge, poll question, poll title, and human-written records section; homepage HTML contains the new "Live from CWI Newsroom" highlight and poll CTA.
 - Local review server is running at `http://localhost:3002` because ports 3000 and 3001 were already occupied.
+
+2026-06-14 live newsroom research update:
+- User supplied OSINT master dossier dated June 14, 2026 and asked to update Live Newsroom.
+- Added `data/live-newsroom-june-14-2026.ts` with 5 approved June 14 records:
+  - `cjp-june-13-ultimatum-expired-national-mobilisation-june-14-2026` as new lead story.
+  - `pune-lucknow-cjp-regional-expansion-exam-protests-june-2026`.
+  - `bengaluru-amritsar-jaipur-cjp-protest-watch-june-14-2026`.
+  - `cjp-unverified-claims-ledger-june-14-2026`.
+  - `neet-june-21-reexam-security-audit-watch-cwi-june-14-2026`.
+- Wired the June 14 module into `data/live-newsroom.ts` ahead of June 8 and base records; June 14 sources are included in `sources` so source ledger can surface them.
+- Updated `/live-newsroom` ticker and metadata/stats to show June 14 coverage, June 13 ultimatum expiry, city protest watch, unverified-claims quarantine, and NEET June 21 security audit watch.
+- Used cautious labels (`Developing`, `Reported`, `Unverified`, `Source-backed`) and explicit source gaps. Did not treat unverified strike date, foreign-funding screenshots, or Patna crackdown rumours as confirmed.
+- Verification: `npm run lint` passed. `npm run build` passed and generated 125 sitemap URLs / 212 static pages. Production server route checks returned 200 for `/live-newsroom` and the new June 14 article slugs.
+- Note: prior site-wide design files are still modified in working tree from earlier turns; this update did not revert them.
