@@ -17,6 +17,9 @@ const statusStyles: Record<string, string> = {
 };
 
 export function LeadStoryCard({ item }: { item: LiveNewsroomItem }) {
+  const image = item.heroImage ?? item.displayImage;
+  const imageAlt = item.altText ?? item.displayImageAlt ?? item.title;
+
   return (
     <article className="relative overflow-hidden rounded-lg border-2 border-cwi-green/35 bg-cwi-cream shadow-card">
       <div className="absolute inset-x-0 top-0 h-2 bg-cwi-saffron" />
@@ -24,12 +27,12 @@ export function LeadStoryCard({ item }: { item: LiveNewsroomItem }) {
         CWI
       </div>
 
-      <div className={`grid gap-0 ${item.displayImage ? "lg:grid-cols-[0.92fr_1.08fr]" : ""}`}>
-        {item.displayImage ? (
+      <div className={`grid gap-0 ${image ? "lg:grid-cols-[0.92fr_1.08fr]" : ""}`}>
+        {image ? (
           <div className="relative min-h-[260px] overflow-hidden border-b border-cwi-brown/10 bg-cwi-muted lg:min-h-[520px] lg:border-b-0 lg:border-r">
             <Image
-              src={item.displayImage}
-              alt={item.displayImageAlt || item.title}
+              src={image}
+              alt={imageAlt}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 46vw"

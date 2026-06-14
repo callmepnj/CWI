@@ -28,6 +28,9 @@ export async function generateMetadata({ params }: Props) {
     });
   }
 
+  const socialImage = item.ogImage ?? item.heroImage ?? item.displayImage ?? `/live-newsroom/${item.slug}/opengraph-image`;
+  const socialAlt = item.altText ?? item.displayImageAlt ?? `${item.title} - CWI Live Newsroom social preview`;
+
   return createMetadata({
     title: `${item.title} - CWI Live Newsroom`,
     description: item.summary,
@@ -37,8 +40,8 @@ export async function generateMetadata({ params }: Props) {
     modifiedTime: item.lastUpdatedAt ?? item.updatedAt,
     keywords: [item.title, item.category, item.status, "CWI Live Newsroom", "Cockroach Watch India"],
     image: {
-      url: absoluteUrl(`/live-newsroom/${item.slug}/opengraph-image`),
-      alt: `${item.title} - CWI Live Newsroom social preview`
+      url: absoluteUrl(socialImage),
+      alt: socialAlt
     }
   });
 }
@@ -49,7 +52,7 @@ export async function generateStaticParams() {
 
 function jsonLdForItem(item: DetailItem) {
   const url = absoluteUrl(`/live-newsroom/${item.slug}`);
-  const image = absoluteUrl(`/live-newsroom/${item.slug}/opengraph-image`);
+  const image = absoluteUrl(item.ogImage ?? item.heroImage ?? item.displayImage ?? `/live-newsroom/${item.slug}/opengraph-image`);
   const articleBase = {
     headline: item.title,
     description: item.summary,
@@ -104,6 +107,8 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
   const status = statusColors[item.status] || statusColors.Reported;
   const jsonLd = jsonLdForItem(item);
   const narrative = buildArticleNarrative(item);
+  const heroImage = item.heroImage ?? item.displayImage;
+  const heroAlt = item.altText ?? item.displayImageAlt ?? item.title;
 
   return (
     <>
@@ -136,9 +141,9 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
             </div>
           </header>
 
-          {item.displayImage ? (
+          {heroImage ? (
             <div className="relative mb-12 h-96 overflow-hidden rounded-lg border-2 border-cwi-green/20 bg-cwi-muted">
-              <Image src={item.displayImage} alt={item.displayImageAlt || item.title} fill sizes="(max-width: 1024px) 100vw, 896px" className="object-cover" />
+              <Image src={heroImage} alt={heroAlt} fill sizes="(max-width: 1024px) 100vw, 896px" className="object-cover" />
             </div>
           ) : null}
 
@@ -226,6 +231,15 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
               <div className="grid gap-6 md:grid-cols-2">
                 {liveNewsroomItems.filter((related) => related.id !== item.id).slice(0, 2).map((relatedItem) => (
                   <Link key={relatedItem.id} href={`/live-newsroom/${relatedItem.slug}`} className="group rounded-lg border-2 border-cwi-green/20 bg-white p-6 transition-all hover:border-cwi-green/40 hover:bg-cwi-cream/30 hover:shadow-md">
+                    <div className="relative mb-4 h-36 overflow-hidden rounded-md border border-cwi-brown/12 bg-cwi-muted">
+                      <Image
+                        src={relatedItem.thumbnailImage ?? relatedItem.displayImage ?? "/images/cwi/newsroom/thumbnails/cwi-live-newsroom-fallback.jpg"}
+                        alt={relatedItem.altText ?? relatedItem.displayImageAlt ?? relatedItem.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 420px"
+                        className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                      />
+                    </div>
                     <div className="mb-2 text-xs font-bold uppercase tracking-wide text-cwi-green">{relatedItem.category}</div>
                     <h3 className="mb-2 line-clamp-2 font-display text-lg font-bold text-cwi-ink transition-colors group-hover:text-cwi-green">{relatedItem.title}</h3>
                     <p className="mb-3 line-clamp-2 text-sm text-cwi-ink/70">{relatedItem.summary}</p>

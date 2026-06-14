@@ -460,3 +460,13 @@ Next steps:
 - Used cautious labels (`Developing`, `Reported`, `Unverified`, `Source-backed`) and explicit source gaps. Did not treat unverified strike date, foreign-funding screenshots, or Patna crackdown rumours as confirmed.
 - Verification: `npm run lint` passed. `npm run build` passed and generated 125 sitemap URLs / 212 static pages. Production server route checks returned 200 for `/live-newsroom` and the new June 14 article slugs.
 - Note: prior site-wide design files are still modified in working tree from earlier turns; this update did not revert them.
+
+2026-06-15 CWI HD newsroom image ingestion:
+- User supplied 49 HD JPEG graphics from `C:\Users\praka\Downloads\CJP New photos` and requested image-only integration without changing UI/UX/colors/layout/fonts/navbar/footer/newsroom pattern.
+- Copied all 49 source images into `public/images/cwi/newsroom/hero/` with lowercase SEO-friendly names grouped by topic: Bengaluru Freedom Park, CJP mascot, Jantar Mantar protest, cockroach masks/youth protest, exam leaks/student justice, Amritsar, night rallies, and police standoff/public safety.
+- Added representative copies into `public/images/cwi/newsroom/thumbnails/`, `public/images/cwi/newsroom/og/`, `public/images/cwi/public-advisories/`, `public/images/cwi/social/`, and `public/images/cwi/unanswered-files/`. Added `public/images/cwi/image-ingest-manifest.csv`.
+- Created `lib/data/cwi-image-library.ts` with image IDs, slugs, paths, tags, alt text, credit, recommended usage, fallback image, and a resolver that maps newsroom slugs/categories/titles to topic-appropriate images.
+- Extended `LiveNewsroomItem` with `heroImage`, `thumbnailImage`, `ogImage`, `altText`, `imageCredit`, `imageCategory`, and `imageSource`; `data/live-newsroom.ts` now auto-enriches all public newsroom items with CWI Original/CWI Graphic image metadata while preserving legacy `displayImage` compatibility.
+- Updated Live Newsroom listing cards to show fixed-size thumbnails, lead cards/home lead story to prefer `heroImage`, article detail pages to use `heroImage` and related-card thumbnails, and article metadata/JSON-LD to prefer mapped `ogImage`.
+- Updated `/live-newsroom` Open Graph and Twitter image to use `https://cockroachwatchindia.online/images/cwi/newsroom/og/cwi-live-newsroom-fallback.jpg`.
+- Verification: direct `/images/cwi` path audit passed; `npm run lint` passed; `npm run build` passed and generated 125 sitemap URLs / 212 static pages. No old Vercel or localhost production image URLs were introduced.

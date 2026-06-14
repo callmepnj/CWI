@@ -20,12 +20,19 @@ export const metadata: Metadata = {
     description: "Source-backed civic newsroom. NEET 2026 coverage, India Unanswered Files, protest updates, and public memory archive.",
     url: "https://cockroachwatchindia.online/live-newsroom",
     siteName: "Cockroach Watch India",
-    type: "website"
+    type: "website",
+    images: [
+      {
+        url: "https://cockroachwatchindia.online/images/cwi/newsroom/og/cwi-live-newsroom-fallback.jpg",
+        alt: "CWI Live Newsroom graphic representing youth voice, public accountability, and India's unanswered questions"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "CWI Live Newsroom - India Is Watching",
-    description: "Source-backed civic newsroom. NEET 2026 coverage, India Unanswered Files, protest updates, and public memory archive."
+    description: "Source-backed civic newsroom. NEET 2026 coverage, India Unanswered Files, protest updates, and public memory archive.",
+    images: ["https://cockroachwatchindia.online/images/cwi/newsroom/og/cwi-live-newsroom-fallback.jpg"]
   }
 };
 

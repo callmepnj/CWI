@@ -121,8 +121,8 @@ export default function HomePage() {
           <section className="mt-12">
             <CwiSectionHeader eyebrow="Lead Story" title="The main record right now" />
             <CwiLeadCard
-              image={leadStory.displayImage?.startsWith("/") ? leadStory.displayImage : undefined}
-              alt={leadStory.displayImageAlt}
+              image={(leadStory.heroImage ?? leadStory.displayImage)?.startsWith("/") ? (leadStory.heroImage ?? leadStory.displayImage) : undefined}
+              alt={leadStory.altText ?? leadStory.displayImageAlt}
               label={leadStory.status}
               title={leadStory.title}
               summary={leadStory.summary}

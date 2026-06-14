@@ -2,6 +2,7 @@
 
 import { june14LiveNewsroomItems, june14Sources } from "./live-newsroom-june-14-2026";
 import { june2026LiveNewsroomItems } from "./live-newsroom-june-2026";
+import { resolveCwiNewsroomImage } from "@/lib/data/cwi-image-library";
 
 export type NewsroomItemStatus =
   | "Verified"
@@ -112,6 +113,13 @@ export interface LiveNewsroomItem {
 
   displayImage?: string;
   displayImageAlt?: string;
+  heroImage?: string;
+  thumbnailImage?: string;
+  ogImage?: string;
+  altText?: string;
+  imageCredit?: string;
+  imageCategory?: string;
+  imageSource?: string;
 
   correctionOpen: boolean;
   sourceRequestOpen: boolean;
@@ -718,11 +726,32 @@ const baseLiveNewsroomItems: LiveNewsroomItem[] = [
   }
 ];
 
-export const liveNewsroomItems: LiveNewsroomItem[] = [
+const rawLiveNewsroomItems: LiveNewsroomItem[] = [
   ...june14LiveNewsroomItems,
   ...june2026LiveNewsroomItems,
   ...baseLiveNewsroomItems
 ];
+
+export const liveNewsroomItems: LiveNewsroomItem[] = rawLiveNewsroomItems.map((item) => {
+  const image = resolveCwiNewsroomImage(item.slug, item.category, item.title);
+  const heroImage = item.heroImage ?? image.filePath ?? item.displayImage;
+  const thumbnailImage = item.thumbnailImage ?? image.thumbnailPath ?? heroImage;
+  const ogImage = item.ogImage ?? image.ogPath ?? heroImage;
+  const altText = item.altText ?? image.altText ?? item.displayImageAlt;
+
+  return {
+    ...item,
+    heroImage,
+    thumbnailImage,
+    ogImage,
+    altText,
+    imageCredit: item.imageCredit ?? image.credit,
+    imageCategory: item.imageCategory ?? image.category,
+    imageSource: item.imageSource ?? "CWI Original / CWI Graphic",
+    displayImage: item.displayImage ?? heroImage,
+    displayImageAlt: item.displayImageAlt ?? altText
+  };
+});
 
 export const publicAdvisories: PublicAdvisory[] = [
   {

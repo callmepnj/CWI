@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { LiveNewsroomItem } from "@/data/live-newsroom";
@@ -63,8 +64,17 @@ export function LiveNewsroomFeed({ items }: { items: LiveNewsroomItem[] }) {
             <Link
               key={item.id}
               href={`/live-newsroom/${item.slug}`}
-              className="group grid gap-3 p-4 transition hover:bg-cwi-cream/60 sm:grid-cols-[1fr_auto] sm:p-5"
+              className="group grid gap-3 p-4 transition hover:bg-cwi-cream/60 sm:grid-cols-[112px_1fr_auto] sm:p-5"
             >
+              <div className="relative h-24 overflow-hidden rounded-md border border-cwi-brown/12 bg-cwi-muted sm:h-full sm:min-h-24">
+                <Image
+                  src={item.thumbnailImage ?? item.displayImage ?? "/images/cwi/newsroom/thumbnails/cwi-live-newsroom-fallback.jpg"}
+                  alt={item.altText ?? item.displayImageAlt ?? item.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 112px"
+                  className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                />
+              </div>
               <div className="min-w-0">
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-cwi-green/10 px-2.5 py-1 text-xs font-black uppercase tracking-wide text-cwi-green">
