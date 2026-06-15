@@ -15,6 +15,7 @@ import {
   CwiTimeline
 } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { NewsArticleSchema } from "@/components/seo/NewsArticleSchema";
 import { posts } from "@/data/posts";
 import { getPublishedWatchPostBySlug } from "@/lib/db/articles";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
@@ -51,6 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     publishedTime: `${post.publishedAt}T00:00:00+05:30`,
     modifiedTime: `${post.updatedAt}T00:00:00+05:30`,
     keywords: post.tags,
+    section: post.category,
+    tags: post.tags,
     image: {
       url: "/opengraph-image",
       alt: post.imageAlt
@@ -66,11 +69,22 @@ export default async function ArchiveArticlePage({ params }: Props) {
   if (!post) notFound();
 
   const related = posts.filter((item) => item.slug !== post.slug && (post.relatedSlugs.includes(item.slug) || item.category === post.category)).slice(0, 3);
-  const articleJsonLd = buildArticleJsonLd(post);
+  const articleUrl = absoluteUrl(`/archive/${post.slug}`);
+  const imageUrl = post.ogImage?.startsWith("http") ? post.ogImage : absoluteUrl(post.ogImage || "/opengraph-image");
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <NewsArticleSchema
+        headline={post.title}
+        datePublished={`${post.publishedAt}T00:00:00+05:30`}
+        dateModified={`${post.updatedAt}T00:00:00+05:30`}
+        description={post.summary}
+        url={articleUrl}
+        imageUrl={imageUrl}
+        authorName={site.editorialDesk}
+        sectionName="Archive"
+        sectionUrl={absoluteUrl("/archive")}
+      />
       <PageBackgroundGesture intensity="subtle">
         <CwiPageShell>
         <div className="mb-5 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-brown/70">
@@ -200,23 +214,6 @@ function ArticleSection({ title, children }: { title: string; children: React.Re
       <div className="mt-4 space-y-4">{children}</div>
     </section>
   );
-}
-
-function buildArticleJsonLd(post: (typeof posts)[number]) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.summary,
-    url: absoluteUrl(`/archive/${post.slug}`),
-    datePublished: `${post.publishedAt}T00:00:00+05:30`,
-    dateModified: `${post.updatedAt}T00:00:00+05:30`,
-    articleSection: post.category,
-    author: { "@type": "Organization", name: site.editorialDesk, url: absoluteUrl("/editorial-policy") },
-    publisher: { "@type": "NewsMediaOrganization", "@id": `${site.url}/#organization`, name: site.name, url: site.url },
-    image: absoluteUrl("/opengraph-image"),
-    mainEntityOfPage: absoluteUrl(`/archive/${post.slug}`)
-  };
 }
 
 function formatDate(value: string) {

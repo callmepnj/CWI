@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTrustStrip } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { WebPageSchema } from "@/components/seo/WebPageSchema";
 import { Card, CardLabel } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -39,7 +40,13 @@ const policies = [
 
 export default function EditorialPolicyPage() {
   return (
-    <PageBackgroundGesture intensity="subtle">
+    <>
+      <WebPageSchema
+        name="Editorial Policy"
+        description="CWI editorial policy for independence, source rules, verification labels, developing claims, corrections, creator credit, safety, and support independence."
+        url="https://cockroachwatchindia.online/editorial-policy"
+      />
+      <PageBackgroundGesture intensity="subtle">
       <CwiPageShell>
       <CwiMasthead
         label="Editorial trust"
@@ -85,5 +92,6 @@ export default function EditorialPolicyPage() {
       <div className="mt-10"><CwiSubmitCTA /></div>
     </CwiPageShell>
       </PageBackgroundGesture>
-    );
-  }
+    </>
+  );
+}

@@ -1,6 +1,7 @@
 ﻿import { CwiButtonLink, CwiDossierCard, CwiEditorialCard, CwiLeadCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTimeline, CwiTrustStrip } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { JoinNowTrigger } from "@/components/JoinNowTrigger";
+import { OrganizationSchema } from "@/components/seo/OrganizationSchema";
 import { getLeadStory, getLiveUpdates, getTodaysTopItems, getWhatChangedToday, todaysBriefs } from "@/data/live-newsroom";
 import { posts } from "@/data/posts";
 import { unansweredFiles } from "@/data/unanswered-files";
@@ -26,6 +27,7 @@ export default function HomePage() {
 
   return (
     <>
+      <OrganizationSchema />
       <PageBackgroundGesture>
         <CwiPageShell>
         <CwiMasthead

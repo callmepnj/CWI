@@ -1,7 +1,7 @@
 ﻿import { NextResponse, type NextRequest } from "next/server";
 
 const officialHost = "cockroachwatchindia.online";
-const redirectHosts = new Set([["cwi-ten", "vercel", "app"].join("."), ["www", officialHost].join(".")]);
+const redirectHosts = new Set([["cwi-ten", "vercel", "app"].join(".")]);
 
 const routeRedirects: Array<[RegExp, string | ((pathname: string) => string)]> = [
   [/^\/latest$/, "/live-newsroom"],

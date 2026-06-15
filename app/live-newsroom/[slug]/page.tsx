@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
+import { NewsArticleSchema } from "@/components/seo/NewsArticleSchema";
 import { createMetadata, absoluteUrl } from "@/lib/seo";
 import { liveNewsroomItems, getItemBySlug } from "@/data/live-newsroom";
 import { site } from "@/lib/site";
@@ -39,6 +40,8 @@ export async function generateMetadata({ params }: Props) {
     publishedTime: item.publishedAt ?? item.createdAt,
     modifiedTime: item.lastUpdatedAt ?? item.updatedAt,
     keywords: [item.title, item.category, item.status, "CWI Live Newsroom", "Cockroach Watch India"],
+    section: item.category,
+    tags: [item.category, item.status, item.changeType, ...item.labels, "CWI Live Newsroom"],
     image: {
       url: absoluteUrl(socialImage),
       alt: socialAlt
@@ -48,45 +51,6 @@ export async function generateMetadata({ params }: Props) {
 
 export async function generateStaticParams() {
   return liveNewsroomItems.map((item) => ({ slug: item.slug }));
-}
-
-function jsonLdForItem(item: DetailItem) {
-  const url = absoluteUrl(`/live-newsroom/${item.slug}`);
-  const image = absoluteUrl(item.ogImage ?? item.heroImage ?? item.displayImage ?? `/live-newsroom/${item.slug}/opengraph-image`);
-  const articleBase = {
-    headline: item.title,
-    description: item.summary,
-    image,
-    datePublished: item.publishedAt ?? item.createdAt,
-    dateModified: item.lastUpdatedAt ?? item.updatedAt,
-    author: { "@type": "Organization", name: site.editorialDesk, url: absoluteUrl("/editorial-policy") },
-    publisher: {
-      "@type": "NewsMediaOrganization",
-      "@id": `${site.url}/#organization`,
-      name: site.name,
-      logo: { "@type": "ImageObject", url: absoluteUrl("/brand/logo.png") }
-    },
-    url,
-    mainEntityOfPage: url,
-    articleSection: item.category,
-    keywords: [item.title, item.category, item.status, "CWI Live Newsroom"].join(", "),
-    citation: item.sourceTrail.map((source) => source.url),
-    isAccessibleForFree: true
-  };
-
-  return [
-    { "@context": "https://schema.org", "@type": "NewsArticle", ...articleBase },
-    { "@context": "https://schema.org", "@type": "BlogPosting", ...articleBase },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: site.url },
-        { "@type": "ListItem", position: 2, name: "Live Newsroom", item: absoluteUrl("/live-newsroom") },
-        { "@type": "ListItem", position: 3, name: item.title, item: url }
-      ]
-    }
-  ];
 }
 
 export default async function LiveNewsroomDetailPage({ params }: Props) {
@@ -106,16 +70,25 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
   };
 
   const status = statusColors[item.status] || statusColors.Reported;
-  const jsonLd = jsonLdForItem(item);
   const narrative = buildArticleNarrative(item);
   const heroImage = item.heroImage ?? item.displayImage;
   const heroAlt = item.altText ?? item.displayImageAlt ?? item.title;
+  const articleUrl = absoluteUrl(`/live-newsroom/${item.slug}`);
+  const schemaImage = absoluteUrl(item.ogImage ?? heroImage ?? `/live-newsroom/${item.slug}/opengraph-image`);
 
   return (
     <>
-      {jsonLd.map((entry) => (
-        <script key={`${entry["@type"]}-${slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }} />
-      ))}
+      <NewsArticleSchema
+        headline={item.title}
+        datePublished={item.publishedAt ?? item.createdAt}
+        dateModified={item.lastUpdatedAt ?? item.updatedAt}
+        description={item.summary}
+        url={articleUrl}
+        imageUrl={schemaImage}
+        authorName={site.editorialDesk}
+        sectionName="Live Newsroom"
+        sectionUrl={absoluteUrl("/live-newsroom")}
+      />
       <PageBackgroundGesture intensity="subtle">
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
           <Link href="/live-newsroom" className="mb-8 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-cwi-green transition-all hover:bg-cwi-green/5">

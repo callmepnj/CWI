@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { CalendarDays, FileText, MapPin, ShieldCheck } from "lucide-react";
 import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSourceChip, CwiStatusBadge, CwiSubmitCTA, CwiTimeline } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { NewsArticleSchema } from "@/components/seo/NewsArticleSchema";
 import { UnansweredArticleActions } from "@/components/UnansweredArticleActions";
 import { UnansweredComments } from "@/components/UnansweredComments";
 import { getLiveUpdates } from "@/data/live-newsroom";
@@ -40,6 +41,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     publishedTime: lastUpdated,
     modifiedTime: lastUpdated,
     keywords: file.keywords,
+    section: file.category,
+    tags: file.keywords,
     image: { url: file.ogImage || "/opengraph-image", alt: file.altText }
   });
 }
@@ -52,11 +55,24 @@ export default async function UnansweredFilePage({ params }: Props) {
   const relatedUpdates = getLiveUpdates(3);
   const faqs = getFileFaqs(file);
   const relatedFiles = unansweredFiles.filter((item) => item.slug !== file.slug && item.category === file.category).slice(0, 3);
-  const jsonLd = [buildJsonLd(file), buildFaqJsonLd(faqs)];
+  const faqJsonLd = buildFaqJsonLd(faqs);
+  const articleUrl = absoluteUrl(`${pagePath}/${file.slug}`);
+  const imageUrl = file.ogImage?.startsWith("http") ? file.ogImage : absoluteUrl(file.ogImage || "/opengraph-image");
 
   return (
     <>
-      {jsonLd.map((item) => <script key={item["@type"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }} />)}
+      <NewsArticleSchema
+        headline={file.title}
+        datePublished={lastUpdated}
+        dateModified={lastUpdated}
+        description={file.summary}
+        url={articleUrl}
+        imageUrl={imageUrl}
+        authorName={site.editorialDesk}
+        sectionName="India Unanswered Files"
+        sectionUrl={absoluteUrl(pagePath)}
+      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <PageBackgroundGesture intensity="subtle">
         <CwiPageShell>
         <div className="mb-5 flex flex-wrap gap-2 text-xs font-black uppercase tracking-[0.12em] text-cwi-brown/70">
@@ -233,24 +249,6 @@ function MiniFact({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
-
-function buildJsonLd(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: file.title,
-    description: file.summary,
-    url: absoluteUrl(`${pagePath}/${file.slug}`),
-    datePublished: lastUpdated,
-    dateModified: lastUpdated,
-    articleSection: file.category,
-    author: { "@type": "Organization", name: site.editorialDesk, url: absoluteUrl("/editorial-policy") },
-    publisher: { "@type": "NewsMediaOrganization", "@id": `${site.url}/#organization`, name: site.name, url: site.url },
-    image: absoluteUrl(file.ogImage || "/opengraph-image"),
-    mainEntityOfPage: absoluteUrl(`${pagePath}/${file.slug}`)
-  };
-}
-
 
 function buildFaqJsonLd(faqs: ReturnType<typeof getFileFaqs>) {
   return {

@@ -23,16 +23,18 @@ const staticRoutes = [
 
 const postsSource = readFileSync(join(root, "data", "posts.ts"), "utf8");
 const removedPostSlugs = new Set(["cwi-priority-public-interest-update"]);
-const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]).filter((slug) => !removedPostSlugs.has(slug));
+const postSlugs = Array.from(postsSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]).filter((slug) => slug?.trim() && !removedPostSlugs.has(slug));
 const unansweredFilesSource = readFileSync(join(root, "data", "unanswered-files.ts"), "utf8");
-const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]);
+const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]).filter((slug) => slug?.trim());
 const liveNewsroomSource = readFileSync(join(root, "data", "live-newsroom.ts"), "utf8");
 const juneLiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-june-2026.ts"), "utf8");
+const june14LiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-june-14-2026.ts"), "utf8");
 const liveNewsroomBlock = liveNewsroomSource.match(/(?:const baseLiveNewsroomItems|export const liveNewsroomItems):[\s\S]*?export const publicAdvisories/)?.[0] ?? "";
 const liveNewsroomSlugs = Array.from(new Set([
   ...Array.from(liveNewsroomBlock.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
-  ...Array.from(juneLiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1])
-]));
+  ...Array.from(juneLiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
+  ...Array.from(june14LiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1])
+])).filter((slug) => slug?.trim());
 
 const routes = Array.from(new Set([
   ...staticRoutes,
@@ -49,7 +51,7 @@ ${routes
     const isLive = route === "/live-newsroom" || route.startsWith("/live-newsroom/");
     const isArticle = route.startsWith("/live-newsroom/") || route.startsWith("/india-unanswered-files/") || route.startsWith("/archive/");
     const changefreq = isHome || isLive ? "daily" : isArticle ? "monthly" : "weekly";
-    const priority = isHome ? "1.0" : route === "/live-newsroom" ? "0.95" : ["/india-unanswered-files", "/archive", "/submit", "/support"].includes(route) ? "0.85" : isArticle ? "0.75" : "0.7";
+    const priority = isHome ? "1.0" : route === "/live-newsroom" ? "0.9" : ["/india-unanswered-files", "/archive", "/submit", "/support"].includes(route) ? "0.85" : isArticle ? "0.75" : "0.7";
     return `  <url>
     <loc>${baseUrl}${route}</loc>
     <lastmod>${lastModified}</lastmod>
@@ -63,11 +65,10 @@ ${routes
 
 const robots = `User-agent: *
 Allow: /
-Disallow: /admin
 Disallow: /admin/
-Disallow: /api/admin
-Disallow: /drafts
-Disallow: /test
+Disallow: /api/
+Disallow: /drafts/
+Disallow: /test/
 Disallow: /archive/cwi-priority-public-interest-update
 
 Sitemap: ${baseUrl}/sitemap.xml

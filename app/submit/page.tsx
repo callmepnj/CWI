@@ -1,6 +1,7 @@
 import { SubmitForm } from "@/components/SubmitForm";
 import { CwiMasthead, CwiPageShell, CwiTrustStrip } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { WebPageSchema } from "@/components/seo/WebPageSchema";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -11,7 +12,13 @@ export const metadata = createMetadata({
 
 export default function SubmitPage() {
   return (
-    <PageBackgroundGesture intensity="subtle">
+    <>
+      <WebPageSchema
+        name="Submit Source or Correction"
+        description="Send CWI a source link, correction, creator credit request, public issue, or missing context for review."
+        url="https://cockroachwatchindia.online/submit"
+      />
+      <PageBackgroundGesture intensity="subtle">
       <CwiPageShell>
       <CwiMasthead
         label="CWI intake desk"
@@ -27,6 +34,7 @@ export default function SubmitPage() {
         <SubmitForm />
       </div>
       </CwiPageShell>
-    </PageBackgroundGesture>
+      </PageBackgroundGesture>
+    </>
   );
 }

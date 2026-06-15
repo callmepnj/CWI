@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { WebPageSchema } from "@/components/seo/WebPageSchema";
 import { Card, CardLabel } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -24,7 +25,13 @@ const terms = [
 
 export default function TermsPage() {
   return (
-    <PageBackgroundGesture intensity="subtle">
+    <>
+      <WebPageSchema
+        name="Terms"
+        description="CWI terms covering informational, satire, commentary, submissions, takedown/corrections, voluntary support, and independence."
+        url="https://cockroachwatchindia.online/terms"
+      />
+      <PageBackgroundGesture intensity="subtle">
       <CwiPageShell>
       <CwiMasthead
         label="Terms"
@@ -51,5 +58,6 @@ export default function TermsPage() {
       </section>
     </CwiPageShell>
       </PageBackgroundGesture>
-    );
-  }
+    </>
+  );
+}

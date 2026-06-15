@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CwiMasthead, CwiPageShell, CwiSectionHeader } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { WebPageSchema } from "@/components/seo/WebPageSchema";
 import { Card, CardLabel } from "@/components/ui/card";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -24,7 +25,13 @@ const sections = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <PageBackgroundGesture intensity="subtle">
+    <>
+      <WebPageSchema
+        name="Privacy Policy"
+        description="CWI privacy policy covering submit form data, supporter notes, cookies or analytics, sensitive data, and removal contacts."
+        url="https://cockroachwatchindia.online/privacy-policy"
+      />
+      <PageBackgroundGesture intensity="subtle">
       <CwiPageShell>
       <CwiMasthead
         label="Privacy"
@@ -51,5 +58,6 @@ export default function PrivacyPolicyPage() {
       </section>
     </CwiPageShell>
       </PageBackgroundGesture>
-    );
-  }
+    </>
+  );
+}

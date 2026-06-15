@@ -3,6 +3,7 @@ import { Mail } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 import { CwiButtonLink, CwiMasthead, CwiPageShell, CwiSectionHeader } from "@/components/CwiDesignSystem";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { WebPageSchema } from "@/components/seo/WebPageSchema";
 import { SocialLinks } from "@/components/SocialLinks";
 import { Card, CardLabel } from "@/components/ui/card";
 import { site } from "@/lib/site";
@@ -24,7 +25,14 @@ const contactCards = [
 
 export default function ContactPage() {
   return (
-    <PageBackgroundGesture intensity="moderate">
+    <>
+      <WebPageSchema
+        type="ContactPage"
+        name="Contact Cockroach Watch India"
+        description="Contact CWI for email, source/correction, creator credit, takedown, support questions, and social links."
+        url="https://cockroachwatchindia.online/contact"
+      />
+      <PageBackgroundGesture intensity="moderate">
       <CwiPageShell>
       <CwiMasthead
         label="Contact CWI"
@@ -59,5 +67,6 @@ export default function ContactPage() {
       </section>
     </CwiPageShell>
       </PageBackgroundGesture>
-    );
-  }
+    </>
+  );
+}

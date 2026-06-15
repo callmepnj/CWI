@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, FileArchive, Megaphone, ShieldCheck } from "lucide-react";
 import { CwiGestureBar, CwiJoinButton, CwiTicker, SupportDeclarationForm } from "@/components/CwiCivicLiveKit";
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
+import { WebPageSchema } from "@/components/seo/WebPageSchema";
 
 export const metadata: Metadata = {
   title: "Support CWI - Cockroach Watch India | Independent Civic Watch",
@@ -63,7 +64,13 @@ const supportReasons = [
 
 export default function SupportPage() {
   return (
-    <PageBackgroundGesture intensity="strong">
+    <>
+      <WebPageSchema
+        name="Support CWI"
+        description="Support Cockroach Watch India - an independent civic watch platform documenting India's unanswered files."
+        url="https://cockroachwatchindia.online/support"
+      />
+      <PageBackgroundGesture intensity="strong">
       <div className="cwi-dark-page min-h-screen">
       <section className="flex min-h-screen items-center px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl">
@@ -143,6 +150,7 @@ export default function SupportPage() {
       </section>
     </div>
       </PageBackgroundGesture>
+    </>
     );
   }
 

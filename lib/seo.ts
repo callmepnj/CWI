@@ -16,6 +16,8 @@ type SeoInput = {
   type?: "website" | "article";
   publishedTime?: string;
   modifiedTime?: string;
+  section?: string;
+  tags?: string[];
   image?: SeoImage;
   index?: boolean;
 };
@@ -52,15 +54,19 @@ export function createMetadata({
   title,
   description,
   path = "/",
+  keywords = [],
   type = "website",
   publishedTime,
   modifiedTime,
+  section,
+  tags = [],
   image,
   index = true
 }: SeoInput): Metadata {
   const url = absoluteUrl(path);
   const seoTitle = cleanSeoTitle(title);
   const socialImage = normalizeSeoImage(image ?? ogImage);
+  const articleTags = Array.from(new Set(tags.length > 0 ? tags : keywords)).filter(Boolean).slice(0, 12);
 
   return {
     title: seoTitle,
@@ -88,7 +94,9 @@ export function createMetadata({
       locale: "en_IN",
       type,
       ...(publishedTime ? { publishedTime } : {}),
-      ...(modifiedTime ? { modifiedTime } : {})
+      ...(modifiedTime ? { modifiedTime } : {}),
+      ...(type === "article" && section ? { section } : {}),
+      ...(type === "article" && articleTags.length > 0 ? { tags: articleTags } : {})
     },
     twitter: {
       card: "summary_large_image",
@@ -97,7 +105,17 @@ export function createMetadata({
       images: [socialImage.url],
       creator: "@CWatchIndia",
       site: "@CWatchIndia"
-    }
+    },
+    ...(type === "article"
+      ? {
+          other: {
+            ...(articleTags.length > 0 ? { news_keywords: articleTags.join(", ") } : {}),
+            ...(publishedTime ? { "article:published_time": publishedTime } : {}),
+            ...(modifiedTime ? { "article:modified_time": modifiedTime } : {}),
+            ...(section ? { "article:section": section } : {})
+          }
+        }
+      : {})
   };
 }
 

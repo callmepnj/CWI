@@ -52,23 +52,6 @@ export const metadata: Metadata = {
   }
 };
 
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "NewsMediaOrganization",
-  "@id": `${site.url}/#organization`,
-  name: site.name,
-  alternateName: site.shortName,
-  url: site.url,
-  email: site.email,
-  description: site.description,
-  logo: `${site.url}/brand/logo.png`,
-  foundingDate: "2026",
-  publishingPrinciples: `${site.url}/editorial-policy`,
-  correctionsPolicy: `${site.url}/corrections`,
-  ethicsPolicy: `${site.url}/editorial-policy`,
-  sameAs: [site.x, site.instagram, site.youtube, site.telegram, site.reddit, site.facebook, site.bluesky]
-};
-
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -77,7 +60,7 @@ const websiteJsonLd = {
   alternateName: site.shortName,
   url: site.url,
   description: site.description,
-  publisher: { "@id": `${site.url}/#organization` },
+  publisher: { "@type": "NewsMediaOrganization", name: site.name, url: site.url },
   potentialAction: {
     "@type": "SearchAction",
     target: `${site.url}/live-newsroom?search={search_term_string}`,
@@ -93,10 +76,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var stored=localStorage.getItem('cwi-theme');var system=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var theme=stored||'light';document.documentElement.classList.toggle('dark',theme==='dark');document.documentElement.dataset.theme=theme;}catch(e){document.documentElement.classList.remove('dark');document.documentElement.dataset.theme='light';}})();`
           }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         <script
           type="application/ld+json"
