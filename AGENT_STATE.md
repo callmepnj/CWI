@@ -518,9 +518,14 @@ Next steps:
 ### Current production check
 - `vercel.json`: not present in repo.
 - `next.config`: no redirect rules; only `poweredByHeader: false`.
-- Current live apex response: `https://cockroachwatchindia.online` returns `307 Location: https://www.cockroachwatchindia.online/`.
-- Current live www response: `https://www.cockroachwatchindia.online` returns `308 Location: https://cockroachwatchindia.online/`.
-- Result: production still has an apex/www redirect loop. This must be fixed in Vercel dashboard by setting `cockroachwatchindia.online` as the primary domain before GSC/Google News submission.
+- 2026-06-16 live check after Vercel domain update:
+  - `https://cockroachwatchindia.online` returns `200`.
+  - `https://www.cockroachwatchindia.online` returns `308 Location: https://cockroachwatchindia.online/`.
+  - `https://cockroachwatchindia.online/sitemap.xml` returns `200`.
+  - `https://cockroachwatchindia.online/robots.txt` returns `200`.
+  - Homepage canonical points to `https://cockroachwatchindia.online`.
+  - Sitemap `<loc>` entries use non-www `https://cockroachwatchindia.online`.
+- Result: apex/www redirect loop is resolved. Vercel still shows "DNS Change Recommended", but the live routing state is now SEO-safe for Search Console and Google News submission.
 
 ### Pending (no code required)
 - Google News review: 2–8 weeks after submission.
