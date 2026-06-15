@@ -5,7 +5,6 @@ import { getLeadStory, getLiveUpdates, getTodaysTopItems, getWhatChangedToday, t
 import { posts } from "@/data/posts";
 import { unansweredFiles } from "@/data/unanswered-files";
 import { createMetadata } from "@/lib/seo";
-import { site } from "@/lib/site";
 
 const description = "Cockroach Watch India is an independent civic watch, satire, commentary, Live Newsroom, and public archive platform tracking public issues, viral claims, source trails, corrections, youth voice, and India Unanswered Files.";
 
@@ -15,29 +14,6 @@ export const metadata = createMetadata({
   path: "/",
   keywords: ["Cockroach Watch India", "CWI Live Newsroom", "India Unanswered Files", "Submit source correction", "CWI Archive"]
 });
-
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: site.name,
-  alternateName: site.shortName,
-  url: site.url,
-  email: site.email,
-  sameAs: [site.x, site.instagram, site.youtube, site.reddit, site.facebook, site.bluesky]
-};
-
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: site.name,
-  url: site.url,
-  description,
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${site.url}/live-newsroom?search={search_term_string}`,
-    "query-input": "required name=search_term_string"
-  }
-};
 
 export default function HomePage() {
   const todaysTop = getTodaysTopItems(3);
@@ -50,8 +26,6 @@ export default function HomePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <PageBackgroundGesture>
         <CwiPageShell>
         <CwiMasthead

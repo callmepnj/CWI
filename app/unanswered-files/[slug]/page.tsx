@@ -77,6 +77,8 @@ export default async function UnansweredFilePage({ params }: Props) {
           meta={[file.status, file.category, `${file.sourceCount} sources`, `Last updated ${formatDate(lastUpdated)}`]}
         />
 
+        <p className="mt-5 text-sm font-bold text-cwi-ink/62">By {site.editorialDesk}</p>
+
         <article className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-8">
             <section className="overflow-hidden rounded-lg border border-cwi-brown/18 bg-white/78 shadow-[0_16px_44px_rgba(29,18,10,0.08)]">
@@ -242,8 +244,8 @@ function buildJsonLd(file: NonNullable<ReturnType<typeof getUnansweredFile>>) {
     datePublished: lastUpdated,
     dateModified: lastUpdated,
     articleSection: file.category,
-    author: { "@type": "Organization", name: site.name },
-    publisher: { "@type": "NewsMediaOrganization", name: site.name, url: site.url },
+    author: { "@type": "Organization", name: site.editorialDesk, url: absoluteUrl("/editorial-policy") },
+    publisher: { "@type": "NewsMediaOrganization", "@id": `${site.url}/#organization`, name: site.name, url: site.url },
     image: absoluteUrl(file.ogImage || "/opengraph-image"),
     mainEntityOfPage: absoluteUrl(`${pagePath}/${file.slug}`)
   };

@@ -52,7 +52,6 @@ export function createMetadata({
   title,
   description,
   path = "/",
-  keywords = [],
   type = "website",
   publishedTime,
   modifiedTime,
@@ -60,13 +59,12 @@ export function createMetadata({
   index = true
 }: SeoInput): Metadata {
   const url = absoluteUrl(path);
-  const metadataKeywords = Array.from(new Set(keywords.length > 0 ? keywords : site.keywords));
+  const seoTitle = cleanSeoTitle(title);
   const socialImage = normalizeSeoImage(image ?? ogImage);
 
   return {
-    title,
+    title: seoTitle,
     description,
-    keywords: metadataKeywords,
     alternates: {
       canonical: url
     },
@@ -82,7 +80,7 @@ export function createMetadata({
       }
     },
     openGraph: {
-      title,
+      title: seoTitle,
       description,
       url,
       siteName: site.name,
@@ -94,13 +92,30 @@ export function createMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: seoTitle,
       description,
       images: [socialImage.url],
       creator: "@CWatchIndia",
       site: "@CWatchIndia"
     }
   };
+}
+
+export function cleanSeoTitle(title: string, maxLength = 60) {
+  const normalized = title.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+
+  const withoutSuffix = normalized
+    .replace(/\s+-\s+CWI\s+(Live Newsroom|Archive)$/i, "")
+    .replace(/\s+-\s+Cockroach Watch India$/i, "")
+    .replace(/\s+\|\s+Cockroach Watch India$/i, "");
+
+  const candidate = withoutSuffix.length <= maxLength ? withoutSuffix : withoutSuffix;
+  if (candidate.length <= maxLength) return candidate;
+
+  const clipped = candidate.slice(0, maxLength - 1);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${(lastSpace > 42 ? clipped.slice(0, lastSpace) : clipped).trim()}…`;
 }
 
 function normalizeSeoImage(image: SeoImage) {

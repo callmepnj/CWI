@@ -59,9 +59,10 @@ function jsonLdForItem(item: DetailItem) {
     image,
     datePublished: item.publishedAt ?? item.createdAt,
     dateModified: item.lastUpdatedAt ?? item.updatedAt,
-    author: { "@type": "Organization", name: site.name, url: site.url },
+    author: { "@type": "Organization", name: site.editorialDesk, url: absoluteUrl("/editorial-policy") },
     publisher: {
-      "@type": "Organization",
+      "@type": "NewsMediaOrganization",
+      "@id": `${site.url}/#organization`,
       name: site.name,
       logo: { "@type": "ImageObject", url: absoluteUrl("/brand/logo.png") }
     },
@@ -133,6 +134,8 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
             <h1 className="mb-4 font-display text-3xl font-black leading-tight text-cwi-ink sm:text-4xl lg:text-5xl">{item.title}</h1>
             <p className="mb-6 max-w-2xl text-xl leading-8 text-cwi-ink/70">{item.summary}</p>
             <div className="flex flex-col gap-4 border-b-2 border-cwi-green/10 pb-6 text-sm text-cwi-ink/60 sm:flex-row">
+              <span>By {site.editorialDesk}</span>
+              <span>/</span>
               <span>Published {new Date(item.publishedAt || item.createdAt).toLocaleDateString("en-IN")}</span>
               <span>/</span>
               <span>Updated {formatDistanceToNow(new Date(item.lastUpdatedAt), { addSuffix: true })}</span>

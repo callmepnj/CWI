@@ -54,23 +54,30 @@ export const metadata: Metadata = {
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "NewsMediaOrganization",
+  "@id": `${site.url}/#organization`,
   name: site.name,
   alternateName: site.shortName,
   url: site.url,
   email: site.email,
-  description: "Founder-led civic watch, satire, and commentary platform.",
+  description: site.description,
   logo: `${site.url}/brand/logo.png`,
+  foundingDate: "2026",
+  publishingPrinciples: `${site.url}/editorial-policy`,
+  correctionsPolicy: `${site.url}/corrections`,
+  ethicsPolicy: `${site.url}/editorial-policy`,
   sameAs: [site.x, site.instagram, site.youtube, site.telegram, site.reddit, site.facebook, site.bluesky]
 };
 
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${site.url}/#website`,
   name: site.name,
   alternateName: site.shortName,
   url: site.url,
   description: site.description,
+  publisher: { "@id": `${site.url}/#organization` },
   potentialAction: {
     "@type": "SearchAction",
     target: `${site.url}/live-newsroom?search={search_term_string}`,

@@ -6,6 +6,7 @@
   founderName: "PNJ",
   founderHandle: "callmepnj",
   editorialLead: "PNJ / callmepnj",
+  editorialDesk: "CWI Editorial Desk",
   supportUpiId: process.env.NEXT_PUBLIC_CWI_UPI_ID ?? "",
   supportUpiName: process.env.NEXT_PUBLIC_CWI_UPI_NAME ?? "Cockroach Watch India",
   supportQrPath: process.env.NEXT_PUBLIC_CWI_UPI_QR_PATH ?? "",

@@ -470,3 +470,13 @@ Next steps:
 - Updated Live Newsroom listing cards to show fixed-size thumbnails, lead cards/home lead story to prefer `heroImage`, article detail pages to use `heroImage` and related-card thumbnails, and article metadata/JSON-LD to prefer mapped `ogImage`.
 - Updated `/live-newsroom` Open Graph and Twitter image to use `https://cockroachwatchindia.online/images/cwi/newsroom/og/cwi-live-newsroom-fallback.jpg`.
 - Verification: direct `/images/cwi` path audit passed; `npm run lint` passed; `npm run build` passed and generated 125 sitemap URLs / 212 static pages. No old Vercel or localhost production image URLs were introduced.
+
+2026-06-15 SEO technical cleanup:
+- User provided an SEO audit score of 62/100 and asked to fix critical technical SEO issues.
+- Canonical policy remains the official non-www domain `https://cockroachwatchindia.online`. Fixed `middleware.ts` so `www.cockroachwatchindia.online` and the old Vercel preview host redirect to the non-www apex; removed the accidental self-redirect risk for the official host.
+- `lib/seo.ts` now shortens emitted title tags to a 60-character target and no longer emits meta keywords. Page/data keyword arrays can still exist internally but are not rendered as `<meta name="keywords">`.
+- Enriched global root JSON-LD in `app/layout.tsx`: Organization is now `NewsMediaOrganization` with stable `@id`, publishing principles, corrections policy, ethics policy, logo, sameAs links, and a WebSite schema linked to the publisher.
+- Removed duplicate homepage Organization/WebSite schema from `app/page.tsx`; root layout now owns the canonical schema graph.
+- Added `site.editorialDesk = "CWI Editorial Desk"` and normalized visible article bylines on Live Newsroom detail pages, Archive article pages, and India Unanswered Files detail pages.
+- Updated article JSON-LD author/publisher entities on Live Newsroom, Archive, and Unanswered Files detail templates to use `CWI Editorial Desk` and the `NewsMediaOrganization` publisher `@id`.
+- Verification: `npm run lint` passed; `npm run build` passed and regenerated 125 sitemap URLs / 212 static pages. Generated HTML spot checks for home, Live Newsroom article, Archive article, and India Unanswered Files article showed JSON-LD present, no `www.cockroachwatchindia.online`, no `name="keywords"`, and non-www canonical/domain output. Article spot checks showed `CWI Editorial Desk` byline present.

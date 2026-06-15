@@ -91,6 +91,8 @@ export default async function ArchiveArticlePage({ params }: Props) {
           meta={[post.verificationStatus, post.category, `${post.sources.length} sources`, `Updated ${formatDate(post.updatedAt)}`]}
         />
 
+        <p className="mt-5 text-sm font-bold text-cwi-ink/62">By {site.editorialDesk}</p>
+
         <article className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-8">
             <section className="overflow-hidden rounded-lg border border-cwi-brown/18 bg-white/78 shadow-[0_16px_44px_rgba(29,18,10,0.08)]">
@@ -210,8 +212,8 @@ function buildArticleJsonLd(post: (typeof posts)[number]) {
     datePublished: `${post.publishedAt}T00:00:00+05:30`,
     dateModified: `${post.updatedAt}T00:00:00+05:30`,
     articleSection: post.category,
-    author: { "@type": "Organization", name: site.name },
-    publisher: { "@type": "NewsMediaOrganization", name: site.name, url: site.url },
+    author: { "@type": "Organization", name: site.editorialDesk, url: absoluteUrl("/editorial-policy") },
+    publisher: { "@type": "NewsMediaOrganization", "@id": `${site.url}/#organization`, name: site.name, url: site.url },
     image: absoluteUrl("/opengraph-image"),
     mainEntityOfPage: absoluteUrl(`/archive/${post.slug}`)
   };
