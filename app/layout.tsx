@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { FloatingJoinButton } from "@/components/FloatingJoinButton";
 import { MobileNav } from "@/components/MobileNav";
 import { Navbar } from "@/components/Navbar";
+import { WebSiteSchema } from "@/components/seo/WebSiteSchema";
 import { createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -52,22 +53,6 @@ export const metadata: Metadata = {
   }
 };
 
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": `${site.url}/#website`,
-  name: site.name,
-  alternateName: site.shortName,
-  url: site.url,
-  description: site.description,
-  publisher: { "@type": "NewsMediaOrganization", name: site.name, url: site.url },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${site.url}/live-newsroom?search={search_term_string}`,
-    "query-input": "required name=search_term_string"
-  }
-};
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-IN" suppressHydrationWarning className={`${display.variable} ${sans.variable} ${mono.variable}`}>
@@ -77,10 +62,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             __html: `(function(){try{var stored=localStorage.getItem('cwi-theme');var system=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';var theme=stored||'light';document.documentElement.classList.toggle('dark',theme==='dark');document.documentElement.dataset.theme=theme;}catch(e){document.documentElement.classList.remove('dark');document.documentElement.dataset.theme='light';}})();`
           }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
+        <WebSiteSchema />
         <DisclaimerBanner />
         <Navbar />
         <main>{children}</main>

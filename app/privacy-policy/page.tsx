@@ -9,8 +9,7 @@ import { site } from "@/lib/site";
 export const metadata = createMetadata({
   title: "Privacy Policy - Cockroach Watch India",
   description: "CWI privacy policy covering submit form data, supporter notes, cookies or analytics, sensitive data, and removal contacts.",
-  path: "/privacy-policy",
-  keywords: ["Cockroach Watch India privacy", "CWI privacy policy", "CWI submissions privacy"]
+  path: "/privacy-policy"
 });
 
 const sections = [

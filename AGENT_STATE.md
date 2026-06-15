@@ -501,3 +501,66 @@ Next steps:
 - `public/robots.txt` remains index-friendly: blocks only `/admin/`, `/api/`, `/drafts/`, `/test/`, and removed draft archive slug; public article/newsroom routes are not blocked.
 - Verification: `npm run typecheck`, `npm run lint`, and `npm run build` passed. Build generated 130 sitemap URLs / 212 static pages. Generated sitemap check found no `www`, no `http`, no empty lastmod, homepage priority `1.0`, and live newsroom priority `0.9`. Generated HTML checks found direct JSON-LD scripts: homepage has `NewsMediaOrganization`; Live Newsroom, Archive, and India Unanswered Files sample articles have `NewsArticle` + `BreadcrumbList`, populated headline, ISO offset `datePublished`, no `undefined`, no `null`, and no `[object Object]` inside JSON-LD. Article pages also contain `og:type=article`, `news_keywords`, `article:published_time`, `article:modified_time`, and `article:section`.
 - Local production server spot checks on port 3017 returned 200 for `/live-newsroom/cjp-june-13-ultimatum-expired-national-mobilisation-june-14-2026`, `/archive/what-is-cockroach-janta-party`, `/india-unanswered-files/manipur-violence`, `/brand/logo.png`, `/sitemap.xml`, and `/robots.txt`; temporary server was stopped afterward.
+
+## Phase 3 — Production fix + submissions (pending external action, documented 2026-06-16)
+
+### Completed
+- [ ] Vercel apex/www redirect loop resolved — apex set as primary domain
+- [ ] www → apex 301 confirmed via curl
+- [ ] Canonical tags confirmed pointing to non-www apex
+- [ ] Sitemap submitted to Google Search Console (~130 URLs)
+- [ ] Priority pages submitted for indexing in GSC
+- [ ] GSC Coverage report checked — no blocking errors
+- [ ] Google News Publisher Center submission initiated
+- [ ] cockroachwatchindia.in purchased and redirecting 301 → .online
+- [ ] Backlink outreach sent to [journalist names]
+
+### Current production check
+- `vercel.json`: not present in repo.
+- `next.config`: no redirect rules; only `poweredByHeader: false`.
+- Current live apex response: `https://cockroachwatchindia.online` returns `307 Location: https://www.cockroachwatchindia.online/`.
+- Current live www response: `https://www.cockroachwatchindia.online` returns `308 Location: https://cockroachwatchindia.online/`.
+- Result: production still has an apex/www redirect loop. This must be fixed in Vercel dashboard by setting `cockroachwatchindia.online` as the primary domain before GSC/Google News submission.
+
+### Pending (no code required)
+- Google News review: 2–8 weeks after submission.
+- GSC indexing: 3–14 days for new pages after indexing requests.
+- .in DNS propagation: up to 48 hours after purchase/DNS setup.
+- Backlink responses.
+
+### SEO baseline (record before outreach begins)
+- GSC impressions: [value]
+- GSC clicks: [value]
+- GSC average position: [value]
+- Indexed pages: [value]
+
+## Phase 2 deployment fix — www/source cleanup + generated HTML verification (completed 2026-06-16)
+
+### Completed
+- Checked source for hardcoded `www.cockroachwatchindia.online` / `www.cockroachwatchindia` across `*.tsx`, `*.ts`, `*.js`, `*.jsx`, `*.json`, and env files. Result: 0 source matches, so no www URL replacements were needed.
+- Confirmed `.env.local` and `.env.example` have no `SITE_URL`, `BASE_URL`, or `www.cockroachwatchindia` values requiring changes.
+- Confirmed there is no `vercel.json`; `next.config` has no redirects and only `poweredByHeader: false`.
+- Confirmed `app/layout.tsx` metadata uses `metadataBase: new URL(site.url)` and `site.url` is `https://cockroachwatchindia.online`.
+- Added `components/seo/WebSiteSchema.tsx` and replaced the inline WebSite JSON-LD object in `app/layout.tsx` with `<WebSiteSchema />` for explicit schema component wiring.
+- Confirmed homepage JSX renders `<OrganizationSchema />` from `app/page.tsx`; layout renders `<WebSiteSchema />`; schema components emit native lowercase `<script type="application/ld+json">`, not `next/script`.
+- Removed unused `keywords` props from non-article metadata calls in `app/page.tsx`, `/about`, `/contact`, `/corrections`, `/editorial-policy`, `/privacy-policy`, `/terms`, `/archive`, and `/unanswered-files`. Article pages still pass `keywords`/`tags` only for Google News `news_keywords` generation.
+- Removed now-unused `unansweredFilesKeywords` import from `app/unanswered-files/page.tsx`.
+
+### Verification
+- `rg "www\.cockroachwatchindia" --glob "*.tsx" --glob "*.ts" --glob "*.js" --glob "*.json" .` returned 0 matches.
+- `npm run typecheck`, `npm run lint`, and `npm run build` passed.
+- Build regenerated `public/sitemap.xml` with 130 URLs / 212 static pages.
+- Generated homepage `.next/server/app/index.html` checks:
+  - `application/ld+json` count: 4.
+  - `keywords` matches: 0.
+  - canonical: `https://cockroachwatchindia.online`.
+  - `www.cockroachwatchindia` matches: false.
+- Generated Live Newsroom article HTML checks:
+  - `NewsArticle`: true.
+  - `BreadcrumbList`: true.
+  - `news_keywords`: true.
+  - `article:section`: true.
+  - `www.cockroachwatchindia` matches: false.
+
+### Production note
+- Live production currently serves `www.cockroachwatchindia.online` as 200 and redirects apex to www. Source code and generated HTML are non-www canonical. Vercel domain primary should still be set to apex if the desired canonical remains `https://cockroachwatchindia.online`.

@@ -12,8 +12,7 @@ const description = "Cockroach Watch India is an independent civic watch, satire
 export const metadata = createMetadata({
   title: "Cockroach Watch India - CWI Live Newsroom",
   description,
-  path: "/",
-  keywords: ["Cockroach Watch India", "CWI Live Newsroom", "India Unanswered Files", "Submit source correction", "CWI Archive"]
+  path: "/"
 });
 
 export default function HomePage() {

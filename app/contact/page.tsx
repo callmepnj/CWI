@@ -12,8 +12,7 @@ import { createMetadata } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "Contact Cockroach Watch India - CWI",
   description: "Contact CWI for email, source/correction, creator credit, takedown, support questions, and social links.",
-  path: "/contact",
-  keywords: ["Contact CWI", "Cockroach Watch India contact", "CWI correction request"]
+  path: "/contact"
 });
 
 const contactCards = [

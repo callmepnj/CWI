@@ -9,8 +9,7 @@ import { createMetadata } from "@/lib/seo";
 export const metadata = createMetadata({
   title: "Corrections & Clarifications - Cockroach Watch India",
   description: "CWI corrections and clarifications. If the record changes, the page should change too.",
-  path: "/corrections",
-  keywords: ["CWI corrections", "Cockroach Watch India corrections", "correction log"]
+  path: "/corrections"
 });
 
 export default function CorrectionsPage() {

@@ -8,8 +8,7 @@ import { site } from "@/lib/site";
 export const metadata = createMetadata({
   title: "About Cockroach Watch India - CWI",
   description: "About Cockroach Watch India, an independent civic watch, satire, commentary, Live Newsroom, and public archive platform.",
-  path: "/about",
-  keywords: ["About Cockroach Watch India", "CWI Live Newsroom", "CWI independent civic watch"]
+  path: "/about"
 });
 
 const whatCwiIs = [

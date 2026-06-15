@@ -11,8 +11,7 @@ const pageDescription = "Older explainers, context posts, and preserved CWI reco
 export const metadata = createMetadata({
   title: "CWI Archive - Older Explainers and Context Posts",
   description: pageDescription,
-  path: "/archive",
-  keywords: ["CWI Archive", "Cockroach Watch India archive", "older CWI explainers", "civic context posts"]
+  path: "/archive"
 });
 
 const archiveJsonLd = {

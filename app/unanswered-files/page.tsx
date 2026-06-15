@@ -1,7 +1,7 @@
 import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { CwiButtonLink, CwiDossierCard, CwiMasthead, CwiPageShell, CwiSectionHeader, CwiSubmitCTA, CwiTrustStrip } from "@/components/CwiDesignSystem";
 import { UnansweredFilesGrid } from "@/components/UnansweredFilesGrid";
-import { unansweredFiles, unansweredFilesKeywords } from "@/data/unanswered-files";
+import { unansweredFiles } from "@/data/unanswered-files";
 import { getLiveUpdates } from "@/data/live-newsroom";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -12,8 +12,7 @@ const pageDescription = "Public issues where records, responsibility, or officia
 export const metadata = createMetadata({
   title: "India Unanswered Files - Cockroach Watch India",
   description: pageDescription,
-  path: pagePath,
-  keywords: [...unansweredFilesKeywords, "India Unanswered Files", "CWI dossier files"]
+  path: pagePath
 });
 
 const pageJsonLd = {

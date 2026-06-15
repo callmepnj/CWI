@@ -9,8 +9,7 @@ import { site } from "@/lib/site";
 export const metadata = createMetadata({
   title: "Editorial Policy - Cockroach Watch India",
   description: "CWI editorial policy for independence, source rules, verification labels, developing claims, corrections, creator credit, safety, and support independence.",
-  path: "/editorial-policy",
-  keywords: ["CWI editorial policy", "Cockroach Watch India verification", "CWI corrections", "creator credit"]
+  path: "/editorial-policy"
 });
 
 const labels = [
