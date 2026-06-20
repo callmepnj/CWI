@@ -29,12 +29,14 @@ const unansweredFileSlugs = Array.from(unansweredFilesSource.matchAll(/slug:\s*"
 const liveNewsroomSource = readFileSync(join(root, "data", "live-newsroom.ts"), "utf8");
 const juneLiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-june-2026.ts"), "utf8");
 const june14LiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-june-14-2026.ts"), "utf8");
+const june15To20LiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-june-15-20-2026.ts"), "utf8");
 const bharatTiwariLiveNewsroomSource = readFileSync(join(root, "data", "live-newsroom-bharat-tiwari.ts"), "utf8");
 const liveNewsroomBlock = liveNewsroomSource.match(/(?:const baseLiveNewsroomItems|export const liveNewsroomItems):[\s\S]*?export const publicAdvisories/)?.[0] ?? "";
 const liveNewsroomSlugs = Array.from(new Set([
   ...Array.from(liveNewsroomBlock.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
   ...Array.from(juneLiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
   ...Array.from(june14LiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
+  ...Array.from(june15To20LiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1]),
   ...Array.from(bharatTiwariLiveNewsroomSource.matchAll(/slug:\s*"([^"]+)"/g), (match) => match[1])
 ])).filter((slug) => slug?.trim());
 

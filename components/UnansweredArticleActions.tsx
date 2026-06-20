@@ -36,6 +36,7 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
   const [pendingAction, setPendingAction] = useState("");
   const url = `${site.url}${path}`;
   const shareText = `Read this CWI investigation: ${title} - ${summary}`;
+  const hasPublicMetrics = counts.views + counts.shares + counts.likes + counts.bookmarks > 0;
 
   const shareLinks = useMemo(
     () => [
@@ -182,12 +183,18 @@ export function UnansweredArticleActions({ slug, title, summary, path, compact =
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
-        <Metric label="Views" value={counts.views} icon={<Eye className="h-4 w-4" />} />
-        <Metric label="Shares" value={counts.shares} icon={<Share2 className="h-4 w-4" />} />
-        <Metric label="Likes" value={counts.likes} icon={<Heart className="h-4 w-4" />} />
-        <Metric label="Saves" value={counts.bookmarks} icon={<Bookmark className="h-4 w-4" />} />
-      </div>
+      {hasPublicMetrics ? (
+        <div className="grid grid-cols-2 gap-2">
+          <Metric label="Views" value={counts.views} icon={<Eye className="h-4 w-4" />} />
+          <Metric label="Shares" value={counts.shares} icon={<Share2 className="h-4 w-4" />} />
+          <Metric label="Likes" value={counts.likes} icon={<Heart className="h-4 w-4" />} />
+          <Metric label="Saves" value={counts.bookmarks} icon={<Bookmark className="h-4 w-4" />} />
+        </div>
+      ) : (
+        <p className="rounded-lg border border-cwi-brown/14 bg-cwi-cream p-3 text-xs font-bold uppercase leading-5 tracking-[0.08em] text-cwi-ink/58">
+          Public activity will appear after real reader actions are recorded.
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-2">
         <button

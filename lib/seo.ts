@@ -131,9 +131,14 @@ export function cleanSeoTitle(title: string, maxLength = 60) {
   const candidate = withoutSuffix.length <= maxLength ? withoutSuffix : withoutSuffix;
   if (candidate.length <= maxLength) return candidate;
 
+  const beforeColon = candidate.split(":")[0]?.trim();
+  if (beforeColon && beforeColon.length >= 24 && beforeColon.length <= maxLength) {
+    return beforeColon;
+  }
+
   const clipped = candidate.slice(0, maxLength - 1);
   const lastSpace = clipped.lastIndexOf(" ");
-  return `${(lastSpace > 42 ? clipped.slice(0, lastSpace) : clipped).trim()}…`;
+  return (lastSpace > 42 ? clipped.slice(0, lastSpace) : clipped).trim();
 }
 
 function normalizeSeoImage(image: SeoImage) {

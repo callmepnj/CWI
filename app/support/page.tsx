@@ -16,12 +16,21 @@ export const metadata: Metadata = {
       "Support Cockroach Watch India - an independent civic watch platform that documents India's unanswered files. No party. No funder. Just citizens.",
     url: "https://cockroachwatchindia.online/support",
     siteName: "Cockroach Watch India",
-    type: "website"
+    type: "website",
+    images: [
+      {
+        url: "https://cockroachwatchindia.online/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Cockroach Watch India support page graphic for independent civic public memory"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
     title: "Support the Watch - Cockroach Watch India",
-    description: "No party. No funder. No compromise. Just citizens keeping the record honest."
+    description: "No party. No funder. No compromise. Just citizens keeping the record honest.",
+    images: ["https://cockroachwatchindia.online/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg"]
   }
 };
 
@@ -32,7 +41,7 @@ const refusalItems = [
   "We don't give platforms to hate -",
   "We don't forget what powerful people want buried -",
   "We don't pretend the system is fine -",
-  "We don't protect corrupt institutions -",
+  "We don't look away when institutions avoid accountability -",
   "We don't stay silent when youth are wronged -",
   "We don't take sides. We take notes. -",
   "We don't run from accountability. We run toward it. -"
@@ -76,11 +85,11 @@ export default function SupportPage() {
         <div className="mx-auto w-full max-w-7xl">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-[var(--cwi-accent-amber)]">This is not a party. This is not a brand.</p>
           <h1 className="cwi-word-reveal mt-6 max-w-5xl text-5xl font-black leading-[0.94] tracking-normal sm:text-7xl lg:text-8xl">
-            <span>We</span> <span>Don&apos;t</span> <span>Work</span> <span>for</span> <span>Them.</span><br />
-            <span>We</span> <span>Work</span> <span>for</span> <span>You.</span>
+            <span>We</span> <span>Don&apos;t</span> <span>Work</span> <span>for</span> <span>Pressure.</span><br />
+            <span>We</span> <span>Work</span> <span>for</span> <span>the</span> <span>Record.</span>
           </h1>
           <p className="mt-7 max-w-3xl animate-[word-rise_700ms_ease_1s_forwards] text-lg leading-8 text-[var(--cwi-text-secondary)] opacity-0 sm:text-xl">
-            CWI is fully independent. We have no political funder. No corporate sponsor. No party line. Just citizens documenting what India&apos;s powerful would rather you forget.
+            CWI is fully independent. We have no political funder. No corporate sponsor. No party line. Just citizens documenting public-interest questions that should not disappear from memory.
           </p>
           <div className="my-8 h-px w-full bg-[var(--cwi-accent-amber)] shadow-[0_0_18px_rgba(245,158,11,0.7)]" />
           <div className="grid gap-3 text-lg font-bold text-[var(--cwi-text-primary)]">

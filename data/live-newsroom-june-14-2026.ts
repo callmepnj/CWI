@@ -10,7 +10,7 @@ const cwiJune14Dossier: Source = {
   type: "User-submitted",
   reliabilityLabel: "Editor supplied research dossier",
   usedIn: "June 14 CWI Live Newsroom update",
-  supports: "Chronology, editorial leads, and unverified-claims ledger supplied to CWI for the June 14 newsroom update.",
+  supports: "Chronology, editorial leads, and the unverified-claims ledger supplied to CWI for the June 14 newsroom update.",
   doesNotProve: "It does not replace primary police orders, ministry records, court transcripts, platform notices, or full media URLs where those are not attached.",
   lastUsedAt: publishedAt
 };

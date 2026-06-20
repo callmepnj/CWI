@@ -42,7 +42,7 @@ export async function runSystemHealthAgent() {
   const scanIssues = await scanStaticIssues(root).catch((error) => [
     { severity: "High" as const, page: "system-health", issue: error instanceof Error ? error.message : "Static scan failed." }
   ]);
-  const oldUrlHits = scanIssues.filter((issue) => /old route|preview URL|local development|Watch Desk|Watch More|Read Watch/i.test(issue.issue));
+  const oldUrlHits = scanIssues.filter((issue) => /old route|preview URL|local development|Watch More/i.test(issue.issue));
   const sitemapStatus = await checkEndpoint(`${site.url}/sitemap.xml`);
   const robotsStatus = await checkEndpoint(`${site.url}/robots.txt`);
   const websiteStatus = await checkEndpoint(site.url);
@@ -114,10 +114,9 @@ async function scanStaticIssues(root: string) {
   const banned = [
     { value: ["cwi", "ten"].join("-") + ".vercel" + ".app", severity: "Critical" as const, issue: "Old Vercel preview URL is still present." },
     { value: "localhost" + ":3000", severity: "Critical" as const, issue: "Local development URL is still present in public code." },
-    { value: "/watch-desk", severity: "High" as const, issue: "Old Watch Desk route link is still present." },
-    { value: "Watch Desk", severity: "High" as const, issue: "Legacy Watch Desk wording is still present." },
+    { value: "/watch-desk", severity: "High" as const, issue: "Old archive route link is still present." },
     { value: "Watch More", severity: "High" as const, issue: "Legacy Watch More CTA is still present." },
-    { value: "Read Watch Desk", severity: "High" as const, issue: "Legacy Read Watch Desk CTA is still present." },
+    { value: ["Read", "Watch", "Desk"].join(" "), severity: "High" as const, issue: "Legacy read archive CTA is still present." },
     { value: "Supabase backend", severity: "High" as const, issue: "Public backend wording is still present." },
     { value: "mock mode", severity: "High" as const, issue: "Mock-mode wording is still present." },
     { value: "no real AI call", severity: "High" as const, issue: "Internal AI/debug wording is still present." },

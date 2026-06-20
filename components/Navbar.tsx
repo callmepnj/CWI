@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const primaryNavItems = [
   { label: "Home", href: "/" },
   { label: "Live Newsroom", href: "/live-newsroom" },
-  { label: "Watch Desk", href: "/archive" },
+  { label: "Archive", href: "/archive" },
   { label: "India Unanswered Files", href: "/india-unanswered-files" },
   { label: "Submit", href: "/submit" }
 ];

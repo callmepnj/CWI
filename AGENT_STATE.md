@@ -623,3 +623,75 @@ Next steps:
 - `npm run build` passed; sitemap remains 131 URLs / 213 static pages.
 - Generated Bharat article HTML references `/images/cwi/generated/hero/cwi-bharat-tiwari-case-explained.jpg` and `/images/cwi/generated/og/cwi-bharat-tiwari-case-explained.jpg`.
 - Generated Live Newsroom index HTML references `/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg`.
+
+## Live Newsroom June 15-20 CJP/NEET update (completed locally 2026-06-20)
+
+### Completed
+- Added `data/live-newsroom-june-15-20-2026.ts` with six approved public Live Newsroom records covering June 15, 16, 17, 18, 19, and 20 CJP/NEET developments.
+- Added public routes/slugs:
+  - `/live-newsroom/jaipur-cjp-protest-dipke-slapped-neet-accountability-june-15-2026`
+  - `/live-newsroom/cjp-one-month-nta-telegram-warning-neet-reexam-june-16-2026`
+  - `/live-newsroom/nagpur-cjp-victim-family-compensation-demand-june-17-2026`
+  - `/live-newsroom/cjp-announces-june-20-jantar-mantar-protest-neet-row-june-18-2026`
+  - `/live-newsroom/cjp-open-letter-pm-modi-thali-chammach-telegram-row-june-19-2026`
+  - `/live-newsroom/cjp-chalo-dilli-jantar-mantar-live-protest-june-20-2026`
+- Wired the new records into `data/live-newsroom.ts` so they appear in the public Live Newsroom feed between the Bharat Tiwari June 20 item and older June 14 items.
+- Updated `scripts/generate-static-seo.mjs` so the six new slugs are included in `public/sitemap.xml`.
+- Updated `/live-newsroom` metadata and hero stat line from `Updated: 14 June 2026` to `Updated: 20 June 2026`.
+- Used cautious source-backed wording and separated reported claims, official warnings, protest plans, and unresolved allegations.
+
+### Sources used
+- Times of India / PTI, June 16, 2026: Jaipur protest where Abhijeet Dipke was slapped.
+- Al Jazeera, June 16, 2026: CJP one-month movement context.
+- Times of India, June 16, 2026: NTA warning against Telegram leak/scam claims before June 21 re-exam.
+- Times of India, June 17, 2026: Nagpur visit to NEET victim's family and Rs 1 crore relief demand.
+- Times of India, June 18, 2026: CJP June 20 Jantar Mantar protest announcement.
+- The New Indian Express, June 19, 2026: open letter to PM Modi and compensation demand.
+- Hindustan Times, June 19-20, 2026: open letter coverage and live June 20 protest updates.
+- Times of India, June 20, 2026: thali-chammach appeal before Jantar Mantar protest.
+
+### Verification
+- `npm run typecheck` passed.
+- `npm run lint` passed.
+- `npm run build` passed.
+- Build regenerated `public/sitemap.xml` with 137 URLs / 219 static pages.
+- `public/sitemap.xml` includes all six June 15-20 CJP/NEET slugs.
+- Generated `/live-newsroom` HTML contains `Updated: 20 June 2026`.
+
+## Full website audit fixes (completed locally 2026-06-20)
+
+### Completed
+- Removed the generic `Why students / public are angry` article heading from Live Newsroom detail pages and replaced it with `Why this matters to readers`.
+- Added justice/accountability-specific narrative copy for high-sensitivity stories such as the Bharat Tiwari encounter case so exam-fee/student boilerplate is not shown on non-exam stories.
+- Added optional `timeline` support to `LiveNewsroomItem` and wired the Bharat Tiwari article to its real event timeline instead of the generated `Record opened / Last source check / Latest CWI update` filler.
+- Updated `cleanSeoTitle()` to avoid literal ellipsis characters in article title/OG/Twitter metadata and to use a complete pre-colon title for long colon-style headlines.
+- Replaced hardcoded `17` Live Newsroom unanswered-file counts with `unansweredFiles.length`; generated HTML now shows `18 Open Files` and `View All 18 Unanswered Files`.
+- Added Support page `og:image` and `twitter:image` metadata using the generated CWI newsroom graphic.
+- Softened Support page high-risk copy:
+  - `We don't protect corrupt institutions` -> `We don't look away when institutions avoid accountability`.
+  - `We Don't Work for Them. We Work for You.` -> `We Don't Work for Pressure. We Work for the Record.`
+- Changed navbar label from `Watch Desk` to `Archive` while keeping `/archive` route unchanged.
+- Added Telegram to the sitewide footer social links.
+- Stopped India Unanswered Files from padding real timelines with generic filler entries when file-specific timeline entries already exist.
+- Preserved each India Unanswered Files seed `seoDescription` instead of overwriting every file with a repeated template description.
+- Hid all-zero public metrics on India Unanswered Files detail pages behind a real-activity notice instead of displaying `Views 0 / Shares 0 / Likes 0 / Saves 0`.
+- Added a DPDP Act, 2023 reference to the Privacy Policy retention/safety section.
+- Cleaned the CJP June 14 source wording around the unverified-claims ledger.
+
+### Verification
+- `npm run typecheck` passed.
+- `npm run lint` passed.
+- `npm run build` passed.
+- Build regenerated `public/sitemap.xml` with 137 URLs / 219 static pages.
+- Targeted source-code check returned no matches for:
+  - `Why students / public are angry`
+  - `17 Open Files`
+  - `View All 17`
+  - `Watch Desk`
+  - `corrupt institutions`
+  - `We Don't Work for Them`
+  - `www.cockroachwatchindia`
+- Generated Bharat article HTML contains clean `og:title` / `twitter:title`: `Bharat Tiwari Encounter Case`.
+- Generated Bharat article HTML contains the real June 16/17 timeline content and no `exam failure` boilerplate.
+- Generated Support HTML contains `og:image` and `twitter:image`.
+- Generated Live Newsroom HTML contains `18 Open Files` and `View All 18 Unanswered Files`.

@@ -1,6 +1,7 @@
 ﻿// Live Newsroom - daily, source-led editorial records.
 
 import { june14LiveNewsroomItems, june14Sources } from "./live-newsroom-june-14-2026";
+import { june15To20LiveNewsroomItems } from "./live-newsroom-june-15-20-2026";
 import { june2026LiveNewsroomItems } from "./live-newsroom-june-2026";
 import { bharatTiwariLiveNewsroomItem } from "./live-newsroom-bharat-tiwari";
 import { resolveCwiNewsroomImage } from "@/lib/data/cwi-image-library";
@@ -108,6 +109,12 @@ export interface LiveNewsroomItem {
   whatWeKnow: string;
   whatWeDontKnow: string;
   sourceGap?: string;
+  timeline?: Array<{
+    date: string;
+    event: string;
+    source?: string;
+    verificationLabel?: string;
+  }>;
   sourceTrail: Source[];
   lastCheckedAt: string;
   lastUpdatedAt: string;
@@ -729,6 +736,7 @@ const baseLiveNewsroomItems: LiveNewsroomItem[] = [
 
 const rawLiveNewsroomItems: LiveNewsroomItem[] = [
   bharatTiwariLiveNewsroomItem,
+  ...june15To20LiveNewsroomItems,
   ...june14LiveNewsroomItems,
   ...june2026LiveNewsroomItems,
   ...baseLiveNewsroomItems

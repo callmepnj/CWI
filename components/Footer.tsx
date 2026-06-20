@@ -33,6 +33,7 @@ const footerGroups = [
       { label: "X", href: site.x },
       { label: "Instagram", href: site.instagram },
       { label: "YouTube", href: site.youtube },
+      { label: "Telegram", href: site.telegram },
       { label: "Reddit", href: site.reddit },
       { label: "Facebook", href: site.facebook },
       { label: "Bluesky", href: site.bluesky },

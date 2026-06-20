@@ -366,6 +366,7 @@ export const bharatTiwariLiveNewsroomItem: LiveNewsroomItem = {
     "It remains unclear whether independent video, CCTV, bodycam or unedited Facebook Live evidence covers the exact moment before shots were fired. It remains unclear whether there was a verified surrender attempt and what happened after the livestream stopped. CWI has not seen the post-mortem report, full police FIR, family complaint status, forensic or ballistic report, medical transfer records, or official magisterial/judicial inquiry findings.",
   sourceGap:
     "Full police FIR, post-mortem report, forensic/ballistic report, official inquiry order/status, verified unedited video/bodycam/CCTV and the status of the family's complaint remain needed.",
+  timeline,
   sourceTrail: liveSourceTrail,
   lastCheckedAt: updatedDate,
   lastUpdatedAt: updatedDate,

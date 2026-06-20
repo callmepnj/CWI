@@ -112,8 +112,8 @@ function withStandardAnswers(file: UnansweredFileSeed): UnansweredFile {
     ...file,
     timeline,
     ...buildImageFields(file.slug),
-    seoTitle: `${file.title} - CWI India Unanswered Files`,
-    seoDescription: `Cockroach Watch India documents ${file.title} as part of CWI India Unanswered Files, tracking public questions, civic memory, and source-backed context.`,
+    seoTitle: file.seoTitle || `${file.title} - CWI India Unanswered Files`,
+    seoDescription: file.seoDescription || `${file.title} remains open in CWI India Unanswered Files because source-backed questions about accountability, public harm, and official response still need tracking.`,
     sourceCount: file.sources.length,
     aiAnswers: [
       {
@@ -179,6 +179,10 @@ function publicImagePath(root: string, folder: string, filename: string) {
 
 function buildDateWiseTimeline(file: UnansweredFileSeed): FileTimelineItem[] {
   const timeline = [...file.timeline];
+  if (timeline.length > 0) {
+    return timeline.slice(0, 8);
+  }
+
   const primarySource = file.sources[0] ? [0] : [];
   const governmentSource = file.sections.find((section) => section.heading === "Government response")?.sourceIndex ?? primarySource;
   const humanSource = file.sections.find((section) => section.heading === "Human cost")?.sourceIndex ?? primarySource;

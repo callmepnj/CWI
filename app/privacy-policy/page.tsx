@@ -18,7 +18,7 @@ const sections = [
   ["Supporter notes", "Supporter notes appear publicly only when approved, consented, and verified. CWI does not publish transaction IDs, emails, phone numbers, UPI IDs, bank details, or internal notes."],
   ["Cookies and analytics", "CWI may use basic analytics, logs, or security tools to understand site reliability and abuse patterns. These tools should not be used to collect political preferences."],
   ["Sensitive data", "Do not submit Aadhaar, PAN, voter details, private addresses, private phone numbers, medical details, threats, hate, or unsupported allegations as fact."],
-  ["Retention and safety", "CWI keeps operational records as needed for editorial review, moderation, corrections, safety, and legal compliance. Unsafe or unnecessary material may be deleted or redacted."],
+  ["Retention and safety", "CWI keeps operational records as needed for editorial review, moderation, corrections, safety, and legal compliance, including India privacy obligations such as the Digital Personal Data Protection Act, 2023 where applicable. Unsafe or unnecessary material may be deleted or redacted."],
   ["Contact for removal", `For privacy, removal, correction, creator credit, or takedown requests, contact ${site.email}.`]
 ];
 

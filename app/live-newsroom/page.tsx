@@ -7,13 +7,14 @@ import { PageBackgroundGesture } from "@/components/PageBackgroundGesture";
 import { PollCard } from "@/components/PollCard";
 import { getPublicLiveNewsroomItems } from "@/data/live-newsroom";
 import { sourcePackUnansweredFileCard } from "@/data/live-newsroom-source-pack";
+import { unansweredFiles } from "@/data/unanswered-files";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "CWI Live Newsroom - Cockroach Watch India Latest Updates",
   description:
-    "CWI Live Newsroom by Cockroach Watch India tracks source-backed updates on NEET 2026, NTA accountability, student protests, India Unanswered Files, and civic issues with verified context. Updated through June 14, 2026.",
+    "CWI Live Newsroom by Cockroach Watch India tracks source-backed updates on NEET 2026, NTA accountability, student protests, India Unanswered Files, and civic issues with verified context. Updated through June 20, 2026.",
   alternates: { canonical: "https://cockroachwatchindia.online/live-newsroom" },
   openGraph: {
     title: "CWI Live Newsroom - India Is Watching",
@@ -125,6 +126,7 @@ const files = [
 
 export default function LiveNewsroomPage() {
   const newsroomItems = getPublicLiveNewsroomItems();
+  const unansweredFileCount = unansweredFiles.length;
 
   return (
     <PageBackgroundGesture intensity="moderate">
@@ -148,7 +150,7 @@ export default function LiveNewsroomPage() {
             </Link>
           </div>
           <div className="mt-8 rounded-lg border border-[var(--cwi-border)] bg-[var(--cwi-card)] px-4 py-3 font-mono text-xs font-bold uppercase tracking-[0.08em] text-[var(--cwi-accent-amber)] shadow-[0_18px_50px_var(--cwi-shadow-soft)] sm:text-sm">
-            17 Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 14 June 2026
+            {unansweredFileCount} Open Files <span className="text-[var(--cwi-text-secondary)]">|</span> 3 Active Investigations <span className="text-[var(--cwi-text-secondary)]">|</span> 22L+ Students Affected by NEET Leak <span className="text-[var(--cwi-text-secondary)]">|</span> Updated: 20 June 2026
           </div>
         </div>
       </section>
@@ -221,7 +223,7 @@ export default function LiveNewsroomPage() {
             <p className="mt-3 text-sm font-bold leading-6 text-[var(--cwi-text-secondary)]">{sourcePackUnansweredFileCard.summary}</p>
           </div>
           <Link href="/india-unanswered-files" className="grid min-w-[270px] place-items-center rounded-lg border border-[var(--cwi-accent-blue)]/45 bg-[var(--cwi-accent-blue)]/10 p-5 text-center font-black text-[var(--cwi-text-primary)]">
-            View All 17 Unanswered Files <ArrowRight className="mt-3 h-5 w-5" />
+            View All {unansweredFileCount} Unanswered Files <ArrowRight className="mt-3 h-5 w-5" />
           </Link>
         </div>
       </section>

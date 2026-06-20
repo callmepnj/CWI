@@ -131,7 +131,7 @@ export default async function LiveNewsroomDetailPage({ params }: Props) {
             {narrative.whatHappened.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
           </ArticleSection>
 
-          <ArticleSection title="Why students / public are angry">
+          <ArticleSection title="Why this matters to readers">
             <p>{narrative.whyPeopleCare}</p>
           </ArticleSection>
 
@@ -256,6 +256,7 @@ function InfoCard({ title, items, tone }: { title: string; items: string[]; tone
 function buildArticleNarrative(item: DetailItem) {
   const isStudent = /student|neet|cbse|exam|nta|cuet|ssc/i.test(`${item.title} ${item.category} ${item.summary}`);
   const isDigital = /x account|platform|withheld|social|quote|portal|screenshot/i.test(`${item.title} ${item.summary}`);
+  const isJustice = /encounter|police|death|custody|justice|accountability|fir|court|legal/i.test(`${item.title} ${item.category} ${item.summary}`);
   const whatWeKnow = splitFacts(item.whatWeKnow, item.sourceTrail.map((source) => `${source.name} is used for ${source.supports || source.usedIn || source.usedFor?.join(", ") || "source-backed context"}.`));
   const whatRemainsUnclear = splitFacts(item.whatWeDontKnow, item.sourceGap ? [item.sourceGap] : []);
 
@@ -270,6 +271,8 @@ function buildArticleNarrative(item: DetailItem) {
       ? "Students and families are affected by more than headlines. Preparation time, application fees, travel, coaching costs, family pressure, mental stress, and future uncertainty all increase when exam systems appear unreliable or unclear. That is why CWI treats student-facing updates as public-interest records, not quick viral posts."
       : isDigital
         ? "Readers care because platform restrictions, technical claims, and viral screenshots can shape public memory quickly. If the source trail is weak, people may share claims that later turn out to be incomplete, disputed, or wrongly framed."
+        : isJustice
+          ? "Readers care because a contested death, police action, FIR, court record, or public-accountability claim cannot be reduced to viral anger. The public needs a separated record of official versions, family or public allegations, source-backed facts, and what still needs independent verification."
         : "The public impact is trust. When civic updates move quickly, readers need a clear record of what happened, who is affected, what sources support it, and what remains unresolved.",
     whatWeKnow,
     whatRemainsUnclear,
@@ -277,6 +280,8 @@ function buildArticleNarrative(item: DetailItem) {
       ? "This matters because an exam failure is not just a technical problem. It affects trust, money, preparation, families, and the future of students who already operate under extreme pressure."
       : isDigital
         ? "This matters because online platform restrictions and technical disputes can affect speech, public memory, civic participation, and the way young people understand a developing issue."
+        : isJustice
+          ? "This matters because accountability protects citizens and honest institutions at the same time. When the official version and public allegations conflict, evidence, due process, medical records, FIRs, and inquiry findings matter more than noise."
         : "This matters because public records should remain readable after the news cycle moves on. CWI documents the source trail so future readers can see what was known, what was unclear, and what changed.",
     cwiContext: `Cockroach Watch India - CWI is tracking this update through the CWI Live Newsroom as part of its public archive on youth voice, civic issues, digital rights, exam accountability, and India's unanswered questions. CWI's role is to document, verify, and amplify public-interest updates with source attribution and editorial caution.`,
     timeline: buildTimeline(item)
@@ -296,6 +301,14 @@ function splitParagraphs(value: string) {
 }
 
 function buildTimeline(item: DetailItem) {
+  if (item.timeline?.length) {
+    return item.timeline.map((event) => ({
+      date: event.date,
+      title: event.verificationLabel || event.source || "Timeline update",
+      body: event.event
+    }));
+  }
+
   return [
     { date: formatDate(item.createdAt), title: "Record opened", body: item.summary },
     { date: formatDate(item.lastCheckedAt), title: "Last source check", body: item.whatChanged },
