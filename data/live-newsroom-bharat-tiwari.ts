@@ -1,3 +1,4 @@
+import type { LiveNewsroomItem, Source } from "@/data/live-newsroom";
 import type { PendingNewsroomRecord } from "@/data/live-newsroom-pending";
 
 const canonical = "https://cockroachwatchindia.online/live-newsroom/bharat-tiwari-encounter-case-explained";
@@ -86,6 +87,17 @@ const sourceTable = [
       "Internal research lead, not a primary public source. Used to identify lines of inquiry; claims are included only when backed by named reporting or clearly labelled contested."
   }
 ];
+
+const liveSourceTrail: Source[] = sourceTable.map((source, index) => ({
+  id: `src-bharat-tiwari-${index + 1}`,
+  name: `${source.sourceName} - ${source.title}`,
+  url: source.url,
+  type: source.sourceName.startsWith("CWI") ? "User-submitted" : "Established media",
+  reliabilityLabel: source.reliabilityNote,
+  supports: source.supports,
+  doesNotProve: source.reliabilityNote,
+  lastUsedAt: updatedDate
+}));
 
 const timeline = [
   {
@@ -319,11 +331,63 @@ export const bharatTiwariPendingRecord: PendingNewsroomRecord = {
   },
   sourceTable,
   image: {
-    heroImage: "/images/cwi/newsroom/hero/cwi-police-standoff-public-safety-01.jpg",
-    thumbnailImage: "/images/cwi/newsroom/thumbnails/cwi-police-standoff-public-safety.jpg",
-    ogImage: "/images/cwi/newsroom/og/cwi-police-standoff-public-safety.jpg",
+    heroImage: "/images/cwi/generated/hero/cwi-bharat-tiwari-case-explained.jpg",
+    thumbnailImage: "/images/cwi/generated/thumbnails/cwi-bharat-tiwari-case-explained.jpg",
+    ogImage: "/images/cwi/generated/og/cwi-bharat-tiwari-case-explained.jpg",
     altText:
       "CWI Live Newsroom graphic explaining the Bharat Tiwari encounter case, family allegations, police version, and unanswered questions.",
     imageCredit: "CWI Original Graphic"
   }
+};
+
+export const bharatTiwariLiveNewsroomItem: LiveNewsroomItem = {
+  id: "live-bharat-tiwari-encounter-case-2026-06-20",
+  slug: "bharat-tiwari-encounter-case-explained",
+  title: "Bharat Tiwari Encounter Case: What We Know, What Is Alleged, and What Still Needs Answers",
+  summary:
+    "Bharat Bhushan Tiwari's death after a reported police/STF encounter in Bhojpur has triggered serious public questions. Police describe self-defence during an armed threat; family members reportedly allege he had surrendered or thrown away his weapon before being shot.",
+  content:
+    "Short answer: Bharat Bhushan Tiwari, a young man from Bilauti village in Bhojpur district, Bihar, died after a reported police/STF encounter on 17 June 2026. His family and supporters have reportedly alleged that he had surrendered or thrown away his weapon before being shot. Police reports say he was armed, had fired at police and public safety was at risk. CWI is separating the police version, family allegations, protest reaction and verified source trail because the claims remain contested. CWI does not independently declare the encounter fake or genuine.",
+  status: "Developing",
+  sections: ["lead-story", "top-3", "what-changed", "latest-updates", "verification-desk", "source-ledger", "featured"],
+  category: "Public Accountability / Justice Watch",
+  isLeadStory: true,
+  topStoryRank: 1,
+  priorityScore: 150,
+  changeType: "New update",
+  labels: ["NEW TODAY", "UPDATED TODAY", "SOURCE REQUEST OPEN"],
+  editorNote:
+    "This is a high-sensitivity developing case. CWI is not calling the encounter fake or genuine. Police version, family allegations, public reaction, legal developments and unanswered questions are tracked separately until official inquiry findings, post-mortem details, FIRs, forensic reports or court records become available.",
+  whatChanged:
+    "CWI added a public Live Newsroom record on the Bharat Tiwari case covering reported Jawaniya public-work context, the June 16 armed confrontation video, the June 17 police/STF encounter, PMCH death, police self-defence version, family surrender allegations, protests, suspensions, FIR developments, political demands and current evidence gaps.",
+  whatWeKnow:
+    "Bharat Bhushan Tiwari died after a reported police/STF encounter in Bhojpur, Bihar, on 17 June 2026. Police reports say he was armed, had fired or threatened police, and that police/STF fired in self-defence. Multiple reports say he livestreamed parts of the standoff or confrontation. His family has reportedly disputed the police version and alleged he had surrendered or thrown away his weapon before being shot. ThePrint/PTI reported four police personnel including Shahpur SHO Rajesh Kumar Malakar were suspended over the June 16 response. Navbharat Times reported FIRs against Tiwari's father, brother and the Bilauti panchayat head after protest/public-order allegations. Ara MP Sudama Prasad reportedly demanded impartial inquiry, compensation and accountability.",
+  whatWeDontKnow:
+    "It remains unclear whether independent video, CCTV, bodycam or unedited Facebook Live evidence covers the exact moment before shots were fired. It remains unclear whether there was a verified surrender attempt and what happened after the livestream stopped. CWI has not seen the post-mortem report, full police FIR, family complaint status, forensic or ballistic report, medical transfer records, or official magisterial/judicial inquiry findings.",
+  sourceGap:
+    "Full police FIR, post-mortem report, forensic/ballistic report, official inquiry order/status, verified unedited video/bodycam/CCTV and the status of the family's complaint remain needed.",
+  sourceTrail: liveSourceTrail,
+  lastCheckedAt: updatedDate,
+  lastUpdatedAt: updatedDate,
+  displayImage: "/images/cwi/generated/hero/cwi-bharat-tiwari-case-explained.jpg",
+  displayImageAlt:
+    "CWI Live Newsroom graphic explaining the Bharat Tiwari encounter case, family allegations, police version, and unanswered questions.",
+  heroImage: "/images/cwi/generated/hero/cwi-bharat-tiwari-case-explained.jpg",
+  thumbnailImage: "/images/cwi/generated/thumbnails/cwi-bharat-tiwari-case-explained.jpg",
+  ogImage: "/images/cwi/generated/og/cwi-bharat-tiwari-case-explained.jpg",
+  altText:
+    "CWI Live Newsroom graphic explaining the Bharat Tiwari encounter case, family allegations, police version, and unanswered questions.",
+  imageCredit: "CWI Original Graphic",
+  imageCategory: "Live Newsroom",
+  imageSource: "CWI Original / CWI Graphic",
+  correctionOpen: true,
+  sourceRequestOpen: true,
+  hiddenFromLiveNewsroom: false,
+  isArchivedContext: false,
+  approvalStatus: "approved",
+  originalPublishDate: updatedDate,
+  createdAt: updatedDate,
+  updatedAt: updatedDate,
+  publishedAt: updatedDate,
+  approvedBy: "Cockroach Watch India Editorial Desk"
 };

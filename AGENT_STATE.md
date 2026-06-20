@@ -584,3 +584,42 @@ Next steps:
 - `npm run lint` passed.
 - `npm run build` passed.
 - Build regenerated `public/sitemap.xml` with 130 URLs, confirming the pending Bharat Tiwari draft was not auto-published into public routes/sitemap.
+
+## Bharat Tiwari Live Newsroom article (published locally 2026-06-20)
+
+### Completed
+- Moved the Bharat Tiwari case from pending-only draft into approved public Live Newsroom data as `bharatTiwariLiveNewsroomItem`.
+- Wired `bharatTiwariLiveNewsroomItem` into `data/live-newsroom.ts` so it appears on `/live-newsroom` and generates `/live-newsroom/bharat-tiwari-encounter-case-explained`.
+- Kept wording legally cautious: the encounter is not declared fake or genuine; police version and family allegations remain separated and attributed.
+- Added source-backed public record fields: summary, short answer, what changed, what we know, what remains unclear, source gap, editor note, eight-source trail, image metadata, canonical-ready slug, and approved/published timestamps.
+- Updated `scripts/generate-static-seo.mjs` to include the Bharat Tiwari newsroom data file in sitemap generation.
+
+### Verification
+- `npm run typecheck` passed.
+- `npm run lint` passed.
+- `npm run build` passed.
+- Build generated 131 sitemap URLs / 213 static pages.
+- Build output lists `/live-newsroom/bharat-tiwari-encounter-case-explained` under static Live Newsroom routes.
+- `public/sitemap.xml` includes `https://cockroachwatchindia.online/live-newsroom/bharat-tiwari-encounter-case-explained`.
+- Generated HTML contains canonical, `NewsArticle` JSON-LD, `BreadcrumbList` JSON-LD, article metadata, OG image, and the caution line that CWI does not independently declare the encounter fake or genuine.
+
+## CWI generated image rollout (completed locally 2026-06-20)
+
+### Completed
+- Extracted `C:\Users\praka\Downloads\download (2).zip` to a temp folder and selected 24 CWI-relevant HD JPEGs for newsroom, Bharat Tiwari, protests, paper-leak, public-advisory, digital-rights, and archive/fallback uses.
+- Generated optimized web variants with `sharp`:
+  - `public/images/cwi/generated/hero/` at 1600x900.
+  - `public/images/cwi/generated/thumbnails/` at 800x450.
+  - `public/images/cwi/generated/og/` at 1200x630.
+  - `public/images/cwi/generated/originals/` preserving selected original files.
+  - `public/images/cwi/generated/generated-image-manifest.csv` mapping source files to generated paths.
+- Updated `lib/data/cwi-image-library.ts` so Live Newsroom topic resolution now uses the generated HD images for NEET/paper leak, Jantar Mantar, CJP/cockroach wave, Bengaluru, Amritsar, night rallies, public advisory, digital rights, police/justice watch, Bharat Tiwari, June 20 CJP protest, and fallback newsroom visuals.
+- Updated Bharat Tiwari public article image fields to use `/images/cwi/generated/.../cwi-bharat-tiwari-case-explained.jpg`.
+- Updated `/live-newsroom` metadata OG/Twitter image to use `/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg`.
+
+### Verification
+- `npm run typecheck` passed.
+- `npm run lint` passed without warnings.
+- `npm run build` passed; sitemap remains 131 URLs / 213 static pages.
+- Generated Bharat article HTML references `/images/cwi/generated/hero/cwi-bharat-tiwari-case-explained.jpg` and `/images/cwi/generated/og/cwi-bharat-tiwari-case-explained.jpg`.
+- Generated Live Newsroom index HTML references `/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg`.

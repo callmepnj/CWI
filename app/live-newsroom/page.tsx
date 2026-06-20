@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://cockroachwatchindia.online/images/cwi/newsroom/og/cwi-live-newsroom-fallback.jpg",
+        url: "https://cockroachwatchindia.online/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg",
         alt: "CWI Live Newsroom graphic representing youth voice, public accountability, and India's unanswered questions"
       }
     ]
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CWI Live Newsroom - India Is Watching",
     description: "Source-backed civic newsroom. NEET 2026 coverage, India Unanswered Files, protest updates, and public memory archive.",
-    images: ["https://cockroachwatchindia.online/images/cwi/newsroom/og/cwi-live-newsroom-fallback.jpg"]
+    images: ["https://cockroachwatchindia.online/images/cwi/generated/og/cwi-newsroom-timeline-cards-hd.jpg"]
   }
 };
 

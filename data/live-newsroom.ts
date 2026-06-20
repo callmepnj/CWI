@@ -2,6 +2,7 @@
 
 import { june14LiveNewsroomItems, june14Sources } from "./live-newsroom-june-14-2026";
 import { june2026LiveNewsroomItems } from "./live-newsroom-june-2026";
+import { bharatTiwariLiveNewsroomItem } from "./live-newsroom-bharat-tiwari";
 import { resolveCwiNewsroomImage } from "@/lib/data/cwi-image-library";
 
 export type NewsroomItemStatus =
@@ -727,6 +728,7 @@ const baseLiveNewsroomItems: LiveNewsroomItem[] = [
 ];
 
 const rawLiveNewsroomItems: LiveNewsroomItem[] = [
+  bharatTiwariLiveNewsroomItem,
   ...june14LiveNewsroomItems,
   ...june2026LiveNewsroomItems,
   ...baseLiveNewsroomItems
