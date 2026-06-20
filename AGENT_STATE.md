@@ -569,3 +569,18 @@ Next steps:
 
 ### Production note
 - Live production currently serves `www.cockroachwatchindia.online` as 200 and redirects apex to www. Source code and generated HTML are non-www canonical. Vercel domain primary should still be set to apex if the desired canonical remains `https://cockroachwatchindia.online`.
+
+## Bharat Tiwari Live Newsroom draft (queued 2026-06-20)
+
+### Completed
+- Added `data/live-newsroom-bharat-tiwari.ts` with a high-sensitivity pending CWI Live Newsroom draft for slug `bharat-tiwari-encounter-case-explained`.
+- Draft uses editor-supplied research plus named source-backed reporting from The Indian Express, Times of India, PTI/ThePrint, Navbharat Times, Live Hindustan, Social News XYZ, and Times of India Jawaniya erosion context.
+- Draft separates police version, family/supporter allegations, what is source-backed, what remains unclear, timeline, CWI context, verification note, responsible-sharing note, submit-correction CTA, image metadata, source table, and SEO preview.
+- Added the draft to `pendingNewsroomRecords` only. It is not published because the approval workflow exists.
+- Extended the admin pending queue preview to display approval-card fields: summary, police version, family allegation summary, timeline preview, unanswered questions, SEO preview, and source-table summary.
+
+### Verification
+- `npm run typecheck` passed.
+- `npm run lint` passed.
+- `npm run build` passed.
+- Build regenerated `public/sitemap.xml` with 130 URLs, confirming the pending Bharat Tiwari draft was not auto-published into public routes/sitemap.

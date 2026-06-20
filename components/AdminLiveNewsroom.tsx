@@ -291,7 +291,14 @@ function PendingQueuePanel() {
           details: [
             record.draftPreview ? `Draft preview: ${record.draftPreview}` : "",
             record.draftPreview ? "Full article sections: short answer, what happened, why students/public are angry, what we know, what remains unclear, why it matters, CWI context, timeline, sources, verification note, submit correction CTA" : "",
+            record.approvalCard ? `Approval card summary: ${record.approvalCard.summary}` : "",
+            record.approvalCard ? `Police version summary: ${record.approvalCard.policeVersionSummary}` : "",
+            record.approvalCard ? `Family allegation summary: ${record.approvalCard.familyAllegationSummary}` : "",
+            record.approvalCard?.timelinePreview?.length ? `Timeline preview: ${record.approvalCard.timelinePreview.join(" | ")}` : "",
+            record.approvalCard?.whatRemainsUnclear?.length ? `What remains unclear: ${record.approvalCard.whatRemainsUnclear.join("; ")}` : "",
             record.seoPreview ? `SEO canonical: ${record.seoPreview.canonical}` : "",
+            record.approvalCard ? `SEO preview: ${record.approvalCard.seoPreview}` : "",
+            record.sourceTable?.length ? `Source table: ${record.sourceTable.map((source) => `${source.sourceName} (${source.date}) - ${source.supports}`).join(" | ")}` : "",
             record.socialPreview?.x ? `Social preview: ${record.socialPreview.x}` : "",
             record.sourceGaps?.length ? `Source gaps: ${record.sourceGaps.join("; ")}` : ""
           ].filter(Boolean)

@@ -1,4 +1,5 @@
 import type { SourceType } from "@/data/live-newsroom";
+import { bharatTiwariPendingRecord } from "@/data/live-newsroom-bharat-tiwari";
 import { cjpExamSourcePackRecords } from "@/data/live-newsroom-source-pack";
 
 export type PendingNewsroomRecord = {
@@ -30,6 +31,33 @@ export type PendingNewsroomRecord = {
   socialPreview?: Record<string, string>;
   sourceGaps?: string[];
   timeline?: Array<{ date: string; event: string; source: string; verificationLabel: string }>;
+  fullArticleDraft?: string;
+  approvalCard?: {
+    summary: string;
+    verificationStatus: string;
+    riskLevel: string;
+    sourceCount: number;
+    timelinePreview: string[];
+    policeVersionSummary: string;
+    familyAllegationSummary: string;
+    whatRemainsUnclear: string[];
+    seoPreview: string;
+  };
+  sourceTable?: Array<{
+    sourceName: string;
+    title: string;
+    date: string;
+    url: string;
+    supports: string;
+    reliabilityNote: string;
+  }>;
+  image?: {
+    heroImage: string;
+    thumbnailImage: string;
+    ogImage: string;
+    altText: string;
+    imageCredit: string;
+  };
 };
 
 const basePendingNewsroomRecords: PendingNewsroomRecord[] = [
@@ -181,6 +209,7 @@ const basePendingNewsroomRecords: PendingNewsroomRecord[] = [
 ];
 
 export const pendingNewsroomRecords: PendingNewsroomRecord[] = [
+  bharatTiwariPendingRecord,
   ...basePendingNewsroomRecords,
   ...cjpExamSourcePackRecords
 ];
